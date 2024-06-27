@@ -36,6 +36,12 @@ dependencies {
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
+allOpen {
+	annotations("jakarta.persistence.Entity")
+	annotation("jakarta.persistence.Embeddable")
+	annotation("jakarta.persistence.MappedSuperclass")
+}
+
 kotlin {
 	compilerOptions {
 		freeCompilerArgs.addAll("-Xjsr305=strict")
