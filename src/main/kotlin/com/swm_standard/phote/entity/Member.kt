@@ -13,7 +13,7 @@ data class Member(
 
 //    @OneToMany
 //    @JoinColumn(name = "workbookId")
-//    val workBook: List<WorkBook>,
+//    val workBook: List<Workbook>,
 
     @CreationTimestamp
     val createdAt: LocalDateTime = LocalDateTime.now(),

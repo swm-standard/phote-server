@@ -5,7 +5,7 @@ import org.hibernate.annotations.CreationTimestamp
 import java.time.LocalDateTime
 
 @Entity
-data class WorkBook(
+data class Workbook(
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "workbook_id")
@@ -15,11 +15,11 @@ data class WorkBook(
 
     val description: String?,
 
-    @ManyToOne(cascade = [(CascadeType.REMOVE)])
+    @ManyToOne
     @JoinColumn(name = "member_id")
     val member: Member,
 
-    @OneToMany(mappedBy = "workbook", cascade = [(CascadeType.REMOVE)])
+    @OneToMany(mappedBy = "workbook")
     val questionSet: Set<QuestionSet>?,
 
     @CreationTimestamp

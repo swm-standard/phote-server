@@ -22,7 +22,7 @@ data class Question(
 
     val category: String,
 
-    @OneToMany(mappedBy = "question", cascade = [(CascadeType.REMOVE)])
+    @OneToMany(mappedBy = "question")
     val questionSet: Set<QuestionSet>?,
 
     @JoinColumn(name = "tag_id", nullable = true)

@@ -4,7 +4,7 @@ import jakarta.persistence.*
 
 @Entity
 data class Tag(
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "tag_id")
     val id: Long,
 

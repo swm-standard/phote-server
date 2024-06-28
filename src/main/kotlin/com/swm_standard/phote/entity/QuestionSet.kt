@@ -15,7 +15,7 @@ data class QuestionSet(
 
     @ManyToOne
     @JoinColumn(name = "workbook_id")
-    val workbook: WorkBook,
+    val workbook: Workbook,
 
     val createdAt: LocalDateTime,
     val deletedAt: LocalDateTime?,
