@@ -8,5 +8,9 @@ data class Tag(
     @Column(name = "tag_id")
     val id: Long,
 
-    val name: String
+    val name: String,
+
+    @OneToMany(mappedBy = "tag")
+    val questions: List<QuestionTag>,
+
 )

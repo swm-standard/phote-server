@@ -20,14 +20,16 @@ data class Question(
 
     val answer: String?,
 
+    val category: String,
+
     @OneToMany(mappedBy = "question", cascade = [(CascadeType.REMOVE)])
     val questionSet: Set<QuestionSet>?,
 
     @JoinColumn(name = "tag_id", nullable = true)
     @OneToMany
-    val tags: Set<Tag>,
+    val tags: Set<QuestionTag>,
 
-    val memo: String?,
+val memo: String?,
 
     @CreationTimestamp
     val createdAt: LocalDateTime,
