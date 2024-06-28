@@ -18,8 +18,6 @@ data class Question(
 
     val image: String?,
 
-    val category: String,
-
     val answer: String?,
 
     @OneToMany(mappedBy = "question", cascade = [(CascadeType.REMOVE)])
