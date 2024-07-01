@@ -1,6 +1,7 @@
 package com.swm_standard.phote.entity
 
 import jakarta.persistence.*
+import java.time.LocalDateTime
 
 @Entity
 data class Tag(
@@ -8,9 +9,12 @@ data class Tag(
     @Column(name = "tag_id")
     val id: Long,
 
+    @Column(unique = true)
     val name: String,
 
-    @OneToMany(mappedBy = "tag")
-    val questions: List<QuestionTag>,
+    @JoinColumn(name = "question_id")
+    @ManyToOne
+    val question: Question,
 
+    val deletedAt: LocalDateTime?
 )
