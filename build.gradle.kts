@@ -2,6 +2,7 @@ plugins {
 	id("org.springframework.boot") version "3.3.1"
 	id("io.spring.dependency-management") version "1.1.5"
 	id("org.asciidoctor.jvm.convert") version "3.3.2"
+	id ("io.sentry.jvm.gradle") version "4.8.0"
 	kotlin("plugin.jpa") version "1.9.24"
 	kotlin("jvm") version "1.9.24"
 	kotlin("plugin.spring") version "1.9.24"
@@ -53,4 +54,21 @@ tasks.test {
 tasks.asciidoctor {
 	inputs.dir(project.extra["snippetsDir"]!!)
 	dependsOn(tasks.test)
+}
+
+buildscript {
+	repositories {
+		mavenCentral()
+	}
+}
+
+sentry {
+	// Generates a JVM (Java, Kotlin, etc.) source bundle and uploads your source code to Sentry.
+	// This enables source context, allowing you to see your source
+	// code as part of your stack traces in Sentry.
+	includeSourceContext = true
+
+	org = "swm-standard"
+	projectName = "phote"
+	authToken = System.getenv("SENTRY_AUTH_TOKEN")
 }
