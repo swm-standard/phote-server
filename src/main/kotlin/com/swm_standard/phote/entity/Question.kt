@@ -27,7 +27,7 @@ data class Question(
 
     val image: String?,
 
-    val answer: String?,
+    val answer: String,
 
     val category: String,
 

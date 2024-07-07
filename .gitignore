@@ -151,3 +151,4 @@ replay_pid*
 /dataSources/
 /dataSources.local.xml
 
+application.properties
