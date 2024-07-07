@@ -1,8 +1,8 @@
-package com.swm_standard.phote.common.authority.service
+package com.swm_standard.phote.service
 
 import com.swm_standard.phote.common.authority.JwtTokenProvider
-import com.swm_standard.phote.common.authority.dto.GoogleAccessResponseDto
-import com.swm_standard.phote.common.authority.dto.UserInfoResponseDto
+import com.swm_standard.phote.dto.GoogleAccessResponseDto
+import com.swm_standard.phote.dto.UserInfoResponseDto
 import com.swm_standard.phote.repository.MemberRepository
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpEntity

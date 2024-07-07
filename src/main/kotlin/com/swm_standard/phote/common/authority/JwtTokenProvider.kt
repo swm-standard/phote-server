@@ -1,6 +1,6 @@
 package com.swm_standard.phote.common.authority
 
-import com.swm_standard.phote.common.authority.dto.UserInfoResponseDto
+import com.swm_standard.phote.dto.UserInfoResponseDto
 import io.jsonwebtoken.*
 import io.jsonwebtoken.io.Decoders
 import io.jsonwebtoken.security.Keys

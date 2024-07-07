@@ -1,4 +1,4 @@
-package com.swm_standard.phote.common.authority.dto
+package com.swm_standard.phote.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.util.UUID

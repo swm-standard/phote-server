@@ -1,7 +1,7 @@
-package com.swm_standard.phote.common.authority.controller
+package com.swm_standard.phote.controller
 
-import com.swm_standard.phote.common.authority.dto.UserInfoResponseDto
-import com.swm_standard.phote.common.authority.service.AuthService
+import com.swm_standard.phote.dto.UserInfoResponseDto
+import com.swm_standard.phote.service.AuthService
 import com.swm_standard.phote.common.responsebody.BaseResponse
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.bind.annotation.GetMapping
