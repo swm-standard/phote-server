@@ -2,6 +2,7 @@ package com.swm_standard.phote.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.validation.constraints.NotBlank
+import java.time.LocalDateTime
 import java.util.UUID
 
 data class CreateWorkbookRequest(
@@ -24,4 +25,10 @@ data class CreateWorkbookRequest(
 
 data class CreateWorkbookResponse(
     val id: UUID
+)
+
+data class DeleteWorkbookResponse(
+    val id: UUID,
+
+    val deletedAt: LocalDateTime
 )
