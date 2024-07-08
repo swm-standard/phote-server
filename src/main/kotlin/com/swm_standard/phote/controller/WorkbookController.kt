@@ -29,8 +29,4 @@ class WorkbookController(private val workbookService: WorkbookService) {
 
         return BaseResponse(msg = "문제집 생성 성공", data = workbook)
     }
-
-    @GetMapping("/test")
-    fun test(@MemberId memberId: String) {
-    }
 }
