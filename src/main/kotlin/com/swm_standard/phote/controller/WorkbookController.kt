@@ -1,6 +1,5 @@
 package com.swm_standard.phote.controller
 
-import com.fasterxml.jackson.databind.ser.Serializers.Base
 import com.swm_standard.phote.common.responsebody.BaseResponse
 import com.swm_standard.phote.dto.DeleteWorkbookResponse
 import com.swm_standard.phote.dto.CreateWorkbookRequest
@@ -39,6 +38,7 @@ class WorkbookController(private val workbookService: WorkbookService) {
 
     @GetMapping("/workbook/{workbookId}")
     fun readWorkbookDetail(@Valid @PathVariable workbookId: UUID): BaseResponse<ReadWorkbookDetailResponse> {
+
         val workbookDetail = workbookService.readWorkbookDetail(workbookId)
 
         return BaseResponse(msg = "문제집 정보 읽기 성공", data = workbookDetail)

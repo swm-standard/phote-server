@@ -6,20 +6,17 @@ import com.swm_standard.phote.dto.DeleteWorkbookResponse
 import com.swm_standard.phote.dto.ReadWorkbookDetailResponse
 import com.swm_standard.phote.entity.Workbook
 import com.swm_standard.phote.repository.MemberRepository
-import com.swm_standard.phote.repository.QuestionRepository
 import com.swm_standard.phote.repository.QuestionSetRepository
 import com.swm_standard.phote.repository.WorkbookRepository
 import jakarta.transaction.Transactional
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 import java.util.UUID
 
 @Service
 class WorkbookService(
     private val workbookRepository: WorkbookRepository,
     private val memberRepository: MemberRepository,
-    private val questionRepository: QuestionRepository,
     private val questionSetRepository: QuestionSetRepository
 ) {
 
@@ -32,7 +29,7 @@ class WorkbookService(
 
     @Transactional
     fun deleteWorkbook(id: UUID): DeleteWorkbookResponse {
-        var workbook = workbookRepository.findWorkbookById(id) ?: throw NotFoundException()
+        val workbook = workbookRepository.findWorkbookById(id) ?: throw NotFoundException()
         if (workbook.deletedAt != null) throw AlreadyDeletedException("workbook")
 
 
