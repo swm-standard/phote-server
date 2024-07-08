@@ -39,9 +39,10 @@ data class Workbook(
     @CreationTimestamp
     val createdAt: LocalDateTime = LocalDateTime.now()
 
-    val deletedAt: LocalDateTime? = null
+    var deletedAt: LocalDateTime? = null
 
     @LastModifiedDate
+    @Column(updatable = false)
     var modifiedAt: LocalDateTime? = null
 
 }

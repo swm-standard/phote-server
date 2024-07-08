@@ -1,15 +1,14 @@
 package com.swm_standard.phote.controller
 
 import com.swm_standard.phote.common.responsebody.BaseResponse
+import com.swm_standard.phote.dto.DeleteWorkbookResponse
 import com.swm_standard.phote.dto.CreateWorkbookRequest
 import com.swm_standard.phote.dto.CreateWorkbookResponse
 import com.swm_standard.phote.service.WorkbookService
 import jakarta.validation.Valid
 import org.springframework.security.core.Authentication
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
+import java.util.*
 
 @RestController
 @RequestMapping("/api")
@@ -26,5 +25,13 @@ class WorkbookController(private val workbookService: WorkbookService) {
         )
 
         return BaseResponse(msg = "문제집 생성 성공", data = workbook)
+    }
+
+    @DeleteMapping("/workbook/{id}")
+    fun deleteWorkbook(@PathVariable("id") id: UUID): BaseResponse<DeleteWorkbookResponse> {
+
+        val deletedWorkbook = workbookService.deleteWorkbook(id)
+
+        return BaseResponse(msg = "문제집 삭제 성공", data = deletedWorkbook)
     }
 }
