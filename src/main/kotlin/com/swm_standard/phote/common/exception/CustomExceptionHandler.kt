@@ -8,6 +8,7 @@ import org.springframework.validation.FieldError
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.servlet.resource.NoResourceFoundException
 
 @RestControllerAdvice
 class CustomExceptionHandler {
@@ -43,5 +44,11 @@ class CustomExceptionHandler {
         val errors = mapOf(ex.message to (ex.message ?: "Not Exception Message"))
         return ResponseEntity(BaseResponse(ResultCode.ERROR.name, ResultCode.ERROR.statusCode, ResultCode.ERROR.msg, errors), HttpStatus.BAD_REQUEST)
 
+    }
+
+    @ExceptionHandler(NoResourceFoundException::class)
+    protected fun noResourceException(ex: Exception) : ResponseEntity<BaseResponse<Map<String?, String>>> {
+        val errors = mapOf(ex.message to (ex.message ?: "Not Exception Message"))
+        return ResponseEntity(BaseResponse(ResultCode.ERROR.name, ResultCode.BAD_REQUEST.statusCode, ResultCode.BAD_REQUEST.msg, errors), HttpStatus.BAD_REQUEST)
     }
 }
