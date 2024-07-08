@@ -18,7 +18,9 @@ class QuestionController {
     private lateinit var questionService: QuestionService
 
     @GetMapping("/api/question/{Id}")
-    fun readQuestionDetail(@PathVariable Id: UUID
+    fun readQuestionDetail(@PathVariable(
+        required = true
+    ) Id: UUID
     ): BaseResponse<ReadQuestionDetailResponseDto> {
         return BaseResponse(msg = "문제 상세조회 성공", data = questionService.readQuestionDetail(Id))
     }
