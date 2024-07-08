@@ -1,13 +1,11 @@
 package com.swm_standard.phote.controller
 
-import com.swm_standard.phote.common.resolver.memberId.MemberId
 import com.swm_standard.phote.common.responsebody.BaseResponse
 import com.swm_standard.phote.dto.CreateWorkbookRequest
 import com.swm_standard.phote.dto.CreateWorkbookResponse
 import com.swm_standard.phote.service.WorkbookService
 import jakarta.validation.Valid
 import org.springframework.security.core.Authentication
-import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
