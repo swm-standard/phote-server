@@ -1,5 +1,6 @@
 package com.swm_standard.phote.entity
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
 import java.time.LocalDateTime
@@ -27,6 +28,7 @@ data class Member(
     @CreationTimestamp
     val joinedAt: LocalDateTime = LocalDateTime.now(),
 
+    @JsonIgnore
     val deletedAt: LocalDateTime?
 )
 

@@ -1,9 +1,11 @@
 package com.swm_standard.phote.controller
 
+import com.fasterxml.jackson.databind.ser.Serializers.Base
 import com.swm_standard.phote.common.responsebody.BaseResponse
 import com.swm_standard.phote.dto.DeleteWorkbookResponse
 import com.swm_standard.phote.dto.CreateWorkbookRequest
 import com.swm_standard.phote.dto.CreateWorkbookResponse
+import com.swm_standard.phote.dto.ReadWorkbookDetailResponse
 import com.swm_standard.phote.service.WorkbookService
 import jakarta.validation.Valid
 import org.springframework.security.core.Authentication
@@ -33,5 +35,12 @@ class WorkbookController(private val workbookService: WorkbookService) {
         val deletedWorkbook = workbookService.deleteWorkbook(id)
 
         return BaseResponse(msg = "문제집 삭제 성공", data = deletedWorkbook)
+    }
+
+    @GetMapping("/workbook/{workbookId}")
+    fun readWorkbookDetail(@Valid @PathVariable workbookId: UUID): BaseResponse<ReadWorkbookDetailResponse> {
+        val workbookDetail = workbookService.readWorkbookDetail(workbookId)
+
+        return BaseResponse(msg = "문제집 정보 읽기 성공", data = workbookDetail)
     }
 }

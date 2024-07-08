@@ -1,5 +1,6 @@
 package com.swm_standard.phote.entity
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.*
 import org.hibernate.annotations.ColumnDefault
 import org.hibernate.annotations.CreationTimestamp
@@ -16,6 +17,7 @@ data class Workbook(
 
     @ManyToOne
     @JoinColumn(name = "member_id")
+    @JsonIgnore
     val member: Member,
 
     var emoji: String?,
@@ -24,14 +26,15 @@ data class Workbook(
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "workbook_id")
+    @JsonIgnore
     val physicalId: Long = 0
 
     @Column(name = "workbook_uuid", nullable = false, unique = true)
     val id: UUID = UUID.randomUUID()
 
     @OneToMany(mappedBy = "workbook")
-    @OrderBy("order asc")
-    val questionSet: Set<QuestionSet>? = null
+    @OrderBy("sequence asc")
+    val questionSet: List<QuestionSet>? = null
 
     @ColumnDefault(value = "0")
     var quantity: Int = 0
@@ -39,6 +42,7 @@ data class Workbook(
     @CreationTimestamp
     val createdAt: LocalDateTime = LocalDateTime.now()
 
+    @JsonIgnore
     var deletedAt: LocalDateTime? = null
 
     @LastModifiedDate
