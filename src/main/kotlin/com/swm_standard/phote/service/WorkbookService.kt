@@ -1,5 +1,6 @@
 package com.swm_standard.phote.service
 
+import com.swm_standard.phote.common.exception.AlreadyDeletedException
 import com.swm_standard.phote.dto.CreateWorkbookResponse
 import com.swm_standard.phote.dto.DeleteWorkbookResponse
 import com.swm_standard.phote.entity.Workbook
@@ -27,8 +28,8 @@ class WorkbookService(
     @Transactional
     fun deleteWorkbook(id: UUID): DeleteWorkbookResponse {
         var workbook = workbookRepository.findWorkbookById(id) ?: throw NotFoundException()
+        if (workbook.deletedAt != null) throw AlreadyDeletedException("workbook")
 
-        workbook.deletedAt = LocalDateTime.now()
 
         val deletedWorkbook = workbookRepository.save(workbook)
 
