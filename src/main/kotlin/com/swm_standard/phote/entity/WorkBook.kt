@@ -10,36 +10,38 @@ import java.util.*
 @Entity
 data class Workbook(
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "workbook_id")
-    val physicalId: Long,
+    var title: String,
 
-    @Column(name = "workbook_uuid", nullable = false, unique = true)
-    val id: UUID,
-
-    val title: String,
-
-    val description: String?,
+    var description: String?,
 
     @ManyToOne
     @JoinColumn(name = "member_id")
     val member: Member,
 
+    var emoji: String?,
+
+){
+
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "workbook_id")
+    val physicalId: Long = 0
+
+    @Column(name = "workbook_uuid", nullable = false, unique = true)
+    val id: UUID = UUID.randomUUID()
+
     @OneToMany(mappedBy = "workbook")
     @OrderBy("order asc")
-    val questionSet: Set<QuestionSet>?,
-
-    val emoji: String,
+    val questionSet: Set<QuestionSet>? = null
 
     @ColumnDefault(value = "0")
-    val quantity: Int,
+    var quantity: Int = 0
 
     @CreationTimestamp
-    val createdAt: LocalDateTime = LocalDateTime.now(),
+    val createdAt: LocalDateTime = LocalDateTime.now()
 
-    val deletedAt: LocalDateTime?,
+    val deletedAt: LocalDateTime? = null
 
     @LastModifiedDate
-    val modifiedAt: LocalDateTime?
+    var modifiedAt: LocalDateTime? = null
 
-    )
+}

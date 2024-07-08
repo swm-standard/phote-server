@@ -21,7 +21,7 @@ class CustomExceptionHandler {
             errors[fieldName] = errorMessage ?: "Not Exception Message"
         }
 
-        return ResponseEntity(BaseResponse(ResultCode.ERROR.name, ResultCode.ERROR.statusCode, ResultCode.ERROR.msg, errors), HttpStatus.BAD_REQUEST)
+        return ResponseEntity(BaseResponse(ResultCode.BAD_REQUEST.name, ResultCode.BAD_REQUEST.statusCode, ResultCode.BAD_REQUEST.msg, errors), HttpStatus.BAD_REQUEST)
     }
 
     @ExceptionHandler(InvalidInputException::class)
@@ -34,6 +34,13 @@ class CustomExceptionHandler {
     @ExceptionHandler(Exception::class)
     protected fun defaultException(ex: Exception) : ResponseEntity<BaseResponse<Map<String, String>>> {
         val errors = mapOf("미처리 에러" to (ex.message ?: "Not Exception Message"))
+        return ResponseEntity(BaseResponse(ResultCode.ERROR.name, ResultCode.ERROR.statusCode, ResultCode.ERROR.msg, errors), HttpStatus.BAD_REQUEST)
+
+    }
+
+    @ExceptionHandler(NullPointerException::class)
+    protected fun nullPointerException(ex: Exception) : ResponseEntity<BaseResponse<Map<String?, String>>> {
+        val errors = mapOf(ex.message to (ex.message ?: "Not Exception Message"))
         return ResponseEntity(BaseResponse(ResultCode.ERROR.name, ResultCode.ERROR.statusCode, ResultCode.ERROR.msg, errors), HttpStatus.BAD_REQUEST)
 
     }

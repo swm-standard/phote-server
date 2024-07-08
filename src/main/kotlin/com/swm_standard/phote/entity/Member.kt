@@ -13,7 +13,7 @@ data class Member(
     val physicalId: Long,
 
     @Column(name = "member_uuid", nullable = false, unique = true)
-    val id: UUID,
+    val id: UUID = UUID.randomUUID(),
 
     val name: String,
 
