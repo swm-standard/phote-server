@@ -1,6 +1,6 @@
 package com.swm_standard.phote.service
 
-import com.swm_standard.phote.dto.WorkbookCreationResponse
+import com.swm_standard.phote.dto.CreateWorkbookResponse
 import com.swm_standard.phote.entity.Workbook
 import com.swm_standard.phote.repository.MemberRepository
 import com.swm_standard.phote.repository.WorkbookRepository
@@ -13,10 +13,10 @@ class WorkbookService(
     private val memberRepository: MemberRepository
 ) {
 
-    fun createWorkbook(title: String, description: String?, memberEmail: String): WorkbookCreationResponse {
+    fun createWorkbook(title: String, description: String?, emoji: String?, memberEmail: String): CreateWorkbookResponse {
         val member = memberRepository.findByEmail(memberEmail) ?: throw NotFoundException()
-        val workbook = workbookRepository.save(Workbook(title, description, member))
+        val workbook = workbookRepository.save(Workbook(title, description, member, emoji))
 
-        return WorkbookCreationResponse(workbook.id)
+        return CreateWorkbookResponse(workbook.id)
     }
 }

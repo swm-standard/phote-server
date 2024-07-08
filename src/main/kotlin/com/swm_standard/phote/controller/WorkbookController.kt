@@ -1,27 +1,27 @@
 package com.swm_standard.phote.controller
 
 import com.swm_standard.phote.common.responsebody.BaseResponse
-import com.swm_standard.phote.dto.WorkbookCreationRequest
-import com.swm_standard.phote.dto.WorkbookCreationResponse
-import com.swm_standard.phote.entity.Workbook
+import com.swm_standard.phote.dto.CreateWorkbookRequest
+import com.swm_standard.phote.dto.CreateWorkbookResponse
 import com.swm_standard.phote.service.WorkbookService
+import jakarta.validation.Valid
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.util.*
 
 @RestController
 @RequestMapping("/api")
 class WorkbookController(private val workbookService: WorkbookService) {
 
     @PostMapping("/workbook")
-    fun createWorkbook(@RequestBody request: WorkbookCreationRequest, authentication: Authentication): BaseResponse<WorkbookCreationResponse> {
+    fun createWorkbook(@Valid @RequestBody request: CreateWorkbookRequest, authentication: Authentication): BaseResponse<CreateWorkbookResponse> {
 
         val workbook = workbookService.createWorkbook(
             request.title,
             request.description,
+            request.emoji,
             authentication.name
         )
 

@@ -16,7 +16,9 @@ data class Workbook(
 
     @ManyToOne
     @JoinColumn(name = "member_id")
-    val member: Member
+    val member: Member,
+
+    var emoji: String?,
 
 ){
 
@@ -31,8 +33,6 @@ data class Workbook(
     @OrderBy("order asc")
     val questionSet: Set<QuestionSet>? = null
 
-    var emoji: String = ""
-
     @ColumnDefault(value = "0")
     var quantity: Int = 0
 
@@ -43,8 +43,5 @@ data class Workbook(
 
     @LastModifiedDate
     var modifiedAt: LocalDateTime? = null
-
-
-
 
 }
