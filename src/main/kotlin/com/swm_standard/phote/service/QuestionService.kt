@@ -10,8 +10,8 @@ import java.util.UUID
 @Service
 class QuestionService (private val questionRepository: QuestionRepository) {
     @Transactional
-    fun readQuestionDetail(questionUUID: UUID): ReadQuestionDetailResponseDto {
-        val question = questionRepository.findById(questionUUID)
+    fun readQuestionDetail(Id: UUID): ReadQuestionDetailResponseDto {
+        val question = questionRepository.findById(Id)
             ?: throw NotFoundException("존재하지 않는 UUID")
 
         return ReadQuestionDetailResponseDto(question)

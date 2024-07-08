@@ -17,9 +17,9 @@ class QuestionController {
     @Autowired
     private lateinit var questionService: QuestionService
 
-    @GetMapping("/api/question/{questionUUID}")
-    fun readQuestionDetail(@PathVariable questionUUID: UUID
+    @GetMapping("/api/question/{Id}")
+    fun readQuestionDetail(@PathVariable Id: UUID
     ): BaseResponse<ReadQuestionDetailResponseDto> {
-        return BaseResponse(msg = "문제 상세조회 성공", data = questionService.readQuestionDetail(questionUUID))
+        return BaseResponse(msg = "문제 상세조회 성공", data = questionService.readQuestionDetail(Id))
     }
 }

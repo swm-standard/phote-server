@@ -43,4 +43,12 @@ class CustomExceptionHandler {
         return ResponseEntity(BaseResponse(ResultCode.NOT_FOUND.name, ResultCode.NOT_FOUND.statusCode, ex.message ?: ResultCode.NOT_FOUND.msg), HttpStatus.NOT_FOUND)
 
     }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException::class)
+    protected fun methodArgumentTypeMismatchException(ex: MethodArgumentTypeMismatchException) : ResponseEntity<BaseResponse<Map<String, String>>> {
+
+        val errors = mapOf(ex.fieldName to (ex.message ?: "Not Exception Message"))
+        return ResponseEntity(BaseResponse(ResultCode.BAD_REQUEST.name, ResultCode.BAD_REQUEST.statusCode, ex.message ?: ResultCode.BAD_REQUEST.msg, errors), HttpStatus.BAD_REQUEST)
+
+    }
 }
