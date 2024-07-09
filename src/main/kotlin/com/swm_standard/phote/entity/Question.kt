@@ -48,9 +48,9 @@ data class Question(
     val createdAt: LocalDateTime = LocalDateTime.now(),
 
     @JsonIgnore
-    val deletedAt: LocalDateTime?,
+    var deletedAt: LocalDateTime?,
 
     @LastModifiedDate
-    val modifiedAt: LocalDateTime?,
+    var modifiedAt: LocalDateTime?,
 
     )

@@ -1,7 +1,9 @@
-package com.swm_standard.phote.dto.response
+package com.swm_standard.phote.dto
+
 import com.fasterxml.jackson.databind.JsonNode
 import com.swm_standard.phote.entity.Question
 import java.time.LocalDateTime
+import java.util.*
 
 data class ReadQuestionDetailResponseDto(
     val createdAt: LocalDateTime,
@@ -24,3 +26,8 @@ data class ReadQuestionDetailResponseDto(
         memo = question.memo
     )
 }
+
+class DeleteQuestionResponseDto (
+    val id: UUID,
+    val deletedAt: LocalDateTime
+)
