@@ -4,7 +4,7 @@ import com.swm_standard.phote.entity.QuestionSet
 import org.springframework.data.jpa.repository.JpaRepository
 import java.util.UUID
 
-interface QuestionSetRepository: JpaRepository<QuestionSet, Long> {
+interface QuestionSetRepository: JpaRepository<QuestionSet, UUID> {
 
     fun findAllByWorkbookId(workbookId:UUID): List<QuestionSet>
 
