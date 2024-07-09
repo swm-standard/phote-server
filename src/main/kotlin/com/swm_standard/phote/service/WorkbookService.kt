@@ -11,6 +11,7 @@ import com.swm_standard.phote.repository.WorkbookRepository
 import jakarta.transaction.Transactional
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 import java.util.UUID
 
 @Service
@@ -32,7 +33,7 @@ class WorkbookService(
         val workbook = workbookRepository.findWorkbookById(id) ?: throw NotFoundException()
         if (workbook.deletedAt != null) throw AlreadyDeletedException("workbook")
 
-
+        workbook.deletedAt = LocalDateTime.now()
         val deletedWorkbook = workbookRepository.save(workbook)
 
         return DeleteWorkbookResponse(deletedWorkbook.id, deletedWorkbook.deletedAt!!)

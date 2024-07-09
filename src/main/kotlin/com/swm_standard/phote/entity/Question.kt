@@ -13,8 +13,8 @@ import java.util.*
 @Entity
 data class Question(
 
-    @Id @Column(name = "question_uuid", nullable = false, unique = true)
-    val id: UUID,
+    @Id @GeneratedValue(strategy = GenerationType.UUID)
+    var id: UUID,
 
     @ManyToOne(cascade = [(CascadeType.REMOVE)])
     @JoinColumn(name = "member_id")
