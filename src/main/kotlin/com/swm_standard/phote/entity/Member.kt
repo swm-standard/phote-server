@@ -9,11 +9,7 @@ import java.util.UUID
 @Entity
 data class Member(
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "member_id")
-    val physicalId: Long,
-
-    @Column(name = "member_uuid", nullable = false, unique = true)
+    @Id @Column(name = "member_uuid", nullable = false, unique = true)
     val id: UUID = UUID.randomUUID(),
 
     val name: String,

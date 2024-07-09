@@ -3,6 +3,8 @@ package com.swm_standard.phote.entity
 import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
+import org.hibernate.annotations.JdbcTypeCode
+import org.hibernate.type.SqlTypes
 import org.springframework.data.annotation.LastModifiedDate
 import java.time.LocalDateTime
 import java.util.*
@@ -10,12 +12,8 @@ import java.util.*
 
 @Entity
 data class Question(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "question_id")
-    @JsonIgnore
-    val physicalId: Long,
 
-    @Column(name = "question_uuid", nullable = false, unique = true)
+    @Id @Column(name = "question_uuid", nullable = false, unique = true)
     val id: UUID,
 
     @ManyToOne(cascade = [(CascadeType.REMOVE)])
@@ -26,7 +24,9 @@ data class Question(
     @Lob
     val statement: String,
 
-    val options: String,
+    @Column(columnDefinition = "json")
+    @JdbcTypeCode(SqlTypes.JSON)
+    val options: List<String>,
 
     val image: String?,
 
