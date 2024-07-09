@@ -38,6 +38,9 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("io.jsonwebtoken:jjwt-api:0.11.5")
 	implementation("org.springframework.boot:spring-boot-starter-validation:3.3.0")
+	implementation ("org.springframework.cloud:spring-cloud-starter-bootstrap:3.1.3")
+	implementation ("org.springframework.cloud:spring-cloud-starter-aws-secrets-manager-config:2.2.6.RELEASE")
+	implementation ("com.amazonaws.secretsmanager:aws-secretsmanager-jdbc:1.0.8")
 	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
 
