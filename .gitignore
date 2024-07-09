@@ -151,3 +151,7 @@ replay_pid*
 /dataSources/
 /dataSources.local.xml
 
+application.properties
+.idea
+.gradle
+build

@@ -95,4 +95,12 @@ class JwtTokenProvider {
             .build()
             .parseClaimsJws(token)
             .body
+
+    public fun getJwtContents(bearerToken: String): Any{
+        val token = bearerToken.substring(7)
+        val claims = getClaims(token)
+        val auth = claims["memberId"]?: throw RuntimeException("잘못된 토큰입니다.")
+
+        return auth
+    }
 }
