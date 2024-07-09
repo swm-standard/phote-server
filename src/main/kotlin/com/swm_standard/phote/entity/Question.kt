@@ -10,12 +10,8 @@ import java.util.*
 
 @Entity
 data class Question(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "question_id")
-    @JsonIgnore
-    val physicalId: Long,
 
-    @Column(name = "question_uuid", nullable = false, unique = true)
+    @Id @Column(name = "question_uuid", nullable = false, unique = true)
     val id: UUID,
 
     @ManyToOne(cascade = [(CascadeType.REMOVE)])

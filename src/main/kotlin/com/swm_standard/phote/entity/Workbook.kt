@@ -24,12 +24,7 @@ data class Workbook(
 
 ){
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "workbook_id")
-    @JsonIgnore
-    val physicalId: Long = 0
-
-    @Column(name = "workbook_uuid", nullable = false, unique = true)
+    @Id @Column(name = "workbook_uuid", nullable = false, unique = true)
     val id: UUID = UUID.randomUUID()
 
     @OneToMany(mappedBy = "workbook")
@@ -37,7 +32,7 @@ data class Workbook(
     val questionSet: List<QuestionSet>? = null
 
     @ColumnDefault(value = "0")
-    var quantity: Int = 0
+    var quantity: Int? = null
 
     @CreationTimestamp
     val createdAt: LocalDateTime = LocalDateTime.now()
