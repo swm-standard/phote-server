@@ -1,5 +1,6 @@
 package com.swm_standard.phote.entity
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
 import org.springframework.data.annotation.LastModifiedDate
@@ -11,6 +12,7 @@ import java.util.*
 data class Question(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "question_id")
+    @JsonIgnore
     val physicalId: Long,
 
     @Column(name = "question_uuid", nullable = false, unique = true)
@@ -18,6 +20,7 @@ data class Question(
 
     @ManyToOne(cascade = [(CascadeType.REMOVE)])
     @JoinColumn(name = "member_id")
+    @JsonIgnore
     val member: Member,
 
     @Lob
@@ -43,6 +46,7 @@ data class Question(
     @CreationTimestamp
     val createdAt: LocalDateTime = LocalDateTime.now(),
 
+    @JsonIgnore
     val deletedAt: LocalDateTime?,
 
     @LastModifiedDate
