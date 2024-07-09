@@ -9,19 +9,21 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.util.*
 
 @RestController
+@RequestMapping("/api")
 class QuestionController {
     @Autowired
     private lateinit var questionService: QuestionService
 
-    @GetMapping("/api/question/{Id}")
+    @GetMapping("/question/{id}")
     fun readQuestionDetail(@PathVariable(
         required = true
-    ) Id: UUID
+    ) id: UUID
     ): BaseResponse<ReadQuestionDetailResponseDto> {
-        return BaseResponse(msg = "문제 상세조회 성공", data = questionService.readQuestionDetail(Id))
+        return BaseResponse(msg = "문제 상세조회 성공", data = questionService.readQuestionDetail(id))
     }
 }
