@@ -26,7 +26,7 @@ data class Question(
 
     @Column(columnDefinition = "json")
     @JdbcTypeCode(SqlTypes.JSON)
-    val options: List<String>,
+    val options: String,
 
     val image: String?,
 

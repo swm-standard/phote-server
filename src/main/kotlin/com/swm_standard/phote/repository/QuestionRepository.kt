@@ -6,6 +6,5 @@ import org.springframework.stereotype.Repository
 import java.util.*
 
 @Repository
-interface QuestionRepository: JpaRepository<Question, Long> {
-    fun findById(id: UUID): Question?
+interface QuestionRepository: JpaRepository<Question, UUID> {
 }
