@@ -9,7 +9,7 @@ data class ReadQuestionDetailResponseDto(
     val statement: String,
     val image: String? = null,
     val options: JsonNode? = null,
-    val answer: String,
+    val answer: String?,
     val category: String,
     val memo: String? = null
 ) {

@@ -1,6 +1,7 @@
 package com.swm_standard.phote.controller
 
 import com.swm_standard.phote.common.exception.InvalidInputException
+import com.swm_standard.phote.common.resolver.memberId.MemberId
 import com.swm_standard.phote.common.responsebody.BaseResponse
 import com.swm_standard.phote.dto.response.ReadQuestionDetailResponseDto
 import com.swm_standard.phote.repository.QuestionRepository

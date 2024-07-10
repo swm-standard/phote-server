@@ -9,6 +9,7 @@ import org.springframework.web.bind.support.WebDataBinderFactory
 import org.springframework.web.context.request.NativeWebRequest
 import org.springframework.web.method.support.HandlerMethodArgumentResolver
 import org.springframework.web.method.support.ModelAndViewContainer
+import java.util.*
 
 @Component
 class MemberIdResolver(
@@ -18,7 +19,7 @@ class MemberIdResolver(
     // supportsParameter: 어떤 파라미터를 처리할 것인지
     override fun supportsParameter(parameter: MethodParameter): Boolean {
         parameter.getParameterAnnotation(MemberId::class.java) ?: return false
-        if (!parameter.parameterType.isAssignableFrom(String::class.java)) {
+        if (!parameter.parameterType.isAssignableFrom(UUID::class.java)) {
             return false
         }
 
