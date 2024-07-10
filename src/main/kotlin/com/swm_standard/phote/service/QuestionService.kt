@@ -46,8 +46,11 @@ class QuestionService (
         questionSetRepository.markDeletedByQuestionId(id, now)
 
         // deletedAt필드 채우기
-        question.deletedAt = now
-        questionRepository.save(question)
+        question.apply {
+            deletedAt = now
+        }.also {
+            questionRepository.save(it)
+        }
 
         return DeleteQuestionResponseDto(id, question.deletedAt!!)
     }
