@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.JdbcTypeCode
+import org.hibernate.annotations.SQLRestriction
 import org.hibernate.type.SqlTypes
 import org.springframework.data.annotation.LastModifiedDate
 import java.time.LocalDateTime
@@ -11,6 +12,7 @@ import java.util.*
 
 
 @Entity
+@SQLRestriction("deleted_at is NULL")
 data class Question(
 
     @Id @Column(name = "question_uuid", nullable = false, unique = true)
@@ -26,11 +28,11 @@ data class Question(
 
     @Column(columnDefinition = "json")
     @JdbcTypeCode(SqlTypes.JSON)
-    val options: String,
+    val options: String?,
 
     val image: String?,
 
-    val answer: String?,
+    val answer: String,
 
     val category: String,
 

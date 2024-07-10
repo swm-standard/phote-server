@@ -9,7 +9,7 @@ data class ReadQuestionDetailResponseDto(
     val statement: String,
     val image: String? = null,
     val options: JsonNode? = null,
-    val answer: String?,
+    val answer: String,
     val category: String,
     val memo: String? = null
 ) {
@@ -19,6 +19,16 @@ data class ReadQuestionDetailResponseDto(
         statement = question.statement,
         image = question.image,
         options = options,
+        answer = question.answer,
+        category = question.category,
+        memo = question.memo
+    )
+
+    constructor(question: Question) : this(
+        createdAt = question.createdAt,
+        modifiedAt = question.modifiedAt,
+        statement = question.statement,
+        image = question.image,
         answer = question.answer,
         category = question.category,
         memo = question.memo
