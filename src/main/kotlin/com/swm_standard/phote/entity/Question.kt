@@ -15,8 +15,8 @@ import java.util.*
 @SQLRestriction("deleted_at is NULL")
 data class Question(
 
-    @Id @GeneratedValue(strategy = GenerationType.UUID)
-    val id: UUID,
+    @Id @Column(name = "question_uuid", nullable = false, unique = true)
+    val id: UUID = UUID.randomUUID(),
 
 
     @ManyToOne(cascade = [(CascadeType.REMOVE)])
