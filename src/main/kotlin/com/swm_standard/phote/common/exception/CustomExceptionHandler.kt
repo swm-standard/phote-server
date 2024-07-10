@@ -41,12 +41,6 @@ class CustomExceptionHandler {
 
     }
 
-    @ExceptionHandler(NullPointerException::class)
-    protected fun nullPointerException(ex: Exception) : ResponseEntity<BaseResponse<Map<String?, String>>> {
-        val errors = mapOf(ex.message to (ex.message ?: "Not Exception Message"))
-        return ResponseEntity(BaseResponse(ErrorCode.ERROR.name, ErrorCode.ERROR.statusCode, ErrorCode.ERROR.msg, errors), HttpStatus.BAD_REQUEST)
-
-    }
 
     @ExceptionHandler(BadRequestException::class)
     protected fun badRequestException(ex: BadRequestException) : ResponseEntity<BaseResponse<Map<String, String>>> {
@@ -57,8 +51,8 @@ class CustomExceptionHandler {
 
 
     @ExceptionHandler(NoResourceFoundException::class)
-    protected fun noResourceException(ex: Exception) : ResponseEntity<BaseResponse<Map<String?, String>>> {
-        val errors = mapOf(ex.message to (ex.message ?: "Not Exception Message"))
+    protected fun noResourceException(ex: Exception) : ResponseEntity<BaseResponse<Map<String, String>>> {
+        val errors = mapOf("id" to (ex.message ?: "Not Exception Message"))
         return ResponseEntity(BaseResponse(ErrorCode.ERROR.name, ErrorCode.BAD_REQUEST.statusCode, ErrorCode.BAD_REQUEST.msg, errors), HttpStatus.BAD_REQUEST)
     }
 

@@ -27,4 +27,7 @@ data class QuestionSet(
 
     @JsonIgnore
     var deletedAt: LocalDateTime?,
-    )
+    ) {
+
+    fun isDeleted():Boolean = this.deletedAt != null
+}
