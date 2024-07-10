@@ -25,6 +25,16 @@ data class ReadQuestionDetailResponseDto(
         category = question.category,
         memo = question.memo
     )
+
+    constructor(question: Question) : this(
+        createdAt = question.createdAt,
+        modifiedAt = question.modifiedAt,
+        statement = question.statement,
+        image = question.image,
+        answer = question.answer,
+        category = question.category,
+        memo = question.memo
+    )
 }
 
 class DeleteQuestionResponseDto (
