@@ -41,7 +41,6 @@ data class Workbook(
     var deletedAt: LocalDateTime? = null
 
     @LastModifiedDate
-    @Column(updatable = false)
     var modifiedAt: LocalDateTime? = null
 
 
