@@ -44,4 +44,6 @@ data class Workbook(
     @Column(updatable = false)
     var modifiedAt: LocalDateTime? = null
 
+
+    fun isDeleted():Boolean = this.deletedAt != null
 }
