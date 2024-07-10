@@ -1,10 +1,8 @@
 package com.swm_standard.phote.service
 
-import com.swm_standard.phote.common.exception.AlreadyDeletedException
 import com.swm_standard.phote.common.exception.NotFoundException
 import com.swm_standard.phote.dto.CreateWorkbookResponse
 import com.swm_standard.phote.dto.DeleteWorkbookResponse
-import com.swm_standard.phote.dto.QuestionSetDto
 import com.swm_standard.phote.dto.ReadWorkbookDetailResponse
 import com.swm_standard.phote.entity.Workbook
 import com.swm_standard.phote.repository.MemberRepository
@@ -31,27 +29,16 @@ class WorkbookService(
 
     @Transactional
     fun deleteWorkbook(id: UUID): DeleteWorkbookResponse {
-        val workbook = workbookRepository.findById(id).orElseThrow { NotFoundException("존재하지 않는 workbook") }
-        if (workbook.isDeleted()) throw AlreadyDeletedException("workbook")
 
-        workbook.deletedAt = LocalDateTime.now()
-        val deletedWorkbook = workbookRepository.save(workbook)
+        workbookRepository.deleteById(id)
 
-        return DeleteWorkbookResponse(deletedWorkbook.id, deletedWorkbook.deletedAt!!)
+        return DeleteWorkbookResponse(id, LocalDateTime.now())
     }
 
     fun readWorkbookDetail(id: UUID) : ReadWorkbookDetailResponse {
-        val workbook = workbookRepository.findById(id).orElseThrow { NotFoundException(message = "존재하지 않는 workbook") }
-        if (workbook.isDeleted()) throw AlreadyDeletedException("workbook")
+        val workbook = workbookRepository.findById(id).orElseThrow { NotFoundException() }
 
         val questionSet = questionSetRepository.findAllByWorkbookId(id)
-
-        val questionSetDto: List<QuestionSetDto> = questionSet.filter { !it.isDeleted() }.map { set ->
-            QuestionSetDto(
-                set.sequence,
-                set.question
-            )
-        }
 
         return ReadWorkbookDetailResponse(
             workbook.id,
@@ -60,7 +47,7 @@ class WorkbookService(
             workbook.emoji!!,
             workbook.createdAt,
             workbook.modifiedAt,
-            questionSetDto
+            questionSet
             )
     }
 }
