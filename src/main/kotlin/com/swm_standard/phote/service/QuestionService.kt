@@ -2,12 +2,15 @@ package com.swm_standard.phote.service
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import com.swm_standard.phote.common.exception.AlreadyDeletedException
+import com.swm_standard.phote.common.exception.BadRequestException
 import com.swm_standard.phote.common.exception.NotFoundException
-import com.swm_standard.phote.dto.response.ReadQuestionDetailResponseDto
+import com.swm_standard.phote.dto.DeleteQuestionResponseDto
+import com.swm_standard.phote.dto.ReadQuestionDetailResponseDto
 import com.swm_standard.phote.repository.QuestionRepository
 import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 import java.util.UUID
 
 @Service
@@ -27,5 +30,17 @@ class QuestionService (private val questionRepository: QuestionRepository) {
 
         // options가 없는 주관식일 경우
         return ReadQuestionDetailResponseDto(question)
+    }
+
+    @Transactional
+    fun deleteQuestion(id: UUID): DeleteQuestionResponseDto {
+        val question = questionRepository.findById(id).orElseThrow { NotFoundException("존재하지 않는 UUID") }
+        if (question.deletedAt != null) throw AlreadyDeletedException()
+
+        // deleteAt필드 채우기
+        question.deletedAt = LocalDateTime.now()
+        questionRepository.save(question)
+
+        return DeleteQuestionResponseDto(id, question.deletedAt!!)
     }
 }
