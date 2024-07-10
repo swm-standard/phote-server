@@ -2,6 +2,7 @@ package com.swm_standard.phote.service
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.swm_standard.phote.common.exception.AlreadyDeletedException
 import com.swm_standard.phote.common.exception.BadRequestException
 import com.swm_standard.phote.common.exception.NotFoundException
 import com.swm_standard.phote.dto.DeleteQuestionResponseDto
@@ -28,7 +29,7 @@ class QuestionService (private val questionRepository: QuestionRepository) {
     @Transactional
     fun deleteQuestion(id: UUID): DeleteQuestionResponseDto {
         val question = questionRepository.findById(id).orElseThrow { NotFoundException("존재하지 않는 UUID") }
-        if (question.deletedAt != null) throw BadRequestException("이미 삭제된 question")
+        if (question.deletedAt != null) throw AlreadyDeletedException()
 
         // deleteAt필드 채우기
         question.deletedAt = LocalDateTime.now()
