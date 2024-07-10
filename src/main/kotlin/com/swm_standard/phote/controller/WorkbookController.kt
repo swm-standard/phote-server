@@ -37,7 +37,7 @@ class WorkbookController(private val workbookService: WorkbookService) {
     }
 
     @GetMapping("/workbook/{workbookId}")
-    fun readWorkbookDetail(@Valid @PathVariable workbookId: UUID): BaseResponse<ReadWorkbookDetailResponse> {
+    fun readWorkbookDetail(@Valid @PathVariable(required = true) workbookId: UUID): BaseResponse<ReadWorkbookDetailResponse> {
 
         val workbookDetail = workbookService.readWorkbookDetail(workbookId)
 

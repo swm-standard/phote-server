@@ -1,6 +1,7 @@
 package com.swm_standard.phote.service
 
 import com.swm_standard.phote.common.exception.AlreadyDeletedException
+import com.swm_standard.phote.common.exception.NotFoundException
 import com.swm_standard.phote.dto.CreateWorkbookResponse
 import com.swm_standard.phote.dto.DeleteWorkbookResponse
 import com.swm_standard.phote.dto.ReadWorkbookDetailResponse
@@ -9,7 +10,6 @@ import com.swm_standard.phote.repository.MemberRepository
 import com.swm_standard.phote.repository.QuestionSetRepository
 import com.swm_standard.phote.repository.WorkbookRepository
 import jakarta.transaction.Transactional
-import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.util.UUID
@@ -40,7 +40,7 @@ class WorkbookService(
     }
 
     fun readWorkbookDetail(id: UUID) : ReadWorkbookDetailResponse {
-        val workbook = workbookRepository.findWorkbookById(id) ?: throw NotFoundException()
+        val workbook = workbookRepository.findWorkbookById(id) ?: throw NotFoundException(message = "존재하지 않는 workbook")
         val questionSet = questionSetRepository.findAllByWorkbookId(id)
 
         return ReadWorkbookDetailResponse(
