@@ -26,5 +26,5 @@ data class QuestionSet(
     val createdAt: LocalDateTime = LocalDateTime.now(),
 
     @JsonIgnore
-    val deletedAt: LocalDateTime?,
+    var deletedAt: LocalDateTime?,
     )
