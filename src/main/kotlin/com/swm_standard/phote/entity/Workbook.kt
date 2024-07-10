@@ -32,7 +32,7 @@ data class Workbook(
     val questionSet: List<QuestionSet>? = null
 
     @ColumnDefault(value = "0")
-    var quantity: Int? = null
+    var quantity: Int = 0
 
     @CreationTimestamp
     val createdAt: LocalDateTime = LocalDateTime.now()
@@ -42,7 +42,6 @@ data class Workbook(
 
     @LastModifiedDate
     var modifiedAt: LocalDateTime? = null
-
 
     fun isDeleted():Boolean = this.deletedAt != null
 }
