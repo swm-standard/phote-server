@@ -10,10 +10,4 @@ import java.util.*
 
 @Repository
 interface QuestionRepository: JpaRepository<Question, UUID> {
-    @Query("UPDATE Question q SET q.deletedAt = CURRENT_TIMESTAMP WHERE q.id = :id")
-    @Modifying
-    override fun deleteById(id: UUID)
-
-    @Query("SELECT q.deletedAt FROM Question q WHERE q.id = :id")
-    fun findDeletedAtById(id: UUID): LocalDateTime
 }

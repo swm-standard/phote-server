@@ -2,7 +2,6 @@ package com.swm_standard.phote.service
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.swm_standard.phote.common.exception.BadRequestException
 import com.swm_standard.phote.common.exception.NotFoundException
 import com.swm_standard.phote.dto.DeleteQuestionResponseDto
