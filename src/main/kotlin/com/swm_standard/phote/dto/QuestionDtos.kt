@@ -21,7 +21,7 @@ data class ReadQuestionDetailResponseDto(
         statement = question.statement,
         image = question.image,
         options = options,
-        answer = question.answer!!,
+        answer = question.answer,
         category = question.category,
         memo = question.memo
     )
