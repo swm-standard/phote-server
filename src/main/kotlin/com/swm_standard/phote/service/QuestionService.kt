@@ -20,7 +20,7 @@ class QuestionService (
     private val questionSetRepository: QuestionSetRepository) {
     @Transactional
     fun readQuestionDetail(id: UUID): ReadQuestionDetailResponseDto {
-        val question = questionRepository.findById(id).orElseThrow { NotFoundException("존재하지 않는 UUID") }
+        val question = questionRepository.findById(id).orElseThrow { NotFoundException("questionId","존재하지 않는 UUID") }
 
         // options가 있는 객관식일 경우
         if (question.options != null) {
@@ -37,7 +37,7 @@ class QuestionService (
 
     @Transactional
     fun deleteQuestion(id: UUID): DeleteQuestionResponseDto {
-        val question = questionRepository.findById(id).orElseThrow { NotFoundException("존재하지 않는 UUID") }
+        val question = questionRepository.findById(id).orElseThrow { NotFoundException("questionId","존재하지 않는 UUID") }
 
         val now = LocalDateTime.now()
 
