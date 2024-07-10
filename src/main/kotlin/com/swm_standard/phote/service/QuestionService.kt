@@ -38,7 +38,6 @@ class QuestionService (
     @Transactional
     fun deleteQuestion(id: UUID): DeleteQuestionResponseDto {
         val question = questionRepository.findById(id).orElseThrow { NotFoundException("존재하지 않는 UUID") }
-        if (question.deletedAt != null) throw AlreadyDeletedException()
 
         val now = LocalDateTime.now()
 
