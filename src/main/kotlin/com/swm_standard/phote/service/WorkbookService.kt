@@ -4,6 +4,7 @@ import com.swm_standard.phote.common.exception.AlreadyDeletedException
 import com.swm_standard.phote.common.exception.NotFoundException
 import com.swm_standard.phote.dto.CreateWorkbookResponse
 import com.swm_standard.phote.dto.DeleteWorkbookResponse
+import com.swm_standard.phote.dto.QuestionSetDto
 import com.swm_standard.phote.dto.ReadWorkbookDetailResponse
 import com.swm_standard.phote.entity.Workbook
 import com.swm_standard.phote.repository.MemberRepository
@@ -45,6 +46,13 @@ class WorkbookService(
 
         val questionSet = questionSetRepository.findAllByWorkbookId(id)
 
+        val questionSetDto: List<QuestionSetDto> = questionSet.filter { !it.isDeleted() }.map { set ->
+            QuestionSetDto(
+                set.sequence,
+                set.question
+            )
+        }
+
         return ReadWorkbookDetailResponse(
             workbook.id,
             workbook.title,
@@ -52,7 +60,7 @@ class WorkbookService(
             workbook.emoji!!,
             workbook.createdAt,
             workbook.modifiedAt,
-            questionSet
+            questionSetDto
             )
     }
 }
