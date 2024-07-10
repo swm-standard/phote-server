@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.JdbcTypeCode
+import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.SQLRestriction
 import org.hibernate.type.SqlTypes
 import org.springframework.data.annotation.LastModifiedDate
@@ -12,6 +13,7 @@ import java.util.*
 
 
 @Entity
+@SQLDelete(sql = "UPDATE question SET deleted_at = NOW() WHERE question_uuid = ?")
 @SQLRestriction("deleted_at is NULL")
 data class Question(
 
@@ -19,7 +21,7 @@ data class Question(
     val id: UUID = UUID.randomUUID(),
 
 
-    @ManyToOne(cascade = [(CascadeType.REMOVE)])
+    @ManyToOne
     @JoinColumn(name = "member_id")
     @JsonIgnore
     val member: Member,
@@ -37,13 +39,12 @@ data class Question(
 
     val category: String,
 
-    @OneToMany(mappedBy = "question")
+    @OneToMany(mappedBy = "question", cascade = [CascadeType.REMOVE])
     @JsonIgnore
-    val questionSet: Set<QuestionSet>?,
+    val questionSet: List<QuestionSet>? = null,
 
-    @JoinColumn(name = "tag_id", nullable = true)
-    @OneToMany
-    val tags: List<Tag>,
+    @OneToMany(mappedBy = "question", cascade = [CascadeType.REMOVE])
+    val tags: List<Tag>? = null,
 
     val memo: String?,
 
