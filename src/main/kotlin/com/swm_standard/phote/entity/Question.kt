@@ -14,7 +14,8 @@ import java.util.*
 data class Question(
 
     @Id @GeneratedValue(strategy = GenerationType.UUID)
-    var id: UUID,
+    val id: UUID,
+
 
     @ManyToOne(cascade = [(CascadeType.REMOVE)])
     @JoinColumn(name = "member_id")
