@@ -32,7 +32,9 @@ class QuestionService (private val questionRepository: QuestionRepository) {
         if (question.deletedAt != null) throw BadRequestException("이미 삭제된 question")
 
         // deleteAt필드 채우기
-        questionRepository.deleteById(id)
-        return DeleteQuestionResponseDto(id, questionRepository.findDeletedAtById(id))
+        question.deletedAt = LocalDateTime.now()
+        questionRepository.save(question)
+
+        return DeleteQuestionResponseDto(id, question.deletedAt!!)
     }
 }
