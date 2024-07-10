@@ -30,7 +30,7 @@ class WorkbookService(
 
     @Transactional
     fun deleteWorkbook(id: UUID): DeleteWorkbookResponse {
-        val workbook = workbookRepository.findWorkbookById(id) ?: throw NotFoundException()
+        val workbook = workbookRepository.findById(id).orElseThrow { NotFoundException("존재하지 않는 workbook") }
         if (workbook.deletedAt != null) throw AlreadyDeletedException("workbook")
 
         workbook.deletedAt = LocalDateTime.now()
@@ -40,7 +40,9 @@ class WorkbookService(
     }
 
     fun readWorkbookDetail(id: UUID) : ReadWorkbookDetailResponse {
-        val workbook = workbookRepository.findWorkbookById(id) ?: throw NotFoundException(message = "존재하지 않는 workbook")
+        val workbook = workbookRepository.findById(id).orElseThrow { NotFoundException(message = "존재하지 않는 workbook") }
+        if (workbook.deletedAt != null) throw AlreadyDeletedException("workbook")
+
         val questionSet = questionSetRepository.findAllByWorkbookId(id)
 
         return ReadWorkbookDetailResponse(
