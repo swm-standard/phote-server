@@ -16,10 +16,16 @@ class QuestionService (private val questionRepository: QuestionRepository) {
     fun readQuestionDetail(id: UUID): ReadQuestionDetailResponseDto {
         val question = questionRepository.findById(id).orElseThrow { NotFoundException("존재하지 않는 UUID") }
 
-        // string type으로 오는 options를 deserialize
-        val objectMapper = ObjectMapper()
-        val questionOptionsObject: JsonNode = objectMapper.readTree(question.options)
+        // options가 있는 객관식일 경우
+        if (question.options != null) {
+            // string type으로 오는 options를 deserialize
+            val objectMapper = ObjectMapper()
+            val questionOptionsObject: JsonNode = objectMapper.readTree(question.options)
 
-        return ReadQuestionDetailResponseDto(question, questionOptionsObject)
+            return ReadQuestionDetailResponseDto(question, questionOptionsObject)
+        }
+
+        // options가 없는 주관식일 경우
+        return ReadQuestionDetailResponseDto(question)
     }
 }
