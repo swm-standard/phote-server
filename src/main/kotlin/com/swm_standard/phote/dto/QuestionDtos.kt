@@ -15,22 +15,13 @@ data class ReadQuestionDetailResponseDto(
     val category: String,
     val memo: String? = null
 ) {
-    constructor(question: Question, options: JsonNode) : this(
-        createdAt = question.createdAt,
-        modifiedAt = question.modifiedAt,
-        statement = question.statement,
-        image = question.image,
-        options = options,
-        answer = question.answer,
-        category = question.category,
-        memo = question.memo
-    )
 
     constructor(question: Question) : this(
         createdAt = question.createdAt,
         modifiedAt = question.modifiedAt,
         statement = question.statement,
         image = question.image,
+        options = question.options,
         answer = question.answer,
         category = question.category,
         memo = question.memo
