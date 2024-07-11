@@ -19,7 +19,7 @@ class WorkbookTest {
                 provider = Provider.APPLE,
                 joinedAt = LocalDateTime.now(),
                 deletedAt = null
-            ), emoji = null
+            ), emoji = "😀"
         )
         workbook.deletedAt = LocalDateTime.now()
 
