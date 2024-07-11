@@ -21,7 +21,6 @@ import java.util.UUID
 @Service
 class QuestionService(
     private val questionRepository: QuestionRepository,
-    private val questionSetRepository: QuestionSetRepository,
     private val memberRepository: MemberRepository,
     private val tagRepository: TagRepository
 ) {

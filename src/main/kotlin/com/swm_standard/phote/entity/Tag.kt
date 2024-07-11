@@ -12,7 +12,7 @@ import java.time.LocalDateTime
 data class Tag(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "tag_id")
-    val id: Long = 0,
+    val id: Long = 0L,
 
     @Column(unique = true)
     val name: String,

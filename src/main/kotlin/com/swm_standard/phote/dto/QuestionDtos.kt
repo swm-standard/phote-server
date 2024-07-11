@@ -45,12 +45,12 @@ class DeleteQuestionResponseDto (
 )
 
 data class CreateQuestionRequestDto(
-    @NotBlank(message = "statement 미입력")
+    @field:NotBlank(message = "statement 미입력")
     val statement: String,
-    @NotBlank(message = "category 미입력")
+    @field:NotBlank(message = "category 미입력")
     val category: String,
     val options: JsonNode? = null,
-    @NotBlank(message = "answer 미입력")
+    @field:NotBlank(message = "answer 미입력")
     val answer: String,
     val tags: List<String>? = null,
     val memo: String? = null
