@@ -71,7 +71,7 @@ class WorkbookService(
                 workbook.description,
                 workbook.emoji,
                 workbook.quantity,
-                workbook.createdAt,
+                workbook.modifiedAt,
             )
         }
     }

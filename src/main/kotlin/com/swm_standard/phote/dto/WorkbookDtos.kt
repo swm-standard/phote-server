@@ -61,6 +61,6 @@ data class ReadWorkbookListResponse(
 
     val quantity: Int,
 
-    val createdAt: LocalDateTime,
+    val modifiedAt: LocalDateTime?
 
 )

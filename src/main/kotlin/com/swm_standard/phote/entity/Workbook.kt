@@ -41,7 +41,7 @@ data class Workbook(
     var deletedAt: LocalDateTime? = null
 
     @LastModifiedDate
-    var modifiedAt: LocalDateTime? = null
+    var modifiedAt: LocalDateTime? = LocalDateTime.now()
 
     fun isDeleted():Boolean = this.deletedAt != null
 }
