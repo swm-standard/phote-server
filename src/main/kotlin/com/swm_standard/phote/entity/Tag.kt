@@ -19,6 +19,7 @@ data class Tag(
 
     @JoinColumn(name = "question_id")
     @ManyToOne
+    @JsonIgnore
     val question: Question,
 
     @JsonIgnore

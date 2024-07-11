@@ -49,3 +49,18 @@ data class ReadWorkbookDetailResponse(
 
     val questions: List<QuestionSet>,
 )
+
+data class ReadWorkbookListResponse(
+    val id: UUID,
+
+    val title: String,
+
+    val description: String?,
+
+    val emoji: String,
+
+    val quantity: Int,
+
+    val modifiedAt: LocalDateTime?
+
+)

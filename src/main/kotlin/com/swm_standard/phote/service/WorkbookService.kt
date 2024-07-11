@@ -1,9 +1,11 @@
 package com.swm_standard.phote.service
 
+import com.swm_standard.phote.common.exception.InvalidInputException
 import com.swm_standard.phote.common.exception.NotFoundException
 import com.swm_standard.phote.dto.CreateWorkbookResponse
 import com.swm_standard.phote.dto.DeleteWorkbookResponse
 import com.swm_standard.phote.dto.ReadWorkbookDetailResponse
+import com.swm_standard.phote.dto.ReadWorkbookListResponse
 import com.swm_standard.phote.entity.Workbook
 import com.swm_standard.phote.repository.MemberRepository
 import com.swm_standard.phote.repository.QuestionSetRepository
@@ -20,7 +22,8 @@ class WorkbookService(
     private val questionSetRepository: QuestionSetRepository
 ) {
 
-    fun createWorkbook(title: String, description: String?, emoji: String?, memberEmail: String): CreateWorkbookResponse {
+    @Transactional
+    fun createWorkbook(title: String, description: String?, emoji: String, memberEmail: String): CreateWorkbookResponse {
         val member = memberRepository.findByEmail(memberEmail) ?: throw NotFoundException()
         val workbook = workbookRepository.save(Workbook(title, description, member, emoji))
 
@@ -29,6 +32,8 @@ class WorkbookService(
 
     @Transactional
     fun deleteWorkbook(id: UUID): DeleteWorkbookResponse {
+
+        workbookRepository.findById(id).orElseThrow { NotFoundException("workbookId","존재하지 않는 workbook") }
 
         workbookRepository.deleteById(id)
 
@@ -44,10 +49,26 @@ class WorkbookService(
             workbook.id,
             workbook.title,
             workbook.description,
-            workbook.emoji!!,
+            workbook.emoji,
             workbook.createdAt,
             workbook.modifiedAt,
             questionSet
             )
+    }
+
+    fun readWorkbookList(memberId: UUID) : List<ReadWorkbookListResponse> {
+        val member = memberRepository.findById(memberId).orElseThrow { InvalidInputException("memberId") }
+        val workbooks: List<Workbook> = workbookRepository.findAllByMember(member)
+
+        return workbooks.map { workbook ->
+            ReadWorkbookListResponse(
+                workbook.id,
+                workbook.title,
+                workbook.description,
+                workbook.emoji,
+                workbook.quantity,
+                workbook.modifiedAt,
+            )
+        }
     }
 }
