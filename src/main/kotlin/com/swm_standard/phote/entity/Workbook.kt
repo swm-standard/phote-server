@@ -24,7 +24,7 @@ data class Workbook(
     @JsonIgnore
     val member: Member,
 
-    var emoji: String?,
+    var emoji: String,
 
 ){
 
@@ -36,7 +36,7 @@ data class Workbook(
     val questionSet: List<QuestionSet>? = null
 
     @ColumnDefault(value = "0")
-    var quantity: Int? = null
+    var quantity: Int = 0
 
     @CreationTimestamp
     val createdAt: LocalDateTime = LocalDateTime.now()
@@ -45,6 +45,6 @@ data class Workbook(
     var deletedAt: LocalDateTime? = null
 
     @LastModifiedDate
-    var modifiedAt: LocalDateTime? = null
+    var modifiedAt: LocalDateTime? = LocalDateTime.now()
 
 }
