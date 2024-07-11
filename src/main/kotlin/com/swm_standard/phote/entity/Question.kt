@@ -45,7 +45,7 @@ data class Question(
     val questionSet: List<QuestionSet>? = null,
 
     @OneToMany(mappedBy = "question", cascade = [CascadeType.REMOVE])
-    val tags: List<Tag>? = null,
+    var tags: MutableList<Tag> = mutableListOf(),
 
     val memo: String?,
 
