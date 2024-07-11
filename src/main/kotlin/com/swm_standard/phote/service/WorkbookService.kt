@@ -33,6 +33,8 @@ class WorkbookService(
     @Transactional
     fun deleteWorkbook(id: UUID): DeleteWorkbookResponse {
 
+        workbookRepository.findById(id).orElseThrow { NotFoundException("workbookId","존재하지 않는 workbook") }
+
         workbookRepository.deleteById(id)
 
         return DeleteWorkbookResponse(id, LocalDateTime.now())
