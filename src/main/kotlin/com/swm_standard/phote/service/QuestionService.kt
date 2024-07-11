@@ -77,20 +77,12 @@ class QuestionService(
 
     @Transactional
     fun deleteQuestion(id: UUID): DeleteQuestionResponseDto {
-        val question = questionRepository.findById(id).orElseThrow { NotFoundException("questionId","존재하지 않는 UUID") }
 
-        val now = LocalDateTime.now()
+        // 존재하지 않는 question id가 아닌지 확인
+        questionRepository.findById(id).orElseThrow { NotFoundException("questionId","존재하지 않는 UUID") }
 
-        // workbook과의 관계 끊어주기
-        questionSetRepository.markDeletedByQuestionId(id, now)
+        questionRepository.deleteById(id)
 
-        // deletedAt필드 채우기
-        question.apply {
-            deletedAt = now
-        }.also {
-            questionRepository.save(it)
-        }
-
-        return DeleteQuestionResponseDto(id, question.deletedAt!!)
+        return DeleteQuestionResponseDto(id, LocalDateTime.now())
     }
 }

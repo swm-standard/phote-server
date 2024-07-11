@@ -21,7 +21,7 @@ data class Question(
     val id: UUID = UUID.randomUUID(),
 
 
-    @ManyToOne(cascade = [(CascadeType.REMOVE)])
+    @ManyToOne
     @JoinColumn(name = "member_id")
     @JsonIgnore
     val member: Member,
@@ -41,7 +41,7 @@ data class Question(
 
     @OneToMany(mappedBy = "question", cascade = [CascadeType.REMOVE])
     @JsonIgnore
-    val questionSet: Set<QuestionSet>? = null,
+    val questionSet: List<QuestionSet>? = null,
 
     @OneToMany(mappedBy = "question", cascade = [CascadeType.REMOVE])
     var tags: MutableList<Tag> = mutableListOf(),
