@@ -66,7 +66,8 @@ class CustomExceptionHandler {
 
     @ExceptionHandler(NotFoundException::class)
     protected fun notFoundException(ex: NotFoundException) : ResponseEntity<BaseResponse<Map<String, String>>> {
-        return ResponseEntity(BaseResponse(ErrorCode.NOT_FOUND.name, ErrorCode.NOT_FOUND.statusCode, ex.message ?: ErrorCode.NOT_FOUND.msg), HttpStatus.NOT_FOUND)
+        val errors = mapOf(ex.fieldName to (ex.message ?: "Not Exception Message"))
+        return ResponseEntity(BaseResponse(ErrorCode.NOT_FOUND.name, ErrorCode.NOT_FOUND.statusCode, ex.message ?: ErrorCode.NOT_FOUND.msg, errors), HttpStatus.NOT_FOUND)
 
     }
 

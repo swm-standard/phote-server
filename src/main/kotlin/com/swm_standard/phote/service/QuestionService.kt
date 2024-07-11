@@ -8,16 +8,19 @@ import com.swm_standard.phote.common.exception.NotFoundException
 import com.swm_standard.phote.dto.DeleteQuestionResponseDto
 import com.swm_standard.phote.dto.ReadQuestionDetailResponseDto
 import com.swm_standard.phote.repository.QuestionRepository
+import com.swm_standard.phote.repository.QuestionSetRepository
 import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.util.UUID
 
 @Service
-class QuestionService (private val questionRepository: QuestionRepository) {
+class QuestionService (
+    private val questionRepository: QuestionRepository,
+    private val questionSetRepository: QuestionSetRepository) {
     @Transactional
     fun readQuestionDetail(id: UUID): ReadQuestionDetailResponseDto {
-        val question = questionRepository.findById(id).orElseThrow { NotFoundException("존재하지 않는 UUID") }
+        val question = questionRepository.findById(id).orElseThrow { NotFoundException("questionId","존재하지 않는 UUID") }
 
         // options가 있는 객관식일 경우
         if (question.options != null) {
@@ -34,13 +37,12 @@ class QuestionService (private val questionRepository: QuestionRepository) {
 
     @Transactional
     fun deleteQuestion(id: UUID): DeleteQuestionResponseDto {
-        val question = questionRepository.findById(id).orElseThrow { NotFoundException("존재하지 않는 UUID") }
-        if (question.deletedAt != null) throw AlreadyDeletedException()
 
-        // deleteAt필드 채우기
-        question.deletedAt = LocalDateTime.now()
-        questionRepository.save(question)
+        // 존재하지 않는 question id가 아닌지 확인
+        questionRepository.findById(id).orElseThrow { NotFoundException("questionId","존재하지 않는 UUID") }
 
-        return DeleteQuestionResponseDto(id, question.deletedAt!!)
+        questionRepository.deleteById(id)
+
+        return DeleteQuestionResponseDto(id, LocalDateTime.now())
     }
 }

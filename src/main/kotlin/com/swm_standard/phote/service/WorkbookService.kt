@@ -1,7 +1,5 @@
 package com.swm_standard.phote.service
 
-import com.swm_standard.phote.common.exception.AlreadyDeletedException
-import com.swm_standard.phote.common.exception.InvalidInputException
 import com.swm_standard.phote.common.exception.NotFoundException
 import com.swm_standard.phote.dto.CreateWorkbookResponse
 import com.swm_standard.phote.dto.DeleteWorkbookResponse
@@ -34,18 +32,14 @@ class WorkbookService(
 
     @Transactional
     fun deleteWorkbook(id: UUID): DeleteWorkbookResponse {
-        val workbook = workbookRepository.findById(id).orElseThrow { NotFoundException("존재하지 않는 workbook") }
-        if (workbook.isDeleted()) throw AlreadyDeletedException("workbook")
 
-        workbook.deletedAt = LocalDateTime.now()
-        val deletedWorkbook = workbookRepository.save(workbook)
+        workbookRepository.deleteById(id)
 
-        return DeleteWorkbookResponse(deletedWorkbook.id, deletedWorkbook.deletedAt!!)
+        return DeleteWorkbookResponse(id, LocalDateTime.now())
     }
 
     fun readWorkbookDetail(id: UUID) : ReadWorkbookDetailResponse {
-        val workbook = workbookRepository.findById(id).orElseThrow { NotFoundException(message = "존재하지 않는 workbook") }
-        if (workbook.isDeleted()) throw AlreadyDeletedException("workbook")
+        val workbook = workbookRepository.findById(id).orElseThrow { NotFoundException() }
 
         val questionSet = questionSetRepository.findAllByWorkbookId(id)
 
