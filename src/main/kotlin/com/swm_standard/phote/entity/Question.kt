@@ -1,6 +1,7 @@
 package com.swm_standard.phote.entity
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.databind.JsonNode
 import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.JdbcTypeCode
@@ -31,7 +32,7 @@ data class Question(
 
     @Column(columnDefinition = "json")
     @JdbcTypeCode(SqlTypes.JSON)
-    val options: String?,
+    val options: JsonNode? = null,
 
     val image: String?,
 

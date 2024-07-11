@@ -24,7 +24,7 @@ data class Workbook(
     @JsonIgnore
     val member: Member,
 
-    var emoji: String?,
+    var emoji: String,
 
 ){
 

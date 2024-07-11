@@ -20,7 +20,7 @@ class WorkbookService(
     private val questionSetRepository: QuestionSetRepository
 ) {
 
-    fun createWorkbook(title: String, description: String?, emoji: String?, memberEmail: String): CreateWorkbookResponse {
+    fun createWorkbook(title: String, description: String?, emoji: String, memberEmail: String): CreateWorkbookResponse {
         val member = memberRepository.findByEmail(memberEmail) ?: throw NotFoundException()
         val workbook = workbookRepository.save(Workbook(title, description, member, emoji))
 
@@ -44,7 +44,7 @@ class WorkbookService(
             workbook.id,
             workbook.title,
             workbook.description,
-            workbook.emoji!!,
+            workbook.emoji,
             workbook.createdAt,
             workbook.modifiedAt,
             questionSet

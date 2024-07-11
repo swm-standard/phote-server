@@ -1,5 +1,6 @@
 package com.swm_standard.phote.entity
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.*
 import java.time.LocalDateTime
 
@@ -14,7 +15,9 @@ data class Tag(
 
     @JoinColumn(name = "question_id")
     @ManyToOne
+    @JsonIgnore
     val question: Question,
 
+    @JsonIgnore
     val deletedAt: LocalDateTime?
 )
