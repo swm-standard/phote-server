@@ -52,7 +52,7 @@ class WorkbookController(private val workbookService: WorkbookService) {
     }
 
     @PostMapping("/workbook/{workbookId}")
-    fun addQuestionstoWorkbook(@PathVariable workbookId: UUID, @RequestBody @Valid request: AddQuestionstoWorbookRequest): BaseResponse<Unit> {
+    fun addQuestionstoWorkbook(@PathVariable workbookId: UUID, @RequestBody @Valid request: AddQuestionstoWorkbookRequest): BaseResponse<Unit> {
         if(request.questions.isEmpty()) throw InvalidInputException(fieldName = "questions", message = "question을 담아 요청해주세요.")
         workbookService.addQuestionstoWorkbook(workbookId,request)
 

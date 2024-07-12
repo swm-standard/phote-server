@@ -74,7 +74,7 @@ class WorkbookService(
         }
     }
 
-    fun addQuestionstoWorkbook(workbookId: UUID, request: AddQuestionstoWorbookRequest) {
+    fun addQuestionstoWorkbook(workbookId: UUID, request: AddQuestionstoWorkbookRequest) {
 
         val workbook: Workbook = workbookRepository.findById(workbookId).orElseThrow { NotFoundException(fieldName = "workbook", message = "id 를 재확인해주세요.") }
 

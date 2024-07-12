@@ -65,7 +65,7 @@ data class ReadWorkbookListResponse(
 
 )
 
-data class AddQuestionstoWorbookRequest(
+data class AddQuestionstoWorkbookRequest(
     @JsonProperty("questions")
     private val _questions: List<UUID>?
 ){
