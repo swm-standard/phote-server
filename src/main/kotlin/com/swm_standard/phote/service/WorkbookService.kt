@@ -1,13 +1,14 @@
 package com.swm_standard.phote.service
 
+import com.swm_standard.phote.common.exception.AlreadyExistedException
 import com.swm_standard.phote.common.exception.InvalidInputException
 import com.swm_standard.phote.common.exception.NotFoundException
-import com.swm_standard.phote.dto.CreateWorkbookResponse
-import com.swm_standard.phote.dto.DeleteWorkbookResponse
-import com.swm_standard.phote.dto.ReadWorkbookDetailResponse
-import com.swm_standard.phote.dto.ReadWorkbookListResponse
+import com.swm_standard.phote.dto.*
+import com.swm_standard.phote.entity.Question
+import com.swm_standard.phote.entity.QuestionSet
 import com.swm_standard.phote.entity.Workbook
 import com.swm_standard.phote.repository.MemberRepository
+import com.swm_standard.phote.repository.QuestionRepository
 import com.swm_standard.phote.repository.QuestionSetRepository
 import com.swm_standard.phote.repository.WorkbookRepository
 import jakarta.transaction.Transactional
@@ -19,7 +20,8 @@ import java.util.UUID
 class WorkbookService(
     private val workbookRepository: WorkbookRepository,
     private val memberRepository: MemberRepository,
-    private val questionSetRepository: QuestionSetRepository
+    private val questionSetRepository: QuestionSetRepository,
+    private val questionRepository: QuestionRepository
 ) {
 
     @Transactional
@@ -69,6 +71,19 @@ class WorkbookService(
                 workbook.quantity,
                 workbook.modifiedAt,
             )
+        }
+    }
+
+    fun addQuestionstoWorkbook(workbookId: UUID, request: AddQuestionstoWorkbookRequest) {
+
+        val workbook: Workbook = workbookRepository.findById(workbookId).orElseThrow { NotFoundException(fieldName = "workbook", message = "id 를 재확인해주세요.") }
+
+        request.questions.forEach { questionId ->
+            val question: Question = questionRepository.findById(questionId).orElseThrow { NotFoundException(fieldName = "question", message = "id 를 재확인해주세요.") }
+            questionSetRepository.findByQuestionIdAndWorkbookId(questionId, workbook.id)?.let { throw  AlreadyExistedException("questionId ($questionId)") }
+            QuestionSet(question, workbook).run {
+                questionSetRepository.save(this)
+            }
         }
     }
 }

@@ -1,6 +1,6 @@
 package com.swm_standard.phote.common.exception
 
-class AlreadyDeletedException (
+class AlreadyExistedException (
     val fieldName: String = "",
-    message: String = "이미 삭제된 리소스입니다."
+    message: String = "이미 존재하는 리소스입니다."
 ): RuntimeException(message)  
