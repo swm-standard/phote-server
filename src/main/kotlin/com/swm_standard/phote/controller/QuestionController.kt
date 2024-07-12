@@ -9,7 +9,6 @@ import com.swm_standard.phote.dto.ReadQuestionDetailResponseDto
 import com.swm_standard.phote.external.aws.S3Service
 import com.swm_standard.phote.service.QuestionService
 import jakarta.validation.Valid
-import org.springframework.validation.annotation.Validated
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import java.util.*

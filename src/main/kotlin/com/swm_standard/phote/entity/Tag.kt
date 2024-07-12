@@ -11,16 +11,15 @@ import java.time.LocalDateTime
 @SQLRestriction("deleted_at is NULL")
 data class Tag(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "tag_id")
+    @Column(name = "tag_id", unique = true)
     val id: Long = 0L,
 
-    @Column(unique = true)
     val name: String,
 
     @JoinColumn(name = "question_id")
     @ManyToOne
     @JsonIgnore
-    val question: Question,
+    var question: Question,
 
     @JsonIgnore
     val deletedAt: LocalDateTime? = null

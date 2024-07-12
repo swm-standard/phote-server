@@ -2,8 +2,8 @@ package com.swm_standard.phote.dto
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.swm_standard.phote.entity.Question
+import com.swm_standard.phote.entity.Tag
 import jakarta.validation.constraints.NotBlank
-import org.springframework.web.multipart.MultipartFile
 import java.time.LocalDateTime
 import java.util.*
 

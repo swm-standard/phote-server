@@ -1,7 +1,5 @@
 package com.swm_standard.phote.service
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.swm_standard.phote.common.exception.NotFoundException
 import com.swm_standard.phote.dto.CreateQuestionRequestDto
 import com.swm_standard.phote.dto.CreateQuestionResponseDto
@@ -30,11 +28,6 @@ class QuestionService(
         // 문제 생성 유저 확인
         val member = memberRepository.findById(memberId).orElseThrow { NotFoundException("존재하지 않는 member") }
 
-        // options를 JSON -> 문자열로 변환
-        val options = request.options?.let {
-            ObjectMapper().writeValueAsString(it)
-        }
-
         // 문제 저장
         val question = questionRepository.save(
             Question(
@@ -42,7 +35,7 @@ class QuestionService(
                 statement = request.statement,
                 image = imageUrl,
                 category = request.category,
-                options = options,
+                options = request.options,
                 answer = request.answer,
                 memo = request.memo
             )

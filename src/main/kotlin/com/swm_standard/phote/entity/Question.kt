@@ -56,6 +56,6 @@ data class Question(
     var deletedAt: LocalDateTime? = null,
 
     @LastModifiedDate
-    var modifiedAt: LocalDateTime? = null
+    var modifiedAt: LocalDateTime? = LocalDateTime.now()
 
     )
