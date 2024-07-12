@@ -26,7 +26,6 @@ class QuestionController(
                        @RequestPart image: MultipartFile?
     ): BaseResponse<CreateQuestionResponseDto> {
         val imageUrl = image?.let { s3Service.uploadImage(it) }
-        println(imageUrl)
         return BaseResponse(msg = "문제 생성 성공", data = questionService.createQuestion(memberId, request, imageUrl))
     }
 
