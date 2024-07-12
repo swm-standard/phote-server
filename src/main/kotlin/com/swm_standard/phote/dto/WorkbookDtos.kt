@@ -64,3 +64,11 @@ data class ReadWorkbookListResponse(
     val modifiedAt: LocalDateTime?
 
 )
+
+data class AddQuestionstoWorbookRequest(
+    @JsonProperty("questions")
+    private val _questions: List<UUID>?
+){
+    val questions: List<UUID> get() = _questions!!
+
+}
