@@ -4,7 +4,6 @@ import com.swm_standard.phote.common.exception.NotFoundException
 import com.swm_standard.phote.dto.DeleteQuestionResponseDto
 import com.swm_standard.phote.dto.ReadQuestionDetailResponseDto
 import com.swm_standard.phote.repository.QuestionRepository
-import com.swm_standard.phote.repository.QuestionSetRepository
 import com.swm_standard.phote.repository.TagRepository
 import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
@@ -19,9 +18,8 @@ class QuestionService(
     @Transactional
     fun readQuestionDetail(id: UUID): ReadQuestionDetailResponseDto {
         val question = questionRepository.findById(id).orElseThrow { NotFoundException("questionId","존재하지 않는 UUID") }
-        val tags = tagRepository.findAllByQuestionId(question.id)
 
-        return ReadQuestionDetailResponseDto(question, tags)
+        return ReadQuestionDetailResponseDto(question)
     }
 
     @Transactional

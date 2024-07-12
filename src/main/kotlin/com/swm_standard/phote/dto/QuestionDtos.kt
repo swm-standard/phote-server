@@ -18,14 +18,14 @@ data class ReadQuestionDetailResponseDto(
     val memo: String? = null
 ) {
 
-    constructor(question: Question, tags: List<Tag>?) : this(
+    constructor(question: Question) : this(
         createdAt = question.createdAt,
         modifiedAt = question.modifiedAt,
         statement = question.statement,
         image = question.image,
         options = question.options,
         answer = question.answer,
-        tags = tags,
+        tags = question.tags,
         category = question.category,
         memo = question.memo
     )
