@@ -1,5 +1,6 @@
 package com.swm_standard.phote.controller
 
+import com.swm_standard.phote.common.exception.InvalidInputException
 import com.swm_standard.phote.common.resolver.memberId.MemberId
 import com.swm_standard.phote.common.responsebody.BaseResponse
 import com.swm_standard.phote.dto.*
@@ -26,10 +27,10 @@ class WorkbookController(private val workbookService: WorkbookService) {
         return BaseResponse(msg = "문제집 생성 성공", data = workbook)
     }
 
-    @DeleteMapping("/workbook/{id}")
-    fun deleteWorkbook(@PathVariable("id") id: UUID): BaseResponse<DeleteWorkbookResponse> {
+    @DeleteMapping("/workbook/{workbookId}")
+    fun deleteWorkbook(@PathVariable workbookId: UUID): BaseResponse<DeleteWorkbookResponse> {
 
-        val deletedWorkbook = workbookService.deleteWorkbook(id)
+        val deletedWorkbook = workbookService.deleteWorkbook(workbookId)
 
         return BaseResponse(msg = "문제집 삭제 성공", data = deletedWorkbook)
     }
@@ -48,5 +49,14 @@ class WorkbookController(private val workbookService: WorkbookService) {
         val readWorkbookList = workbookService.readWorkbookList(memberId)
 
         return BaseResponse(msg = "문제집 목록 조회 성공", data = readWorkbookList)
+    }
+
+    @PostMapping("/workbook/{workbookId}")
+    fun addQuestionstoWorkbook(@PathVariable workbookId: UUID, @RequestBody @Valid request: AddQuestionstoWorkbookRequest): BaseResponse<Unit> {
+        if(request.questions.isEmpty()) throw InvalidInputException(fieldName = "questions", message = "question을 담아 요청해주세요.")
+        workbookService.addQuestionstoWorkbook(workbookId,request)
+
+        return BaseResponse(msg = "문제집에 문제 추가 성공")
+
     }
 }

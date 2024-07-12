@@ -11,9 +11,6 @@ import java.time.LocalDateTime
 @SQLDelete(sql = "UPDATE question_set SET deleted_at = NOW() WHERE question_set_id = ?")
 @SQLRestriction("deleted_at is NULL")
 data class QuestionSet(
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "questionSet_id")
-    val id: Long,
 
     @ManyToOne
     @JoinColumn(name = "question_id")
@@ -24,11 +21,19 @@ data class QuestionSet(
     @JsonIgnore
     val workbook: Workbook,
 
-    val sequence: Int,
+
+    ){
+
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "questionSet_id")
+    val id: Long = 0
+
+    var sequence: Int = 0
 
     @CreationTimestamp
-    val createdAt: LocalDateTime = LocalDateTime.now(),
+    val createdAt: LocalDateTime = LocalDateTime.now()
 
     @JsonIgnore
-    var deletedAt: LocalDateTime?,
-    )
+    var deletedAt: LocalDateTime? = null
+
+}
