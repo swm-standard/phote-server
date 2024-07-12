@@ -3,6 +3,7 @@ package com.swm_standard.phote.dto
 import com.fasterxml.jackson.databind.JsonNode
 import com.swm_standard.phote.entity.Question
 import com.swm_standard.phote.entity.Tag
+import jakarta.validation.constraints.NotBlank
 import java.time.LocalDateTime
 import java.util.*
 
@@ -34,4 +35,20 @@ data class ReadQuestionDetailResponseDto(
 class DeleteQuestionResponseDto (
     val id: UUID,
     val deletedAt: LocalDateTime
+)
+
+data class CreateQuestionRequestDto(
+    @field:NotBlank(message = "statement 미입력")
+    val statement: String,
+    @field:NotBlank(message = "category 미입력")
+    val category: String,
+    val options: JsonNode? = null,
+    @field:NotBlank(message = "answer 미입력")
+    val answer: String,
+    val tags: List<String>? = null,
+    val memo: String? = null
+)
+
+data class CreateQuestionResponseDto(
+    val id: UUID
 )
