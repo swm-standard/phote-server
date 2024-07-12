@@ -4,6 +4,7 @@ import com.swm_standard.phote.common.responsebody.BaseResponse
 import com.swm_standard.phote.common.responsebody.ErrorCode
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.validation.FieldError
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -75,6 +76,14 @@ class CustomExceptionHandler {
     protected fun methodArgumentTypeMismatchException(ex: MethodArgumentTypeMismatchException) : ResponseEntity<BaseResponse<Map<String, String>>> {
 
         val errors = mapOf(ex.name to (ex.message ?: "Not Exception Message"))
+        return ResponseEntity(BaseResponse(ErrorCode.BAD_REQUEST.name, ErrorCode.BAD_REQUEST.statusCode, ErrorCode.BAD_REQUEST.msg, errors), HttpStatus.BAD_REQUEST)
+
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException::class)
+    protected fun httpMessageNotReadableException(ex: HttpMessageNotReadableException) : ResponseEntity<BaseResponse<Map<String, String>>> {
+
+        val errors = mapOf("" to (ex.message ?: "Not Exception Message"))
         return ResponseEntity(BaseResponse(ErrorCode.BAD_REQUEST.name, ErrorCode.BAD_REQUEST.statusCode, ErrorCode.BAD_REQUEST.msg, errors), HttpStatus.BAD_REQUEST)
 
     }
