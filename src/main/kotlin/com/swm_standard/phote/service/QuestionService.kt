@@ -11,7 +11,6 @@ import com.swm_standard.phote.entity.Question
 import com.swm_standard.phote.entity.Tag
 import com.swm_standard.phote.repository.MemberRepository
 import com.swm_standard.phote.repository.QuestionRepository
-import com.swm_standard.phote.repository.QuestionSetRepository
 import com.swm_standard.phote.repository.TagRepository
 import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
@@ -61,16 +60,6 @@ class QuestionService(
     fun readQuestionDetail(id: UUID): ReadQuestionDetailResponseDto {
         val question = questionRepository.findById(id).orElseThrow { NotFoundException("questionId","존재하지 않는 UUID") }
 
-        // options가 있는 객관식일 경우
-        if (question.options != null) {
-            // string type으로 오는 options를 deserialize
-            val objectMapper = ObjectMapper()
-            val questionOptionsObject: JsonNode = objectMapper.readTree(question.options)
-
-            return ReadQuestionDetailResponseDto(question, questionOptionsObject)
-        }
-
-        // options가 없는 주관식일 경우
         return ReadQuestionDetailResponseDto(question)
     }
 
