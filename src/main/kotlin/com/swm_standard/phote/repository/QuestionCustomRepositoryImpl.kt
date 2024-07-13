@@ -29,8 +29,9 @@ class QuestionCustomRepositoryImpl(
                     .selectFrom(tag)
                     .where(tag.name.eq(tagName).and(tag.question.eq(question)))
                     .exists()
-            }.reduce { sub, predicate -> sub.and(predicate) } // reduce: 서브쿼리(sub)들을 and조건으로 결합
-            query.where(tagCondition)
+            }
+            // reduce: 서브쿼리(sub)들을 and조건으로 결합
+            query.where(tagCondition.reduce { sub, predicate -> sub.and(predicate) } )
         }
 
         // 문항 조건: keywords로 들어온 검색어를 모두 포함하는 문항(statement)을 가진 문제 검색
