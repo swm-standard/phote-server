@@ -74,7 +74,7 @@ class WorkbookService(
         }
     }
 
-    fun addQuestionstoWorkbook(workbookId: UUID, request: AddQuestionstoWorkbookRequest) {
+    fun addQuestionsToWorkbook(workbookId: UUID, request: AddQuestionsToWorkbookRequest) {
 
         val workbook: Workbook = workbookRepository.findById(workbookId).orElseThrow { NotFoundException(fieldName = "workbook", message = "id 를 재확인해주세요.") }
 
@@ -85,5 +85,21 @@ class WorkbookService(
                 questionSetRepository.save(this)
             }
         }
+    }
+
+    fun deleteQuestionInWorkbook(workbookId: UUID, questionId: UUID): DeleteQuestionInWorkbookResponse {
+        workbookRepository.findById(workbookId)
+            .orElseThrow { NotFoundException(fieldName = "workbook", message = "id 를 재확인해주세요.") }
+
+        questionRepository.findById(questionId)
+            .orElseThrow { NotFoundException(fieldName = "question", message = "id 를 재확인해주세요.") }
+
+        val questionSet: QuestionSet? = questionSetRepository.findByQuestionIdAndWorkbookId(questionId, workbookId)?.also {
+            questionSetRepository.delete(it)
+        }
+
+        if (questionSet == null) throw InvalidInputException("question", message = "문제집에 속해있지 않습니다.")
+
+        return DeleteQuestionInWorkbookResponse(workbookId, questionId, LocalDateTime.now())
     }
 }

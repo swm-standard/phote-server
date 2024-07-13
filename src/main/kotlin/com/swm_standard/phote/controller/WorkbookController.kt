@@ -28,7 +28,7 @@ class WorkbookController(private val workbookService: WorkbookService) {
     }
 
     @DeleteMapping("/workbook/{workbookId}")
-    fun deleteWorkbook(@PathVariable workbookId: UUID): BaseResponse<DeleteWorkbookResponse> {
+    fun deleteWorkbook(@PathVariable(required = true) workbookId: UUID): BaseResponse<DeleteWorkbookResponse> {
 
         val deletedWorkbook = workbookService.deleteWorkbook(workbookId)
 
@@ -36,7 +36,7 @@ class WorkbookController(private val workbookService: WorkbookService) {
     }
 
     @GetMapping("/workbook/{workbookId}")
-    fun readWorkbookDetail(@Valid @PathVariable(required = true) workbookId: UUID): BaseResponse<ReadWorkbookDetailResponse> {
+    fun readWorkbookDetail(@PathVariable(required = true) workbookId: UUID): BaseResponse<ReadWorkbookDetailResponse> {
 
         val workbookDetail = workbookService.readWorkbookDetail(workbookId)
 
@@ -52,11 +52,16 @@ class WorkbookController(private val workbookService: WorkbookService) {
     }
 
     @PostMapping("/workbook/{workbookId}")
-    fun addQuestionstoWorkbook(@PathVariable workbookId: UUID, @RequestBody @Valid request: AddQuestionstoWorkbookRequest): BaseResponse<Unit> {
+    fun addQuestionsToWorkbook(@PathVariable(required = true) workbookId: UUID, @RequestBody @Valid request: AddQuestionsToWorkbookRequest): BaseResponse<Unit> {
         if(request.questions.isEmpty()) throw InvalidInputException(fieldName = "questions", message = "question을 담아 요청해주세요.")
-        workbookService.addQuestionstoWorkbook(workbookId,request)
+        workbookService.addQuestionsToWorkbook(workbookId,request)
 
         return BaseResponse(msg = "문제집에 문제 추가 성공")
+    }
 
+    @DeleteMapping("/workbook/{workbookId}/question/{questionId}")
+    fun deleteQuestionInWorkbook(@PathVariable(required = true) workbookId: UUID, @PathVariable(required = true) questionId: UUID): BaseResponse<DeleteQuestionInWorkbookResponse> {
+
+        return BaseResponse(msg = "문제집의 문제 삭제 성공", data = workbookService.deleteQuestionInWorkbook(workbookId, questionId))
     }
 }
