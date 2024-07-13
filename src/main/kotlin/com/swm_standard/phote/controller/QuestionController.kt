@@ -8,7 +8,6 @@ import com.swm_standard.phote.external.aws.S3Service
 import com.swm_standard.phote.service.QuestionService
 import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.filter.RequestContextFilter
 import org.springframework.web.multipart.MultipartFile
 import java.util.*
 
@@ -16,8 +15,7 @@ import java.util.*
 @RequestMapping("/api")
 class QuestionController(
     private val questionService: QuestionService,
-    private val s3Service: S3Service,
-    private val requestContextFilter: RequestContextFilter
+    private val s3Service: S3Service
 ) {
 
     @PostMapping( "/question")
