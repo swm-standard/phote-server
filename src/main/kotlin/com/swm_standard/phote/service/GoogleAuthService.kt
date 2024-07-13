@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
 
 @Service
-class AuthService(private val memberRepository: MemberRepository, private val jwtTokenProvider: JwtTokenProvider) {
+class GoogleAuthService(private val memberRepository: MemberRepository, private val jwtTokenProvider: JwtTokenProvider) {
     @Value("\${GOOGLE_CLIENT_ID}")
     lateinit var clientId:String
 

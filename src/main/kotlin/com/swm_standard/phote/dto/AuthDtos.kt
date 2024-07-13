@@ -21,7 +21,7 @@ data class GoogleAccessResponseDto(
 )
 
 data class UserInfoResponseDto(
-    var accessToken: String?,
+    var accessToken: String? = null,
     val name: String,
     val email: String,
     val picture: String,

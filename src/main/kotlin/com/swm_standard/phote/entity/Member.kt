@@ -25,7 +25,7 @@ data class Member(
     val joinedAt: LocalDateTime = LocalDateTime.now(),
 
     @JsonIgnore
-    val deletedAt: LocalDateTime?
+    val deletedAt: LocalDateTime? = null
 )
 
 
