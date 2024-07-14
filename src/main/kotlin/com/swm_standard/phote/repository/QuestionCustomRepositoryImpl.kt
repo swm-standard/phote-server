@@ -20,7 +20,7 @@ class QuestionCustomRepositoryImpl(
         val query = jpaQueryFactory
             .selectFrom(question)
             .where(question.member.id.eq(memberId))
-            .leftJoin(question.tags, tag)
+            .leftJoin(question.tags, tag).fetchJoin()
             .distinct()
 
 
