@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.*
 import org.hibernate.annotations.ColumnDefault
 import org.hibernate.annotations.CreationTimestamp
+import org.hibernate.annotations.DynamicUpdate
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.SQLRestriction
 import org.springframework.data.annotation.LastModifiedDate
@@ -13,6 +14,7 @@ import java.util.*
 @Entity
 @SQLDelete(sql = "UPDATE workbook SET deleted_at = NOW() WHERE workbook_uuid = ?")
 @SQLRestriction("deleted_at is NULL")
+@DynamicUpdate
 data class Workbook(
 
     var title: String,
@@ -49,9 +51,12 @@ data class Workbook(
 
     fun decreaseQuantity(){
         this.quantity -= 1
+        modifiedAt = LocalDateTime.now()
     }
 
     fun increaseQuantity(count: Int){
         this.quantity += count
+        modifiedAt = LocalDateTime.now()
     }
+
 }

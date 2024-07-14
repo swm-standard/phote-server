@@ -99,10 +99,7 @@ class WorkbookService(
         questionSetRepository.findByQuestionIdAndWorkbookId(questionId, workbookId)?.also {
             questionSetRepository.delete(it)
 
-            workbook.apply {
-                decreaseQuantity()
-                workbookRepository.save(this)
-            }
+            workbook.decreaseQuantity()
 
             return DeleteQuestionInWorkbookResponse(workbookId, questionId, LocalDateTime.now())
         }

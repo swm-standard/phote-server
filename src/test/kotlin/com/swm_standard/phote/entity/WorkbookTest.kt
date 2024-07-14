@@ -3,7 +3,6 @@ package com.swm_standard.phote.entity
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 
-import org.junit.jupiter.api.Assertions.*
 import java.time.LocalDateTime
 import java.util.*
 
@@ -18,6 +17,7 @@ class WorkbookTest {
         workbook.decreaseQuantity()
 
         Assertions.assertThat(workbook.quantity).isEqualTo(testNum - 1)
+        Assertions.assertThat(workbook.modifiedAt?.second).isEqualTo(LocalDateTime.now().second)
     }
 
     @Test
@@ -30,7 +30,9 @@ class WorkbookTest {
         workbook.increaseQuantity(createdQuestionCnt)
 
         Assertions.assertThat(workbook.quantity).isEqualTo(testNum + createdQuestionCnt)
+        Assertions.assertThat(workbook.modifiedAt?.second).isEqualTo(LocalDateTime.now().second)
     }
+
 
     fun createWorkbook(): Workbook {
         return Workbook(
@@ -45,4 +47,6 @@ class WorkbookTest {
             ), emoji = "contentiones"
         )
     }
+
+
 }
