@@ -5,12 +5,14 @@ import com.swm_standard.phote.entity.QQuestion
 import com.swm_standard.phote.entity.QTag
 import com.swm_standard.phote.entity.Question
 import org.springframework.stereotype.Repository
+import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
 
 @Repository
 class QuestionCustomRepositoryImpl(
     private val jpaQueryFactory: JPAQueryFactory
 ): QuestionCustomRepository{
+    @Transactional(readOnly = true)
     override fun searchQuestionsList(memberId:UUID, tags: List<String>?, keywords: List<String>?): List<Question> {
         val question = QQuestion.question
         val tag = QTag.tag
