@@ -65,10 +65,18 @@ data class ReadWorkbookListResponse(
 
 )
 
-data class AddQuestionstoWorkbookRequest(
+data class AddQuestionsToWorkbookRequest(
     @JsonProperty("questions")
     private val _questions: List<UUID>?
 ){
     val questions: List<UUID> get() = _questions!!
 
 }
+
+data class DeleteQuestionInWorkbookResponse(
+    val workbookId: UUID,
+
+    val questionId: UUID,
+
+    val deletedAt: LocalDateTime
+)

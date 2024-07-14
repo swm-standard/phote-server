@@ -47,4 +47,11 @@ data class Workbook(
     @LastModifiedDate
     var modifiedAt: LocalDateTime? = LocalDateTime.now()
 
+    fun decreaseQuantity(){
+        this.quantity -= 1
+    }
+
+    fun increaseQuantity(count: Int){
+        this.quantity += count
+    }
 }
