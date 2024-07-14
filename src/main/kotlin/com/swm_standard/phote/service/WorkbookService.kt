@@ -11,8 +11,8 @@ import com.swm_standard.phote.repository.MemberRepository
 import com.swm_standard.phote.repository.QuestionRepository
 import com.swm_standard.phote.repository.QuestionSetRepository
 import com.swm_standard.phote.repository.WorkbookRepository
-import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -42,6 +42,7 @@ class WorkbookService(
         return DeleteWorkbookResponse(id, LocalDateTime.now())
     }
 
+    @Transactional(readOnly = true)
     fun readWorkbookDetail(id: UUID) : ReadWorkbookDetailResponse {
         val workbook = workbookRepository.findById(id).orElseThrow { NotFoundException() }
 
@@ -58,6 +59,7 @@ class WorkbookService(
             )
     }
 
+    @Transactional(readOnly = true)
     fun readWorkbookList(memberId: UUID) : List<ReadWorkbookListResponse> {
         val member = memberRepository.findById(memberId).orElseThrow { InvalidInputException("memberId") }
         val workbooks: List<Workbook> = workbookRepository.findAllByMember(member)
@@ -74,7 +76,8 @@ class WorkbookService(
         }
     }
 
-    fun addQuestionstoWorkbook(workbookId: UUID, request: AddQuestionstoWorkbookRequest) {
+    @Transactional
+    fun addQuestionsToWorkbook(workbookId: UUID, request: AddQuestionsToWorkbookRequest) {
 
         val workbook: Workbook = workbookRepository.findById(workbookId).orElseThrow { NotFoundException(fieldName = "workbook", message = "id 를 재확인해주세요.") }
 
@@ -85,5 +88,27 @@ class WorkbookService(
                 questionSetRepository.save(this)
             }
         }
+
+        workbook.increaseQuantity(request.questions.size)
+    }
+
+
+    @Transactional
+    fun deleteQuestionInWorkbook(workbookId: UUID, questionId: UUID): DeleteQuestionInWorkbookResponse {
+        val workbook = workbookRepository.findById(workbookId)
+            .orElseThrow { NotFoundException(fieldName = "workbook", message = "id 를 재확인해주세요.") }
+
+        questionSetRepository.findByQuestionIdAndWorkbookId(questionId, workbookId)?.also {
+            questionSetRepository.delete(it)
+
+            workbook.apply {
+                decreaseQuantity()
+                workbookRepository.save(this)
+            }
+
+            return DeleteQuestionInWorkbookResponse(workbookId, questionId, LocalDateTime.now())
+        }
+
+        throw InvalidInputException("question", message = "문제집에 속해있지 않습니다.")
     }
 }
