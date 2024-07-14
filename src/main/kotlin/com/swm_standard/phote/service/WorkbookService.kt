@@ -46,16 +46,14 @@ class WorkbookService(
     fun readWorkbookDetail(id: UUID) : ReadWorkbookDetailResponse {
         val workbook = workbookRepository.findById(id).orElseThrow { NotFoundException() }
 
-        val questionSet = questionSetRepository.findAllByWorkbookId(id)
 
         return ReadWorkbookDetailResponse(
             workbook.id,
             workbook.title,
             workbook.description,
             workbook.emoji,
-            workbook.createdAt,
+            workbook.quantity,
             workbook.modifiedAt,
-            questionSet
             )
     }
 
@@ -101,10 +99,7 @@ class WorkbookService(
         questionSetRepository.findByQuestionIdAndWorkbookId(questionId, workbookId)?.also {
             questionSetRepository.delete(it)
 
-            workbook.apply {
-                decreaseQuantity()
-                workbookRepository.save(this)
-            }
+            workbook.decreaseQuantity()
 
             return DeleteQuestionInWorkbookResponse(workbookId, questionId, LocalDateTime.now())
         }

@@ -43,11 +43,9 @@ data class ReadWorkbookDetailResponse(
 
     val emoji: String,
 
-    val createdAt: LocalDateTime,
+    val quantity: Int,
 
     val modifiedAt: LocalDateTime?,
-
-    val questions: List<QuestionSet>,
 )
 
 data class ReadWorkbookListResponse(
