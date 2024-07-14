@@ -10,7 +10,8 @@ import com.swm_standard.phote.entity.Tag
 import com.swm_standard.phote.repository.MemberRepository
 import com.swm_standard.phote.repository.QuestionRepository
 import com.swm_standard.phote.repository.TagRepository
-import jakarta.transaction.Transactional
+import com.swm_standard.phote.repository.WorkbookRepository
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.util.UUID
@@ -19,7 +20,8 @@ import java.util.UUID
 class QuestionService(
     private val questionRepository: QuestionRepository,
     private val memberRepository: MemberRepository,
-    private val tagRepository: TagRepository
+    private val tagRepository: TagRepository,
+    private val workbookRepository: WorkbookRepository
 ) {
     @Transactional
     fun createQuestion(memberId:UUID, request: CreateQuestionRequestDto, imageUrl: String?)
@@ -60,7 +62,14 @@ class QuestionService(
     fun deleteQuestion(id: UUID): DeleteQuestionResponseDto {
 
         // 존재하지 않는 question id가 아닌지 확인
-        questionRepository.findById(id).orElseThrow { NotFoundException("questionId","존재하지 않는 UUID") }
+        val question = questionRepository.findById(id).orElseThrow { NotFoundException("questionId","존재하지 않는 UUID") }
+
+        // 연결된 workbook의 quantity 감소
+        question.questionSet?.forEach { questionSet ->
+            val workbook = questionSet.workbook
+            workbook.decreaseQuantity()
+            workbookRepository.save(workbook)
+        }
 
         questionRepository.deleteById(id)
 
