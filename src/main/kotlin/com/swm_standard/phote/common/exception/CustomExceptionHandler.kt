@@ -9,6 +9,7 @@ import org.springframework.validation.FieldError
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.method.annotation.HandlerMethodValidationException
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
 import org.springframework.web.servlet.resource.NoResourceFoundException
 
@@ -69,6 +70,20 @@ class CustomExceptionHandler {
     protected fun notFoundException(ex: NotFoundException) : ResponseEntity<BaseResponse<Map<String, String>>> {
         val errors = mapOf(ex.fieldName to (ex.message ?: "Not Exception Message"))
         return ResponseEntity(BaseResponse(ErrorCode.NOT_FOUND.name, ErrorCode.NOT_FOUND.statusCode, ex.message ?: ErrorCode.NOT_FOUND.msg, errors), HttpStatus.NOT_FOUND)
+
+    }
+
+    @ExceptionHandler(HandlerMethodValidationException::class)
+    protected fun handlerMethodValidationException(ex: HandlerMethodValidationException) : ResponseEntity<BaseResponse<Map<String, String>>> {
+        val errors = mutableMapOf<String, String>()
+
+        ex.allErrors.forEach{ error ->
+            val fieldName = (error as FieldError).field
+            val errorMessage = error.defaultMessage
+            errors[fieldName] = errorMessage ?: "Not Exception Message"
+        }
+
+        return ResponseEntity(BaseResponse(ErrorCode.ERROR.name, ErrorCode.BAD_REQUEST.statusCode, ex.message , errors), HttpStatus.BAD_REQUEST)
 
     }
 

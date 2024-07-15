@@ -2,7 +2,6 @@ package com.swm_standard.phote.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.validation.constraints.NotBlank
-import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.PositiveOrZero
 import java.time.LocalDateTime
 import java.util.UUID
@@ -81,17 +80,16 @@ data class DeleteQuestionInWorkbookResponse(
 )
 
 data class UpdateQuestionSequenceRequest(
-    @field:NotNull
     @JsonProperty("id")
-    private var _id: UUID,
+    private val _id: UUID?,
 
-    @field:PositiveOrZero
+    @field:PositiveOrZero(message = "sequence는 0 이상의 정수만 가능합니다.")
     @JsonProperty("sequence")
-    private var _sequence: Int,
+    private val _sequence: Int?,
 ){
-    val id: UUID get() = _id
+    val id: UUID get() = _id!!
 
-    val sequence: Int get() = _sequence
+    val sequence: Int get() = _sequence!!
 }
 
 data class UpdateQuestionSequenceResponse(

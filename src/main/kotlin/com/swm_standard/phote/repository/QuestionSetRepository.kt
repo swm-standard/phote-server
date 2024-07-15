@@ -7,7 +7,5 @@ import java.util.UUID
 
 interface QuestionSetRepository: JpaRepository<QuestionSet, UUID> {
 
-    fun findAllByWorkbookId(workbookId:UUID): List<QuestionSet>
-
     fun findByQuestionIdAndWorkbookId(questionId: UUID, workbookId: UUID): QuestionSet?
 }
