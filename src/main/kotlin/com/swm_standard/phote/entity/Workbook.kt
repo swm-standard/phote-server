@@ -59,4 +59,6 @@ data class Workbook(
         modifiedAt = LocalDateTime.now()
     }
 
+    fun compareQuestionQuantity(num: Int) = num == this.quantity
+
 }

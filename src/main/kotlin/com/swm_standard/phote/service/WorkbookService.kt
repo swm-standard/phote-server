@@ -109,6 +109,10 @@ class WorkbookService(
 
     @Transactional
     fun updateQuestionSequence(workbookId: UUID, request: List<UpdateQuestionSequenceRequest>): UUID {
+        val workbook: Workbook = workbookRepository.findById(workbookId)
+            .orElseThrow { NotFoundException(fieldName = "workbook", message = "id를 재확인해주세요.") }
+
+        if (!workbook.compareQuestionQuantity(request.size)) throw InvalidInputException(fieldName = "question", message = "문제집 내 모든 문제를 포함해주세요.")
 
         request.forEach {
             val questionSet: QuestionSet? =
