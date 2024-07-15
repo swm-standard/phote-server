@@ -44,7 +44,8 @@ class AuthController(
         val accessToken = googleAuthService.getTokenFromGoogle(code)
         val userInfo = googleAuthService.getUserInfoFromGoogle(accessToken)
 
-        return BaseResponse(msg = "로그인 성공", data = userInfo)
+        val message = if (userInfo.isMember == false) "회원가입 성공" else "로그인 성공"
+        return BaseResponse(msg = message, data = userInfo)
     }
 
     @GetMapping("/kakao-login")

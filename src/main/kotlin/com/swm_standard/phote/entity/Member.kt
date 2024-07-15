@@ -9,9 +9,6 @@ import java.util.UUID
 @Entity
 data class Member(
 
-    @Id @Column(name = "member_uuid", nullable = false, unique = true)
-    val id: UUID = UUID.randomUUID(),
-
     val name: String,
 
     val email: String,
@@ -21,11 +18,15 @@ data class Member(
     @Enumerated(EnumType.STRING)
     val provider: Provider,
 
+){
+    @Id @Column(name = "member_uuid", nullable = false, unique = true)
+    val id: UUID = UUID.randomUUID()
+
     @CreationTimestamp
-    val joinedAt: LocalDateTime = LocalDateTime.now(),
+    val joinedAt: LocalDateTime = LocalDateTime.now()
 
     @JsonIgnore
     val deletedAt: LocalDateTime? = null
-)
+}
 
 
