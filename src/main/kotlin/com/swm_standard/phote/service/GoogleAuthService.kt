@@ -3,6 +3,8 @@ package com.swm_standard.phote.service
 import com.swm_standard.phote.common.authority.JwtTokenProvider
 import com.swm_standard.phote.dto.GoogleAccessResponseDto
 import com.swm_standard.phote.dto.UserInfoResponseDto
+import com.swm_standard.phote.entity.Member
+import com.swm_standard.phote.entity.Provider
 import com.swm_standard.phote.repository.MemberRepository
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpEntity
@@ -58,6 +60,11 @@ class GoogleAuthService(private val memberRepository: MemberRepository, private 
 
         if (member == null){
             dto.isMember = false
+
+            val save: Member = memberRepository.save(Member(dto.name, dto.email, dto.picture, Provider.GOOGLE))
+            dto.accessToken = jwtTokenProvider.createToken(dto, save.id)
+            dto.userId = save.id
+
         } else {
             dto.isMember = true
             dto.accessToken = jwtTokenProvider.createToken(dto, member.id)
