@@ -1,18 +1,15 @@
 package com.swm_standard.phote.service
 
 import com.swm_standard.phote.common.exception.NotFoundException
-import com.swm_standard.phote.dto.CreateQuestionRequestDto
-import com.swm_standard.phote.dto.CreateQuestionResponseDto
-import com.swm_standard.phote.dto.DeleteQuestionResponseDto
-import com.swm_standard.phote.dto.ReadQuestionDetailResponseDto
+import com.swm_standard.phote.dto.*
 import com.swm_standard.phote.entity.Question
 import com.swm_standard.phote.entity.Tag
 import com.swm_standard.phote.repository.MemberRepository
 import com.swm_standard.phote.repository.QuestionRepository
 import com.swm_standard.phote.repository.TagRepository
 import com.swm_standard.phote.repository.WorkbookRepository
-import org.springframework.transaction.annotation.Transactional
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -51,11 +48,20 @@ class QuestionService(
         return CreateQuestionResponseDto(question.id)
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     fun readQuestionDetail(id: UUID): ReadQuestionDetailResponseDto {
         val question = questionRepository.findById(id).orElseThrow { NotFoundException("questionId","존재하지 않는 UUID") }
 
         return ReadQuestionDetailResponseDto(question)
+    }
+
+    @Transactional(readOnly = true)
+    fun searchQuestions(memberId: UUID, tags: List<String>?, keywords: List<String>?): List<Question> {
+
+        // 요청을 보낸 멤버가 생성한 문제이고, tags, keywords를 모두 포함하는 문제만 불러옴
+        val questions: List<Question> = questionRepository.searchQuestionsList(memberId, tags, keywords)
+
+        return questions
     }
 
     @Transactional

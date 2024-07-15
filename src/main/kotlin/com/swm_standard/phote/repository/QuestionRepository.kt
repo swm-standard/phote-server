@@ -9,5 +9,5 @@ import java.time.LocalDateTime
 import java.util.*
 
 @Repository
-interface QuestionRepository: JpaRepository<Question, UUID> {
+interface QuestionRepository: JpaRepository<Question, UUID>, QuestionCustomRepository {
 }
