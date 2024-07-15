@@ -76,7 +76,6 @@ class WorkbookService(
     fun addQuestionsToWorkbook(workbookId: UUID, request: AddQuestionsToWorkbookRequest) {
 
         val workbook: Workbook = workbookRepository.findById(workbookId).orElseThrow { NotFoundException(fieldName = "workbook", message = "id 를 재확인해주세요.") }
-        println(questionSetCustomRepository.findMaxSequenceByWorkbookId(workbook))
         var nextSequence = questionSetCustomRepository.findMaxSequenceByWorkbookId(workbook) + 1
 
         request.questions.forEach { questionId ->
