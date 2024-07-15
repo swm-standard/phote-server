@@ -36,4 +36,8 @@ data class QuestionSet(
     @JsonIgnore
     var deletedAt: LocalDateTime? = null
 
+    fun updateSequence(seq: Int) {
+        this.sequence = seq
+    }
+
 }

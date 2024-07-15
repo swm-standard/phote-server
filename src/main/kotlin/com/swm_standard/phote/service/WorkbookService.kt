@@ -106,4 +106,19 @@ class WorkbookService(
 
         throw InvalidInputException("question", message = "문제집에 속해있지 않습니다.")
     }
+
+    @Transactional
+    fun updateQuestionSequence(workbookId: UUID, request: List<UpdateQuestionSequenceRequest>): UUID {
+
+        request.forEach {
+            val questionSet: QuestionSet? =
+                questionSetRepository.findByQuestionIdAndWorkbookId(it.id, workbookId)?.apply {
+                    updateSequence(it.sequence)
+                }
+
+            if (questionSet == null) throw InvalidInputException("questionSet")
+        }
+
+        return workbookId
+    }
 }

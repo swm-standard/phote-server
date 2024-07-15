@@ -1,8 +1,9 @@
 package com.swm_standard.phote.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.swm_standard.phote.entity.QuestionSet
 import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.PositiveOrZero
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -77,4 +78,22 @@ data class DeleteQuestionInWorkbookResponse(
     val questionId: UUID,
 
     val deletedAt: LocalDateTime
+)
+
+data class UpdateQuestionSequenceRequest(
+    @field:NotNull
+    @JsonProperty("id")
+    private var _id: UUID,
+
+    @field:PositiveOrZero
+    @JsonProperty("sequence")
+    private var _sequence: Int,
+){
+    val id: UUID get() = _id
+
+    val sequence: Int get() = _sequence
+}
+
+data class UpdateQuestionSequenceResponse(
+    val id: UUID,
 )
