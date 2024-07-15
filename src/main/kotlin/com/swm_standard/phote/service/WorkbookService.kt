@@ -7,10 +7,7 @@ import com.swm_standard.phote.dto.*
 import com.swm_standard.phote.entity.Question
 import com.swm_standard.phote.entity.QuestionSet
 import com.swm_standard.phote.entity.Workbook
-import com.swm_standard.phote.repository.MemberRepository
-import com.swm_standard.phote.repository.QuestionRepository
-import com.swm_standard.phote.repository.QuestionSetRepository
-import com.swm_standard.phote.repository.WorkbookRepository
+import com.swm_standard.phote.repository.*
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -21,7 +18,8 @@ class WorkbookService(
     private val workbookRepository: WorkbookRepository,
     private val memberRepository: MemberRepository,
     private val questionSetRepository: QuestionSetRepository,
-    private val questionRepository: QuestionRepository
+    private val questionRepository: QuestionRepository,
+    private val questionSetCustomRepository: QuestionSetCustomRepository
 ) {
 
     @Transactional
@@ -78,13 +76,15 @@ class WorkbookService(
     fun addQuestionsToWorkbook(workbookId: UUID, request: AddQuestionsToWorkbookRequest) {
 
         val workbook: Workbook = workbookRepository.findById(workbookId).orElseThrow { NotFoundException(fieldName = "workbook", message = "id 를 재확인해주세요.") }
+        var nextSequence = questionSetCustomRepository.findMaxSequenceByWorkbookId(workbook) + 1
 
         request.questions.forEach { questionId ->
             val question: Question = questionRepository.findById(questionId).orElseThrow { NotFoundException(fieldName = "question", message = "id 를 재확인해주세요.") }
             questionSetRepository.findByQuestionIdAndWorkbookId(questionId, workbook.id)?.let { throw  AlreadyExistedException("questionId ($questionId)") }
-            QuestionSet(question, workbook).run {
+            QuestionSet(question, workbook, nextSequence).run {
                 questionSetRepository.save(this)
             }
+            nextSequence += 1
         }
 
         workbook.increaseQuantity(request.questions.size)
@@ -105,5 +105,24 @@ class WorkbookService(
         }
 
         throw InvalidInputException("question", message = "문제집에 속해있지 않습니다.")
+    }
+
+    @Transactional
+    fun updateQuestionSequence(workbookId: UUID, request: List<UpdateQuestionSequenceRequest>): UUID {
+        val workbook: Workbook = workbookRepository.findById(workbookId)
+            .orElseThrow { NotFoundException(fieldName = "workbook", message = "id를 재확인해주세요.") }
+
+        if (!workbook.compareQuestionQuantity(request.size)) throw InvalidInputException(fieldName = "question", message = "문제집 내 모든 문제를 포함해주세요.")
+
+        request.forEach {
+            val questionSet: QuestionSet? =
+                questionSetRepository.findByQuestionIdAndWorkbookId(it.id, workbookId)?.apply {
+                    updateSequence(it.sequence)
+                }
+
+            if (questionSet == null) throw InvalidInputException("questionSet")
+        }
+
+        return workbookId
     }
 }

@@ -64,4 +64,12 @@ class WorkbookController(private val workbookService: WorkbookService) {
 
         return BaseResponse(msg = "문제집의 문제 삭제 성공", data = workbookService.deleteQuestionInWorkbook(workbookId, questionId))
     }
+
+    @PatchMapping("/workbook/question-sequence/{workbookId}")
+    fun updateQuestionSequence(@PathVariable(required = true) workbookId: UUID, @RequestBody @Valid request: List<UpdateQuestionSequenceRequest>): BaseResponse<UpdateQuestionSequenceResponse> {
+
+        val response = UpdateQuestionSequenceResponse(workbookService.updateQuestionSequence(workbookId, request))
+
+        return BaseResponse(msg = "문제집의 문제 순서 변경 성공", data = response)
+    }
 }

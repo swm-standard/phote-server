@@ -21,6 +21,7 @@ data class QuestionSet(
     @JsonIgnore
     val workbook: Workbook,
 
+    var sequence: Int = 0
 
     ){
 
@@ -28,12 +29,15 @@ data class QuestionSet(
     @Column(name = "questionSet_id")
     val id: Long = 0
 
-    var sequence: Int = 0
 
     @CreationTimestamp
     val createdAt: LocalDateTime = LocalDateTime.now()
 
     @JsonIgnore
     var deletedAt: LocalDateTime? = null
+
+    fun updateSequence(seq: Int) {
+        this.sequence = seq
+    }
 
 }
