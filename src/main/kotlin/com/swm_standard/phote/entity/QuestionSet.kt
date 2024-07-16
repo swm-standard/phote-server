@@ -6,6 +6,7 @@ import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.SQLRestriction
 import java.time.LocalDateTime
+import java.util.UUID
 
 @Entity
 @SQLDelete(sql = "UPDATE question_set SET deleted_at = NOW() WHERE question_set_id = ?")
@@ -25,9 +26,9 @@ data class QuestionSet(
 
     ){
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
     @Column(name = "questionSet_id")
-    val id: Long = 0
+    val id: UUID = UUID.randomUUID()
 
 
     @CreationTimestamp
