@@ -18,7 +18,7 @@ import java.util.UUID
 
 const val ACCESS_TOKEN_EXPIRATION: Long = 1000 * 60 * 60 * 24
 
-const val REFRESH_TOKEN_EXPIRATION: Long = 1000 * 60 * 60 * 24 * 30
+const val REFRESH_TOKEN_EXPIRATION: Long = 1000 * 60 * 60
 
 @Component
 class JwtTokenProvider {
