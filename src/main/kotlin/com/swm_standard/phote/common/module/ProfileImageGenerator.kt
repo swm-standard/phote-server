@@ -1,4 +1,4 @@
-package com.swm_standard.phote.external.randomprofile
+package com.swm_standard.phote.common.module
 
 class ProfileImageGenerator {
 

@@ -6,7 +6,7 @@ import com.swm_standard.phote.dto.GoogleAccessResponse
 import com.swm_standard.phote.dto.UserInfoResponseDto
 import com.swm_standard.phote.entity.Member
 import com.swm_standard.phote.entity.Provider
-import com.swm_standard.phote.external.randomprofile.ProfileImageGenerator
+import com.swm_standard.phote.common.module.ProfileImageGenerator
 import com.swm_standard.phote.repository.MemberRepository
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpEntity
