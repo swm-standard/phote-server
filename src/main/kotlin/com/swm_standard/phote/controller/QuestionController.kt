@@ -43,6 +43,14 @@ class QuestionController(
         return BaseResponse(msg = "문제 검색 성공", data=questionService.searchQuestions(memberId, tags, keywords))
     }
 
+    @GetMapping("/questions/workbook/{workbookId}")
+    fun searchQuestionsToAdd(@MemberId memberId: UUID,
+                             @PathVariable(required = true) workbookId: UUID,
+                             @RequestParam(required = false) tags: List<String>? = null,
+                             @RequestParam(required = false) keywords: List<String>? = null): BaseResponse<List<SearchQuestionsToAddResponseDto>> {
+        return BaseResponse(msg = "문제집에 추가할 문제 목록 검색 성공", data = questionService.searchQuestionsToAdd(memberId, workbookId, tags, keywords))
+    }
+
     @DeleteMapping("/question/{id}")
     fun deleteQuestion(@PathVariable(required = true) id: UUID)
     : BaseResponse<DeleteQuestionResponseDto>{

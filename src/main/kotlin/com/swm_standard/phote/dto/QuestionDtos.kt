@@ -53,3 +53,16 @@ data class CreateQuestionRequestDto(
 data class CreateQuestionResponseDto(
     val id: UUID
 )
+
+data class SearchQuestionsToAddResponseDto(
+    val createdAt: LocalDateTime,
+    val modifiedAt: LocalDateTime? = null,
+    val statement: String,
+    val image: String? = null,
+    val options: JsonNode? = null,
+    val answer: String,
+    val category: Category,
+    val tags: List<Tag>? = null,
+    val memo: String? = null,
+    var isContain: Boolean = false
+)
