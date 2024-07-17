@@ -3,7 +3,7 @@ package com.swm_standard.phote.dto
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.util.UUID
 
-data class GoogleAccessResponseDto(
+data class GoogleAccessResponse(
     @JsonProperty("access_token")
     val accessToken: String,
 
@@ -22,9 +22,10 @@ data class GoogleAccessResponseDto(
 
 data class UserInfoResponseDto(
     var accessToken: String? = null,
-    val name: String,
+    var name: String?,
     val email: String,
-    val picture: String,
-    var isMember: Boolean?,
+    var picture: String,
+    var isMember: Boolean? = true,
     var userId: UUID?,
 )
+
