@@ -33,7 +33,7 @@ class AuthController(
     @GetMapping("/google-login")
     fun googleLogin(): RedirectView {
         val redirectView = RedirectView()
-        redirectView.url = "https://accounts.google.com/o/oauth2/v2/auth?client_id=$clientId&response_type=code&redirect_uri=$redirectUri&scope=https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email"
+        redirectView.url = "https://accounts.google.com/o/oauth2/v2/auth?client_id=$clientId&response_type=code&redirect_uri=$redirectUri&scope=https://www.googleapis.com/auth/userinfo.email"
 
         return redirectView
     }
