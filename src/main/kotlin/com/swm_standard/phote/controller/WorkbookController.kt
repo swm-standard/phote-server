@@ -72,4 +72,13 @@ class WorkbookController(private val workbookService: WorkbookService) {
 
         return BaseResponse(msg = "문제집의 문제 순서 변경 성공", data = response)
     }
+
+    @GetMapping("/workbook/questions/{workbookId}")
+    fun readQuestionsInWorkbook(@PathVariable(required = true) workbookId: UUID): BaseResponse<List<ReadQuestionsInWorkbookResponse>> {
+
+        val response = workbookService.readQuestionsInWorkbook(workbookId)
+
+        return BaseResponse(msg = "문제집의 문제 목록 조회 성공", data = response)
+
+    }
 }

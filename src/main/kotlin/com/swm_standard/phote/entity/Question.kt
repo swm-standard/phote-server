@@ -38,7 +38,8 @@ data class Question(
 
     val answer: String,
 
-    val category: String,
+    @Enumerated(EnumType.STRING)
+    val category: Category,
 
     @OneToMany(mappedBy = "question", cascade = [CascadeType.REMOVE])
     @JsonIgnore

@@ -12,6 +12,7 @@ import java.time.LocalDateTime
 data class Tag(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "tag_id", unique = true)
+    @JsonIgnore
     val id: Long = 0L,
 
     val name: String,

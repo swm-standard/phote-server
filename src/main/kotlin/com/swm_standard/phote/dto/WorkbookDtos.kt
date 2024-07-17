@@ -1,6 +1,9 @@
 package com.swm_standard.phote.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.databind.JsonNode
+import com.swm_standard.phote.entity.Category
+import com.swm_standard.phote.entity.Tag
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.PositiveOrZero
 import java.time.LocalDateTime
@@ -95,3 +98,21 @@ data class UpdateQuestionSequenceRequest(
 data class UpdateQuestionSequenceResponse(
     val id: UUID,
 )
+
+data class ReadQuestionsInWorkbookResponse(
+    val questionSetId: UUID,
+
+    val questionId: UUID,
+
+    val statement: String,
+
+    val options: JsonNode?,
+
+    val image: String?,
+
+    val category: Category,
+
+    val sequence: Int,
+
+    val tags: List<Tag>,
+    )

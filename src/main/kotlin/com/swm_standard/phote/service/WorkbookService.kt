@@ -125,4 +125,23 @@ class WorkbookService(
 
         return workbookId
     }
+
+    fun readQuestionsInWorkbook(workbookId: UUID): List<ReadQuestionsInWorkbookResponse> {
+
+        workbookRepository.findById(workbookId).orElseThrow{ InvalidInputException(fieldName = "workboook", message = "id를 재확인해주세요.")}
+        val questionSets: List<QuestionSet> = questionSetRepository.findByWorkbookIdOrderBySequence(workbookId)
+
+        return questionSets.map { set ->
+            ReadQuestionsInWorkbookResponse(
+                set.id,
+                set.question.id,
+                set.question.statement,
+                set.question.options,
+                set.question.image,
+                set.question.category,
+                set.sequence,
+                set.question.tags
+            )
+        }
+    }
 }

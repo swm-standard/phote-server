@@ -8,4 +8,6 @@ import java.util.UUID
 interface QuestionSetRepository: JpaRepository<QuestionSet, UUID> {
 
     fun findByQuestionIdAndWorkbookId(questionId: UUID, workbookId: UUID): QuestionSet?
+
+    fun findByWorkbookIdOrderBySequence(workbookId: UUID): List<QuestionSet>
 }

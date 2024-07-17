@@ -1,6 +1,7 @@
 package com.swm_standard.phote.dto
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.swm_standard.phote.entity.Category
 import com.swm_standard.phote.entity.Question
 import com.swm_standard.phote.entity.Tag
 import jakarta.validation.constraints.NotBlank
@@ -14,7 +15,7 @@ data class ReadQuestionDetailResponseDto(
     val image: String? = null,
     val options: JsonNode? = null,
     val answer: String,
-    val category: String,
+    val category: Category,
     val tags: List<Tag>? = null,
     val memo: String? = null
 ) {
@@ -41,7 +42,7 @@ data class CreateQuestionRequestDto(
     @field:NotBlank(message = "statement 미입력")
     val statement: String,
     @field:NotBlank(message = "category 미입력")
-    val category: String,
+    val category: Category,
     val options: JsonNode? = null,
     @field:NotBlank(message = "answer 미입력")
     val answer: String,
