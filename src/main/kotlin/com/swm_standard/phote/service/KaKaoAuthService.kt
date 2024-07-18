@@ -3,6 +3,7 @@ package com.swm_standard.phote.service
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.swm_standard.phote.common.authority.JwtTokenProvider
 import com.swm_standard.phote.common.module.NicknameGenerator
+import com.swm_standard.phote.common.module.ProfileImageGenerator
 import com.swm_standard.phote.dto.UserInfoResponseDto
 import com.swm_standard.phote.entity.Member
 import com.swm_standard.phote.entity.Provider
@@ -27,9 +28,6 @@ class KaKaoAuthService(
 
     @Value("\${KAKAO_REDIRECT_URI}")
     lateinit var kakaoRedirectUri:String
-
-    @Value("\${INIT_PROFILE_IMAGE}")
-    lateinit var initProfileImage:String
 
     fun getTokenFromKakao(code: String): String {
 
@@ -72,7 +70,6 @@ class KaKaoAuthService(
             String::class.java
         )
 
-        // 이메일 추출
         val responseBody = response.body
         val objectMapper = ObjectMapper()
         val jsonNode = objectMapper.readTree(responseBody)
@@ -82,14 +79,13 @@ class KaKaoAuthService(
         var member = memberRepository.findByEmail(email)
 
         val isMember:Boolean
-        // 가입하지 않은 멤버이면 회원가입
-        if (member == null){
-            // 닉네임 생성
-            val nicknameGenerator = NicknameGenerator()
-            val initName = nicknameGenerator.randomNickname()
 
-            member = Member(name = initName, email = email, image = initProfileImage, provider = Provider.KAKAO)
-            // 디비에 저장
+        if (member == null){
+
+            val nicknameGenerator = NicknameGenerator()
+
+            member = Member(name = nicknameGenerator.randomNickname(), email = email, image = ProfileImageGenerator().imageGenerator(), provider = Provider.KAKAO)
+
             memberRepository.save(member)
 
             isMember = false
