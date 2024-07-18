@@ -13,11 +13,11 @@ import java.util.UUID
 @SQLRestriction("deleted_at is NULL")
 data class QuestionSet(
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "question_id")
     val question: Question,
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "workbook_id")
     @JsonIgnore
     val workbook: Workbook,
@@ -27,7 +27,7 @@ data class QuestionSet(
     ){
 
     @Id
-    @Column(name = "questionSet_id")
+    @Column(name = "question_set_id", nullable = false, unique = true)
     val id: UUID = UUID.randomUUID()
 
 
