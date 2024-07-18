@@ -5,6 +5,7 @@ import com.swm_standard.phote.entity.Category
 import com.swm_standard.phote.entity.Question
 import com.swm_standard.phote.entity.Tag
 import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotNull
 import java.time.LocalDateTime
 import java.util.*
 
@@ -41,7 +42,7 @@ class DeleteQuestionResponseDto (
 data class CreateQuestionRequestDto(
     @field:NotBlank(message = "statement 미입력")
     val statement: String,
-    @field:NotBlank(message = "category 미입력")
+    @field:NotNull(message = "category 미입력")
     val category: Category,
     val options: JsonNode? = null,
     @field:NotBlank(message = "answer 미입력")

@@ -47,7 +47,7 @@ class CustomExceptionHandler {
     @ExceptionHandler(BadRequestException::class)
     protected fun badRequestException(ex: BadRequestException) : ResponseEntity<BaseResponse<Map<String, String>>> {
         val errors = mapOf(ex.fieldName to (ex.message ?: "Not Exception Message"))
-        return ResponseEntity(BaseResponse(ErrorCode.BAD_REQUEST.name, ErrorCode.BAD_REQUEST.statusCode, ex.message ?: ErrorCode.BAD_REQUEST.msg, errors), HttpStatus.BAD_REQUEST)
+        return ResponseEntity(BaseResponse(ErrorCode.ERROR.name, ErrorCode.BAD_REQUEST.statusCode, ex.message ?: ErrorCode.BAD_REQUEST.msg, errors), HttpStatus.BAD_REQUEST)
 
     }
 
@@ -69,7 +69,7 @@ class CustomExceptionHandler {
     @ExceptionHandler(NotFoundException::class)
     protected fun notFoundException(ex: NotFoundException) : ResponseEntity<BaseResponse<Map<String, String>>> {
         val errors = mapOf(ex.fieldName to (ex.message ?: "Not Exception Message"))
-        return ResponseEntity(BaseResponse(ErrorCode.NOT_FOUND.name, ErrorCode.NOT_FOUND.statusCode, ex.message ?: ErrorCode.NOT_FOUND.msg, errors), HttpStatus.NOT_FOUND)
+        return ResponseEntity(BaseResponse(ErrorCode.ERROR.name, ErrorCode.NOT_FOUND.statusCode, ex.message ?: ErrorCode.NOT_FOUND.msg, errors), HttpStatus.NOT_FOUND)
 
     }
 
@@ -91,7 +91,7 @@ class CustomExceptionHandler {
     protected fun methodArgumentTypeMismatchException(ex: MethodArgumentTypeMismatchException) : ResponseEntity<BaseResponse<Map<String, String>>> {
 
         val errors = mapOf(ex.name to (ex.message ?: "Not Exception Message"))
-        return ResponseEntity(BaseResponse(ErrorCode.BAD_REQUEST.name, ErrorCode.BAD_REQUEST.statusCode, ErrorCode.BAD_REQUEST.msg, errors), HttpStatus.BAD_REQUEST)
+        return ResponseEntity(BaseResponse(ErrorCode.ERROR.name, ErrorCode.BAD_REQUEST.statusCode, ErrorCode.BAD_REQUEST.msg, errors), HttpStatus.BAD_REQUEST)
 
     }
 
@@ -99,7 +99,7 @@ class CustomExceptionHandler {
     protected fun httpMessageNotReadableException(ex: HttpMessageNotReadableException) : ResponseEntity<BaseResponse<Map<String, String>>> {
 
         val errors = mapOf("" to (ex.message ?: "Not Exception Message"))
-        return ResponseEntity(BaseResponse(ErrorCode.BAD_REQUEST.name, ErrorCode.BAD_REQUEST.statusCode, ErrorCode.BAD_REQUEST.msg, errors), HttpStatus.BAD_REQUEST)
+        return ResponseEntity(BaseResponse(ErrorCode.ERROR.name, ErrorCode.BAD_REQUEST.statusCode, ErrorCode.BAD_REQUEST.msg, errors), HttpStatus.BAD_REQUEST)
 
     }
 }
