@@ -65,8 +65,6 @@ data class Workbook(
         val language: List<String> = listOf("국어", "언매", "화작", "비문학", "문학", "독서", "듣기", "영어", "eng", "토익", "외국")
         val science: List<String> = listOf("과학", "화학", "생물", "생명", "물리", "지구")
 
-        println("math.size = ${math.size}")
-        println("math.filter { it in title }.size = ${math.filter { !title.contains(it) }.size}")
         emoji = when {
             math.size != math.filter { !title.contains(it) }.size -> "➗"
             language.size != language.filter { !title.contains(it) }.size -> "💬"

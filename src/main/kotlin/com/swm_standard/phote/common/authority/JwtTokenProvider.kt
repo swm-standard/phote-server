@@ -84,7 +84,6 @@ class JwtTokenProvider {
                 is IllegalArgumentException -> {}
                 else -> {}
             }
-            println(e.message)
         }
         return false
     }
