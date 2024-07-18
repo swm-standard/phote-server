@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.swm_standard.phote.common.authority.JwtTokenProvider
 import com.swm_standard.phote.common.module.NicknameGenerator
 import com.swm_standard.phote.common.module.ProfileImageGenerator
-import com.swm_standard.phote.dto.UserInfoResponseDto
+import com.swm_standard.phote.dto.UserInfoResponse
 import com.swm_standard.phote.entity.Member
 import com.swm_standard.phote.entity.Provider
 import com.swm_standard.phote.repository.MemberRepository
@@ -56,7 +56,7 @@ class KaKaoAuthService(
         return jsonNode["access_token"].asText()
     }
 
-    fun getUserInfoFromKakao(token: String): UserInfoResponseDto {
+    fun getUserInfoFromKakao(token: String): UserInfoResponse {
 
         val headers = HttpHeaders()
         headers.add("Authorization", "Bearer $token")
@@ -94,7 +94,7 @@ class KaKaoAuthService(
             isMember = true
         }
 
-        val dto = UserInfoResponseDto(name = member.name, email = member.email,
+        val dto = UserInfoResponse(name = member.name, email = member.email,
             picture = member.image, isMember = isMember, userId = member.id)
 
         dto.accessToken = jwtTokenProvider.createToken(dto, member.id)

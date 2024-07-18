@@ -9,7 +9,7 @@ import jakarta.validation.constraints.NotNull
 import java.time.LocalDateTime
 import java.util.*
 
-data class ReadQuestionDetailResponseDto(
+data class ReadQuestionDetailResponse(
     val createdAt: LocalDateTime,
     val modifiedAt: LocalDateTime? = null,
     val statement: String,
@@ -34,12 +34,12 @@ data class ReadQuestionDetailResponseDto(
     )
 }
 
-class DeleteQuestionResponseDto (
+class DeleteQuestionResponse (
     val id: UUID,
     val deletedAt: LocalDateTime
 )
 
-data class CreateQuestionRequestDto(
+data class CreateQuestionRequest(
     @field:NotBlank(message = "statement 미입력")
     val statement: String,
     @field:NotNull(message = "category 미입력")
@@ -51,11 +51,11 @@ data class CreateQuestionRequestDto(
     val memo: String? = null
 )
 
-data class CreateQuestionResponseDto(
+data class CreateQuestionResponse(
     val id: UUID
 )
 
-data class SearchQuestionsToAddResponseDto(
+data class SearchQuestionsToAddResponse(
     val createdAt: LocalDateTime,
     val modifiedAt: LocalDateTime? = null,
     val statement: String,

@@ -1,6 +1,6 @@
 package com.swm_standard.phote.common.authority
 
-import com.swm_standard.phote.dto.UserInfoResponseDto
+import com.swm_standard.phote.dto.UserInfoResponse
 import io.jsonwebtoken.*
 import io.jsonwebtoken.io.Decoders
 import io.jsonwebtoken.security.Keys
@@ -29,7 +29,7 @@ class JwtTokenProvider {
         Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey))}
 
 
-    fun createToken(userInfoResponseDto: UserInfoResponseDto, memberId: UUID): String {
+    fun createToken(userInfoResponseDto: UserInfoResponse, memberId: UUID): String {
 
         val now = Date()
         val accessExpiration = Date(now.time + ACCESS_TOKEN_EXPIRATION)

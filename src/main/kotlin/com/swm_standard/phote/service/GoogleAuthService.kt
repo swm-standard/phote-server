@@ -3,7 +3,7 @@ package com.swm_standard.phote.service
 import com.swm_standard.phote.common.authority.JwtTokenProvider
 import com.swm_standard.phote.common.module.NicknameGenerator
 import com.swm_standard.phote.dto.GoogleAccessResponse
-import com.swm_standard.phote.dto.UserInfoResponseDto
+import com.swm_standard.phote.dto.UserInfoResponse
 import com.swm_standard.phote.entity.Member
 import com.swm_standard.phote.entity.Provider
 import com.swm_standard.phote.common.module.ProfileImageGenerator
@@ -42,7 +42,7 @@ class GoogleAuthService(private val memberRepository: MemberRepository, private 
         return response.accessToken
     }
 
-    fun getUserInfoFromGoogle(token: String): UserInfoResponseDto {
+    fun getUserInfoFromGoogle(token: String): UserInfoResponse {
         val restTemplate = RestTemplate()
         val headers = HttpHeaders()
         val params: MutableMap<String, Any> = HashMap()
@@ -51,11 +51,11 @@ class GoogleAuthService(private val memberRepository: MemberRepository, private 
         val googleTokenRequest: HttpEntity<MutableMap<String, Any>> = HttpEntity(params, headers)
 
 
-        val dto: UserInfoResponseDto = restTemplate.exchange(
+        val dto: UserInfoResponse = restTemplate.exchange(
             "https://www.googleapis.com/userinfo/v2/me",
             HttpMethod.GET,
             googleTokenRequest,
-            UserInfoResponseDto::class.java
+            UserInfoResponse::class.java
         ).body!!
 
 
