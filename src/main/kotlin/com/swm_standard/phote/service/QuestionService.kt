@@ -64,6 +64,14 @@ class QuestionService(
         return questions
     }
 
+    @Transactional(readOnly = true)
+    fun searchQuestionsToAdd(memberId: UUID, workbookId: UUID, tags: List<String>?, keywords: List<String>?): List<SearchQuestionsToAddResponseDto> {
+
+        val questions: List<SearchQuestionsToAddResponseDto> = questionRepository.searchQuestionsToAddList(memberId, workbookId, tags, keywords)
+
+        return questions
+    }
+
     @Transactional
     fun deleteQuestion(id: UUID): DeleteQuestionResponseDto {
 

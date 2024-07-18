@@ -1,18 +1,19 @@
 package com.swm_standard.phote.repository
 
 import com.querydsl.jpa.impl.JPAQueryFactory
+import com.swm_standard.phote.dto.SearchQuestionsToAddResponseDto
 import com.swm_standard.phote.entity.QQuestion
+import com.swm_standard.phote.entity.QQuestionSet
 import com.swm_standard.phote.entity.QTag
 import com.swm_standard.phote.entity.Question
 import org.springframework.stereotype.Repository
-import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
 
 @Repository
 class QuestionCustomRepositoryImpl(
     private val jpaQueryFactory: JPAQueryFactory
 ): QuestionCustomRepository{
-    @Transactional(readOnly = true)
+
     override fun searchQuestionsList(memberId:UUID, tags: List<String>?, keywords: List<String>?): List<Question> {
         val question = QQuestion.question
         val tag = QTag.tag
@@ -47,5 +48,38 @@ class QuestionCustomRepositoryImpl(
         return query
             .orderBy(question.modifiedAt.desc())
             .fetch()
+    }
+
+    override fun searchQuestionsToAddList(
+        memberId: UUID,
+        workbookId: UUID,
+        tags: List<String>?,
+        keywords: List<String>?
+    ): List<SearchQuestionsToAddResponseDto> {
+
+        val questionSet = QQuestionSet.questionSet
+
+        val questionsInWorkbook = jpaQueryFactory
+            .select(questionSet.question.id)
+            .from(questionSet)
+            .where(questionSet.workbook.id.eq(workbookId))
+            .fetch()
+
+        val questions = searchQuestionsList(memberId, tags, keywords)
+
+        return questions.map { question ->
+            SearchQuestionsToAddResponseDto(
+                createdAt = question.createdAt,
+                modifiedAt = question.modifiedAt,
+                statement = question.statement,
+                image = question.image,
+                options = question.options,
+                answer = question.answer,
+                category = question.category,
+                tags = question.tags,
+                memo = question.memo,
+                isContain = question.id in questionsInWorkbook
+            )
+        }
     }
 }
