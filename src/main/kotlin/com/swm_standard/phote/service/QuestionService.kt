@@ -24,6 +24,9 @@ class QuestionService(
     fun createQuestion(memberId:UUID, request: CreateQuestionRequestDto, imageUrl: String?)
     : CreateQuestionResponseDto {
 
+        println("여기")
+        println(request)
+
         // 문제 생성 유저 확인
         val member = memberRepository.findById(memberId).orElseThrow { NotFoundException("존재하지 않는 member") }
 
