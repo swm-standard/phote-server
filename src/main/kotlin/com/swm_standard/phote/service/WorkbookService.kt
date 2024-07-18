@@ -23,10 +23,12 @@ class WorkbookService(
 ) {
 
     @Transactional
-    fun createWorkbook(title: String, description: String?, emoji: String, memberEmail: String): CreateWorkbookResponse {
-        val member = memberRepository.findByEmail(memberEmail) ?: throw NotFoundException()
-        val workbook = workbookRepository.save(Workbook(title, description, member, emoji))
-
+    fun createWorkbook(request: CreateWorkbookRequest, memberId: UUID): CreateWorkbookResponse {
+        val member = memberRepository.findById(memberId).orElseThrow { NotFoundException(fieldName = "member")}
+        val workbook = Workbook(request.title, request.description, member).apply {
+            matchEmojiByTitle()
+            workbookRepository.save(this)
+        }
         return CreateWorkbookResponse(workbook.id)
     }
 
@@ -133,6 +135,7 @@ class WorkbookService(
 
         workbook.title = request.title
         workbook.description = request.description
+        workbook.matchEmojiByTitle()
 
         return UpdateWorkbookDetailResponse(workbookId)
     }

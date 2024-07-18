@@ -18,14 +18,10 @@ data class CreateWorkbookRequest(
     @JsonProperty("description")
     private val _description: String?,
 
-    @JsonProperty("emoji")
-    private val _emoji: String?,
 ) {
     val title: String get() = _title!!
 
     val description: String get() = _description ?: ""
-
-    val emoji: String get() = _emoji ?: "📚"
 }
 
 data class CreateWorkbookResponse(
