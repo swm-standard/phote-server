@@ -6,7 +6,6 @@ import com.swm_standard.phote.common.responsebody.BaseResponse
 import com.swm_standard.phote.dto.*
 import com.swm_standard.phote.service.WorkbookService
 import jakarta.validation.Valid
-import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
@@ -15,14 +14,8 @@ import java.util.*
 class WorkbookController(private val workbookService: WorkbookService) {
 
     @PostMapping("/workbook")
-    fun createWorkbook(@Valid @RequestBody request: CreateWorkbookRequest, authentication: Authentication): BaseResponse<CreateWorkbookResponse> {
-
-        val workbook = workbookService.createWorkbook(
-            request.title,
-            request.description,
-            request.emoji,
-            authentication.name
-        )
+    fun createWorkbook(@Valid @RequestBody request: CreateWorkbookRequest, @MemberId memberId: UUID): BaseResponse<CreateWorkbookResponse> {
+        val workbook = workbookService.createWorkbook(request, memberId)
 
         return BaseResponse(msg = "문제집 생성 성공", data = workbook)
     }
