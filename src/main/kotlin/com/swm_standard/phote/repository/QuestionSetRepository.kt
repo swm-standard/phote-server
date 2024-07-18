@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 import java.util.UUID
 
-interface QuestionSetRepository: JpaRepository<QuestionSet, UUID> {
+interface QuestionSetRepository: JpaRepository<QuestionSet, UUID>, QuestionSetCustomRepository {
 
     fun findByQuestionIdAndWorkbookId(questionId: UUID, workbookId: UUID): QuestionSet?
 

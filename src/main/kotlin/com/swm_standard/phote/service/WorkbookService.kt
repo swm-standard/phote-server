@@ -19,7 +19,6 @@ class WorkbookService(
     private val memberRepository: MemberRepository,
     private val questionSetRepository: QuestionSetRepository,
     private val questionRepository: QuestionRepository,
-    private val questionSetCustomRepository: QuestionSetCustomRepository
 ) {
 
     @Transactional
@@ -76,20 +75,17 @@ class WorkbookService(
     fun addQuestionsToWorkbook(workbookId: UUID, request: AddQuestionsToWorkbookRequest) {
 
         val workbook: Workbook = workbookRepository.findById(workbookId).orElseThrow { NotFoundException(fieldName = "workbook", message = "id 를 재확인해주세요.") }
-        var nextSequence = questionSetCustomRepository.findMaxSequenceByWorkbookId(workbook) + 1
+        var nextSequence = questionSetRepository.findMaxSequenceByWorkbookId(workbook) + 1
 
         request.questions.forEach { questionId ->
             val question: Question = questionRepository.findById(questionId).orElseThrow { NotFoundException(fieldName = "question", message = "id 를 재확인해주세요.") }
             questionSetRepository.findByQuestionIdAndWorkbookId(questionId, workbook.id)?.let { throw  AlreadyExistedException("questionId ($questionId)") }
-            QuestionSet(question, workbook, nextSequence).run {
-                questionSetRepository.save(this)
-            }
+            questionSetRepository.save(QuestionSet(question, workbook, nextSequence))
             nextSequence += 1
         }
 
         workbook.increaseQuantity(request.questions.size)
     }
-
 
     @Transactional
     fun deleteQuestionInWorkbook(workbookId: UUID, questionId: UUID): DeleteQuestionInWorkbookResponse {
@@ -115,12 +111,10 @@ class WorkbookService(
         if (!workbook.compareQuestionQuantity(request.size)) throw InvalidInputException(fieldName = "question", message = "문제집 내 모든 문제를 포함해주세요.")
 
         request.forEach {
-            val questionSet: QuestionSet? =
-                questionSetRepository.findByQuestionIdAndWorkbookId(it.id, workbookId)?.apply {
+            questionSetRepository.findById(it.id).orElseThrow { InvalidInputException("questionSet") }
+                .apply {
                     updateSequence(it.sequence)
                 }
-
-            if (questionSet == null) throw InvalidInputException("questionSet")
         }
 
         return workbookId
