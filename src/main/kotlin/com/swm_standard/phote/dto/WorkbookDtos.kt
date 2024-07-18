@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.swm_standard.phote.entity.Category
 import com.swm_standard.phote.entity.Tag
 import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.PositiveOrZero
 import java.time.LocalDateTime
 import java.util.UUID
@@ -98,6 +99,18 @@ data class UpdateQuestionSequenceRequest(
 data class UpdateQuestionSequenceResponse(
     val id: UUID,
 )
+
+data class UpdateWorkbookDetailRequest(
+    @field:NotBlank(message = "title 미입력")
+    val title: String,
+    @field:NotNull(message = "description 미입력")
+    val description: String,
+)
+
+data class UpdateWorkbookDetailResponse(
+    val id: UUID
+)
+
 
 data class ReadQuestionsInWorkbookResponse(
     val questionSetId: UUID,

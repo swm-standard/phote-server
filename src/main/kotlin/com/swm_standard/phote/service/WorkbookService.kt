@@ -126,6 +126,17 @@ class WorkbookService(
         return workbookId
     }
 
+    @Transactional
+    fun updateWorkbookDetail(workbookId: UUID, request: UpdateWorkbookDetailRequest): UpdateWorkbookDetailResponse {
+        val workbook: Workbook = workbookRepository.findById(workbookId)
+            .orElseThrow { NotFoundException(fieldName = "workbook", message = "id를 재확인해주세요.") }
+
+        workbook.title = request.title
+        workbook.description = request.description
+
+        return UpdateWorkbookDetailResponse(workbookId)
+    }
+
     fun readQuestionsInWorkbook(workbookId: UUID): List<ReadQuestionsInWorkbookResponse> {
 
         workbookRepository.findById(workbookId).orElseThrow{ InvalidInputException(fieldName = "workboook", message = "id를 재확인해주세요.")}
