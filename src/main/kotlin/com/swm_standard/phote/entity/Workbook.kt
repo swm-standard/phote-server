@@ -14,7 +14,6 @@ import java.util.*
 @Entity
 @SQLDelete(sql = "UPDATE workbook SET deleted_at = NOW() WHERE workbook_uuid = ?")
 @SQLRestriction("deleted_at is NULL")
-@DynamicUpdate
 data class Workbook(
 
     var title: String,
