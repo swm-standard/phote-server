@@ -20,9 +20,9 @@ class QuestionController(
 
     @PostMapping( "/question")
     fun createQuestion(@MemberId memberId: UUID,
-                       @Valid @RequestPart request: CreateQuestionRequestDto,
+                       @Valid @RequestPart request: CreateQuestionRequest,
                        @RequestPart image: MultipartFile?
-    ): BaseResponse<CreateQuestionResponseDto> {
+    ): BaseResponse<CreateQuestionResponse> {
         val imageUrl = image?.let { s3Service.uploadImage(it) }
         return BaseResponse(msg = "문제 생성 성공", data = questionService.createQuestion(memberId, request, imageUrl))
     }
@@ -31,7 +31,7 @@ class QuestionController(
     fun readQuestionDetail(@PathVariable(
         required = true
     ) id: UUID
-    ): BaseResponse<ReadQuestionDetailResponseDto> {
+    ): BaseResponse<ReadQuestionDetailResponse> {
         return BaseResponse(msg = "문제 상세조회 성공", data = questionService.readQuestionDetail(id))
     }
 
@@ -47,13 +47,13 @@ class QuestionController(
     fun searchQuestionsToAdd(@MemberId memberId: UUID,
                              @PathVariable(required = true) workbookId: UUID,
                              @RequestParam(required = false) tags: List<String>? = null,
-                             @RequestParam(required = false) keywords: List<String>? = null): BaseResponse<List<SearchQuestionsToAddResponseDto>> {
+                             @RequestParam(required = false) keywords: List<String>? = null): BaseResponse<List<SearchQuestionsToAddResponse>> {
         return BaseResponse(msg = "문제집에 추가할 문제 목록 검색 성공", data = questionService.searchQuestionsToAdd(memberId, workbookId, tags, keywords))
     }
 
     @DeleteMapping("/question/{id}")
     fun deleteQuestion(@PathVariable(required = true) id: UUID)
-    : BaseResponse<DeleteQuestionResponseDto>{
+    : BaseResponse<DeleteQuestionResponse>{
         return BaseResponse(msg = "문제 삭제 성공", data = questionService.deleteQuestion(id))
     }
 

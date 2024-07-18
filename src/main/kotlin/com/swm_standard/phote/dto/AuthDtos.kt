@@ -20,7 +20,7 @@ data class GoogleAccessResponse(
     val idToken: String,
 )
 
-data class UserInfoResponseDto(
+data class UserInfoResponse(
     var accessToken: String? = null,
     var name: String?,
     val email: String,

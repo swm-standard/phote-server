@@ -1,6 +1,6 @@
 package com.swm_standard.phote.controller
 
-import com.swm_standard.phote.dto.UserInfoResponseDto
+import com.swm_standard.phote.dto.UserInfoResponse
 import com.swm_standard.phote.service.GoogleAuthService
 import com.swm_standard.phote.common.responsebody.BaseResponse
 import com.swm_standard.phote.service.KaKaoAuthService
@@ -39,7 +39,7 @@ class AuthController(
     }
 
     @GetMapping("/token")
-    fun getUserInfo(@RequestParam code: String): BaseResponse<UserInfoResponseDto> {
+    fun getUserInfo(@RequestParam code: String): BaseResponse<UserInfoResponse> {
 
         val accessToken = googleAuthService.getTokenFromGoogle(code)
         val userInfo = googleAuthService.getUserInfoFromGoogle(accessToken)
@@ -57,7 +57,7 @@ class AuthController(
     }
 
     @GetMapping("/kakao-token")
-    fun getKakaoUserInfo(@RequestParam code: String): BaseResponse<UserInfoResponseDto> {
+    fun getKakaoUserInfo(@RequestParam code: String): BaseResponse<UserInfoResponse> {
 
         val accessToken = kaKaoAuthService.getTokenFromKakao(code)
         val userInfo = kaKaoAuthService.getUserInfoFromKakao(accessToken)

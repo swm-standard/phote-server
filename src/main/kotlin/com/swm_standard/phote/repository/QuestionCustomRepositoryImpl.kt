@@ -1,7 +1,7 @@
 package com.swm_standard.phote.repository
 
 import com.querydsl.jpa.impl.JPAQueryFactory
-import com.swm_standard.phote.dto.SearchQuestionsToAddResponseDto
+import com.swm_standard.phote.dto.SearchQuestionsToAddResponse
 import com.swm_standard.phote.entity.QQuestion
 import com.swm_standard.phote.entity.QQuestionSet
 import com.swm_standard.phote.entity.QTag
@@ -55,7 +55,7 @@ class QuestionCustomRepositoryImpl(
         workbookId: UUID,
         tags: List<String>?,
         keywords: List<String>?
-    ): List<SearchQuestionsToAddResponseDto> {
+    ): List<SearchQuestionsToAddResponse> {
 
         val questionSet = QQuestionSet.questionSet
 
@@ -68,7 +68,7 @@ class QuestionCustomRepositoryImpl(
         val questions = searchQuestionsList(memberId, tags, keywords)
 
         return questions.map { question ->
-            SearchQuestionsToAddResponseDto(
+            SearchQuestionsToAddResponse(
                 createdAt = question.createdAt,
                 modifiedAt = question.modifiedAt,
                 statement = question.statement,

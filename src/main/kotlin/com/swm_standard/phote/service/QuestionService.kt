@@ -21,8 +21,8 @@ class QuestionService(
     private val workbookRepository: WorkbookRepository
 ) {
     @Transactional
-    fun createQuestion(memberId:UUID, request: CreateQuestionRequestDto, imageUrl: String?)
-    : CreateQuestionResponseDto {
+    fun createQuestion(memberId:UUID, request: CreateQuestionRequest, imageUrl: String?)
+    : CreateQuestionResponse {
 
         // 문제 생성 유저 확인
         val member = memberRepository.findById(memberId).orElseThrow { NotFoundException("존재하지 않는 member") }
@@ -45,14 +45,14 @@ class QuestionService(
             tagRepository.save(Tag(name = it, question = question))
         }
 
-        return CreateQuestionResponseDto(question.id)
+        return CreateQuestionResponse(question.id)
     }
 
     @Transactional(readOnly = true)
-    fun readQuestionDetail(id: UUID): ReadQuestionDetailResponseDto {
+    fun readQuestionDetail(id: UUID): ReadQuestionDetailResponse {
         val question = questionRepository.findById(id).orElseThrow { NotFoundException("questionId","존재하지 않는 UUID") }
 
-        return ReadQuestionDetailResponseDto(question)
+        return ReadQuestionDetailResponse(question)
     }
 
     @Transactional(readOnly = true)
@@ -65,15 +65,15 @@ class QuestionService(
     }
 
     @Transactional(readOnly = true)
-    fun searchQuestionsToAdd(memberId: UUID, workbookId: UUID, tags: List<String>?, keywords: List<String>?): List<SearchQuestionsToAddResponseDto> {
+    fun searchQuestionsToAdd(memberId: UUID, workbookId: UUID, tags: List<String>?, keywords: List<String>?): List<SearchQuestionsToAddResponse> {
 
-        val questions: List<SearchQuestionsToAddResponseDto> = questionRepository.searchQuestionsToAddList(memberId, workbookId, tags, keywords)
+        val questions: List<SearchQuestionsToAddResponse> = questionRepository.searchQuestionsToAddList(memberId, workbookId, tags, keywords)
 
         return questions
     }
 
     @Transactional
-    fun deleteQuestion(id: UUID): DeleteQuestionResponseDto {
+    fun deleteQuestion(id: UUID): DeleteQuestionResponse {
 
         // 존재하지 않는 question id가 아닌지 확인
         val question = questionRepository.findById(id).orElseThrow { NotFoundException("questionId","존재하지 않는 UUID") }
@@ -87,6 +87,6 @@ class QuestionService(
 
         questionRepository.deleteById(id)
 
-        return DeleteQuestionResponseDto(id, LocalDateTime.now())
+        return DeleteQuestionResponse(id, LocalDateTime.now())
     }
 }
