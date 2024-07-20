@@ -26,22 +26,25 @@ class JwtTokenProvider {
     lateinit var secretKey: String
 
     private val key by lazy {
-        Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey))}
+        Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey))
+    }
 
-
-    fun createToken(userInfoResponseDto: UserInfoResponse, memberId: UUID): String {
-
+    fun createToken(
+        userInfoResponseDto: UserInfoResponse,
+        memberId: UUID,
+    ): String {
         val now = Date()
         val accessExpiration = Date(now.time + ACCESS_TOKEN_EXPIRATION)
 
-        val accessToken = Jwts
-            .builder()
-            .setSubject(userInfoResponseDto.email)
-            .claim("memberId", memberId)
-            .setIssuedAt(now)
-            .setExpiration(accessExpiration)
-            .signWith(key, SignatureAlgorithm.HS256)
-            .compact()
+        val accessToken =
+            Jwts
+                .builder()
+                .setSubject(userInfoResponseDto.email)
+                .claim("memberId", memberId)
+                .setIssuedAt(now)
+                .setExpiration(accessExpiration)
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact()
 
         return "Bearer $accessToken"
     }
@@ -60,11 +63,12 @@ class JwtTokenProvider {
     fun getAuthentication(token: String): Authentication {
         val claims: Claims = getClaims(token)
 
-        val auth = claims["memberId"]?: throw RuntimeException("잘못된 토큰입니다.")
+        val auth = claims["memberId"] ?: throw RuntimeException("잘못된 토큰입니다.")
 
-        val authorities: Collection<GrantedAuthority> = (auth as String)
-            .split(",")
-            .map { SimpleGrantedAuthority(it) }
+        val authorities: Collection<GrantedAuthority> =
+            (auth as String)
+                .split(",")
+                .map { SimpleGrantedAuthority(it) }
 
         val principal: UserDetails = User(claims.subject, "", authorities)
 
@@ -76,7 +80,7 @@ class JwtTokenProvider {
             getClaims(token)
             return true
         } catch (e: Exception) {
-            when(e) {
+            when (e) {
                 is SecurityException -> {}
                 is MalformedJwtException -> {}
                 is ExpiredJwtException -> {}
@@ -89,16 +93,17 @@ class JwtTokenProvider {
     }
 
     private fun getClaims(token: String): Claims =
-        Jwts.parserBuilder()
+        Jwts
+            .parserBuilder()
             .setSigningKey(key)
             .build()
             .parseClaimsJws(token)
             .body
 
-    public fun getJwtContents(bearerToken: String): UUID{
+    public fun getJwtContents(bearerToken: String): UUID {
         val token = bearerToken.substring(7)
         val claims = getClaims(token)
-        val auth = claims["memberId"]?: throw RuntimeException("잘못된 토큰입니다.")
+        val auth = claims["memberId"] ?: throw RuntimeException("잘못된 토큰입니다.")
 
         return UUID.fromString(auth.toString())
     }

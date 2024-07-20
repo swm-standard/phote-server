@@ -23,7 +23,8 @@ class WorkbookService(
 
     @Transactional
     fun createWorkbook(request: CreateWorkbookRequest, memberId: UUID): CreateWorkbookResponse {
-        val member = memberRepository.findById(memberId).orElseThrow { NotFoundException(fieldName = "member")}
+
+        val member = memberRepository.findById(memberId).orElseThrow { NotFoundException(fieldName = "member") }
         val workbook = Workbook(request.title, request.description, member).apply {
             matchEmojiByTitle()
             workbookRepository.save(this)
@@ -34,7 +35,7 @@ class WorkbookService(
     @Transactional
     fun deleteWorkbook(id: UUID): DeleteWorkbookResponse {
 
-        workbookRepository.findById(id).orElseThrow { NotFoundException("workbookId","존재하지 않는 workbook") }
+        workbookRepository.findById(id).orElseThrow { NotFoundException("workbookId", "존재하지 않는 workbook") }
 
         workbookRepository.deleteById(id)
 
@@ -42,9 +43,8 @@ class WorkbookService(
     }
 
     @Transactional(readOnly = true)
-    fun readWorkbookDetail(id: UUID) : ReadWorkbookDetailResponse {
+    fun readWorkbookDetail(id: UUID): ReadWorkbookDetailResponse {
         val workbook = workbookRepository.findById(id).orElseThrow { NotFoundException() }
-
 
         return ReadWorkbookDetailResponse(
             workbook.id,
@@ -53,11 +53,11 @@ class WorkbookService(
             workbook.emoji,
             workbook.quantity,
             workbook.modifiedAt,
-            )
+        )
     }
 
     @Transactional(readOnly = true)
-    fun readWorkbookList(memberId: UUID) : List<ReadWorkbookListResponse> {
+    fun readWorkbookList(memberId: UUID): List<ReadWorkbookListResponse> {
         val member = memberRepository.findById(memberId).orElseThrow { InvalidInputException("memberId") }
         val workbooks: List<Workbook> = workbookRepository.findAllByMember(member)
 
@@ -76,12 +76,15 @@ class WorkbookService(
     @Transactional
     fun addQuestionsToWorkbook(workbookId: UUID, request: AddQuestionsToWorkbookRequest) {
 
-        val workbook: Workbook = workbookRepository.findById(workbookId).orElseThrow { NotFoundException(fieldName = "workbook", message = "id 를 재확인해주세요.") }
+        val workbook: Workbook = workbookRepository.findById(workbookId)
+            .orElseThrow { NotFoundException(fieldName = "workbook", message = "id 를 재확인해주세요.") }
         var nextSequence = questionSetRepository.findMaxSequenceByWorkbookId(workbook) + 1
 
         request.questions.forEach { questionId ->
-            val question: Question = questionRepository.findById(questionId).orElseThrow { NotFoundException(fieldName = "question", message = "id 를 재확인해주세요.") }
-            questionSetRepository.findByQuestionIdAndWorkbookId(questionId, workbook.id)?.let { throw  AlreadyExistedException("questionId ($questionId)") }
+            val question: Question = questionRepository.findById(questionId)
+                .orElseThrow { NotFoundException(fieldName = "question", message = "id 를 재확인해주세요.") }
+            questionSetRepository.findByQuestionIdAndWorkbookId(questionId, workbook.id)
+                ?.let { throw AlreadyExistedException("questionId ($questionId)") }
             questionSetRepository.save(QuestionSet(question, workbook, nextSequence))
             nextSequence += 1
         }
@@ -110,7 +113,10 @@ class WorkbookService(
         val workbook: Workbook = workbookRepository.findById(workbookId)
             .orElseThrow { NotFoundException(fieldName = "workbook", message = "id를 재확인해주세요.") }
 
-        if (!workbook.compareQuestionQuantity(request.size)) throw InvalidInputException(fieldName = "question", message = "문제집 내 모든 문제를 포함해주세요.")
+        if (!workbook.compareQuestionQuantity(request.size)) throw InvalidInputException(
+            fieldName = "question",
+            message = "문제집 내 모든 문제를 포함해주세요."
+        )
 
         request.forEach {
             questionSetRepository.findById(it.id).orElseThrow { InvalidInputException("questionSet") }
@@ -136,7 +142,8 @@ class WorkbookService(
 
     fun readQuestionsInWorkbook(workbookId: UUID): List<ReadQuestionsInWorkbookResponse> {
 
-        workbookRepository.findById(workbookId).orElseThrow{ InvalidInputException(fieldName = "workboook", message = "id를 재확인해주세요.")}
+        workbookRepository.findById(workbookId)
+            .orElseThrow { InvalidInputException(fieldName = "workboook", message = "id를 재확인해주세요.") }
         val questionSets: List<QuestionSet> = questionSetRepository.findByWorkbookIdOrderBySequence(workbookId)
 
         return questionSets.map { set ->

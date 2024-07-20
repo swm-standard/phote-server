@@ -24,12 +24,11 @@ data class QuestionSet(
 
     var sequence: Int = 0
 
-    ){
+) {
 
     @Id
     @Column(name = "question_set_id", nullable = false, unique = true)
     val id: UUID = UUID.randomUUID()
-
 
     @CreationTimestamp
     val createdAt: LocalDateTime = LocalDateTime.now()
@@ -40,5 +39,4 @@ data class QuestionSet(
     fun updateSequence(seq: Int) {
         this.sequence = seq
     }
-
 }

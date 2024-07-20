@@ -17,18 +17,19 @@ class S3Service(
     companion object {
         const val TYPE_IMAGE = "image"
     }
+
     fun uploadImage(multipartFile: MultipartFile): String {
         val originalFilename = multipartFile.originalFilename
             ?: throw BadRequestException("image 미입력")
         FileValidate.checkImageFormat(originalFilename)
-        val fileName = "${UUID.randomUUID()}-${originalFilename}"
+        val fileName = "${UUID.randomUUID()}-$originalFilename"
         val objectMetadata = setFileDateOption(
             type = TYPE_IMAGE,
             file = getFileExtension(originalFilename),
             multipartFile = multipartFile
         )
         amazonS3.putObject(bucket, fileName, multipartFile.inputStream, objectMetadata)
-        val imageUrl = amazonS3.getUrl(bucket,fileName).toString()
+        val imageUrl = amazonS3.getUrl(bucket, fileName).toString()
         return imageUrl
     }
 
@@ -43,7 +44,7 @@ class S3Service(
         multipartFile: MultipartFile
     ): ObjectMetadata {
         val objectMetadata = ObjectMetadata()
-        objectMetadata.contentType = "/${type}/${getFileExtension(file)}"
+        objectMetadata.contentType = "/$type/${getFileExtension(file)}"
         objectMetadata.contentLength = multipartFile.inputStream.available().toLong()
         return objectMetadata
     }
@@ -55,7 +56,7 @@ class FileValidate {
         private val IMAGE_EXTENSIONS: List<String> = listOf("jpg", "png", "gif", "webp")
         fun checkImageFormat(fileName: String) {
             val extensionIndex = fileName.lastIndexOf('.')
-            if(extensionIndex == -1) {
+            if (extensionIndex == -1) {
                 throw BadRequestException("파일 확장자가 없음")
             }
             val extension = fileName.substring(extensionIndex + 1)

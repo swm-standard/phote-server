@@ -11,16 +11,16 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-class SecurityConfig (
+class SecurityConfig(
     private val jwtTokenProvider: JwtTokenProvider
 ) {
     @Bean
-    fun filterChain(http: HttpSecurity): SecurityFilterChain  {
+    fun filterChain(http: HttpSecurity): SecurityFilterChain {
         http
-            .httpBasic { it.disable()}
-            .csrf{it.disable()}
+            .httpBasic { it.disable() }
+            .csrf { it.disable() }
             .cors(Customizer.withDefaults())
-            .sessionManagement{it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)}
+            .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests {
                 it.requestMatchers("/api/auth/*").anonymous()
                     .anyRequest().authenticated()

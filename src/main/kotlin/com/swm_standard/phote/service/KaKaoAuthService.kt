@@ -17,17 +17,17 @@ import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.MultiValueMap
 import org.springframework.web.client.RestTemplate
 
-
 @Service
 class KaKaoAuthService(
     private val memberRepository: MemberRepository,
-    private val jwtTokenProvider: JwtTokenProvider) {
+    private val jwtTokenProvider: JwtTokenProvider
+) {
 
     @Value("\${KAKAO_REST_API_KEY}")
-    lateinit var kakaokey:String
+    lateinit var kakaokey: String
 
     @Value("\${KAKAO_REDIRECT_URI}")
-    lateinit var kakaoRedirectUri:String
+    lateinit var kakaoRedirectUri: String
 
     fun getTokenFromKakao(code: String): String {
 
@@ -39,7 +39,6 @@ class KaKaoAuthService(
         body.add("client_id", kakaokey)
         body.add("redirect_uri", kakaoRedirectUri)
         body.add("code", code)
-
 
         val kakaoTokenRequest = HttpEntity(body, headers)
         val response = RestTemplate().exchange(
@@ -78,24 +77,30 @@ class KaKaoAuthService(
 
         var member = memberRepository.findByEmail(email)
 
-        val isMember:Boolean
+        val isMember: Boolean
 
-        if (member == null){
+        if (member == null) {
 
             val nicknameGenerator = NicknameGenerator()
 
-            member = Member(name = nicknameGenerator.randomNickname(), email = email, image = ProfileImageGenerator().imageGenerator(), provider = Provider.KAKAO)
+            member = Member(
+                name = nicknameGenerator.randomNickname(),
+                email = email,
+                image = ProfileImageGenerator().imageGenerator(),
+                provider = Provider.KAKAO
+            )
 
             memberRepository.save(member)
 
             isMember = false
-
         } else {
             isMember = true
         }
 
-        val dto = UserInfoResponse(name = member.name, email = member.email,
-            picture = member.image, isMember = isMember, userId = member.id)
+        val dto = UserInfoResponse(
+            name = member.name, email = member.email,
+            picture = member.image, isMember = isMember, userId = member.id
+        )
 
         dto.accessToken = jwtTokenProvider.createToken(dto, member.id)
 

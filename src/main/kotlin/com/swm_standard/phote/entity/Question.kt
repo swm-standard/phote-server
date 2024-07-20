@@ -12,7 +12,6 @@ import org.springframework.data.annotation.LastModifiedDate
 import java.time.LocalDateTime
 import java.util.*
 
-
 @Entity
 @SQLDelete(sql = "UPDATE question SET deleted_at = NOW() WHERE question_uuid = ?")
 @SQLRestriction("deleted_at is NULL")
@@ -20,7 +19,6 @@ data class Question(
 
     @Id @Column(name = "question_uuid", nullable = false, unique = true)
     val id: UUID = UUID.randomUUID(),
-
 
     @ManyToOne
     @JoinColumn(name = "member_id")
@@ -59,4 +57,4 @@ data class Question(
     @LastModifiedDate
     var modifiedAt: LocalDateTime? = LocalDateTime.now()
 
-    )
+)

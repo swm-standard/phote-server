@@ -6,16 +6,12 @@ import java.util.UUID
 data class GoogleAccessResponse(
     @JsonProperty("access_token")
     val accessToken: String,
-
     @JsonProperty("expires_in")
     val expiresIn: Int,
-
     @JsonProperty("scope")
     val scope: String,
-
     @JsonProperty("token_type")
     val tokenType: String,
-
     @JsonProperty("id_token")
     val idToken: String,
 )
@@ -28,4 +24,3 @@ data class UserInfoResponse(
     var isMember: Boolean? = true,
     var userId: UUID?,
 )
-

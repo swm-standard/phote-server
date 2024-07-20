@@ -1,6 +1,5 @@
 package com.swm_standard.phote.common.module
 
-
 class NicknameGenerator {
     fun randomNickname(): String {
         val adjectives = listOf(
