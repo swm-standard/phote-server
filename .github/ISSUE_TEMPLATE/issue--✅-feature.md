@@ -7,20 +7,13 @@ assignees: ''
 
 ---
 
-
 ## ISSUE: ✅ FEATURE
-
-feature 작업 사항을 입력하세요.
-
----
 
 ### ✨ 기능 설명
 
 설명 작성
 
 ---
-
-
 
 ### 📌 To-Do
 

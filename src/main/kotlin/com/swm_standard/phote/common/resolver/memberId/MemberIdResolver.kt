@@ -14,7 +14,7 @@ import java.util.*
 @Component
 class MemberIdResolver(
     private val jwtTokenProvider: JwtTokenProvider
-): HandlerMethodArgumentResolver {
+) : HandlerMethodArgumentResolver {
 
     // supportsParameter: 어떤 파라미터를 처리할 것인지
     override fun supportsParameter(parameter: MethodParameter): Boolean {

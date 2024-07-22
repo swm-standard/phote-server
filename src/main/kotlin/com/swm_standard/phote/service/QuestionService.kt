@@ -18,27 +18,30 @@ class QuestionService(
     private val questionRepository: QuestionRepository,
     private val memberRepository: MemberRepository,
     private val tagRepository: TagRepository,
-    private val workbookRepository: WorkbookRepository
+    private val workbookRepository: WorkbookRepository,
 ) {
     @Transactional
-    fun createQuestion(memberId:UUID, request: CreateQuestionRequest, imageUrl: String?)
-    : CreateQuestionResponse {
-
+    fun createQuestion(
+        memberId: UUID,
+        request: CreateQuestionRequest,
+        imageUrl: String?,
+    ): CreateQuestionResponse {
         // 문제 생성 유저 확인
         val member = memberRepository.findById(memberId).orElseThrow { NotFoundException("존재하지 않는 member") }
 
         // 문제 저장
-        val question = questionRepository.save(
-            Question(
-                member = member,
-                statement = request.statement,
-                image = imageUrl,
-                category = request.category,
-                options = request.options,
-                answer = request.answer,
-                memo = request.memo
+        val question =
+            questionRepository.save(
+                Question(
+                    member = member,
+                    statement = request.statement,
+                    image = imageUrl,
+                    category = request.category,
+                    options = request.options,
+                    answer = request.answer,
+                    memo = request.memo,
+                ),
             )
-        )
 
         // 태그 생성
         request.tags?.forEach {
@@ -50,14 +53,17 @@ class QuestionService(
 
     @Transactional(readOnly = true)
     fun readQuestionDetail(id: UUID): ReadQuestionDetailResponse {
-        val question = questionRepository.findById(id).orElseThrow { NotFoundException("questionId","존재하지 않는 UUID") }
+        val question = questionRepository.findById(id).orElseThrow { NotFoundException("questionId", "존재하지 않는 UUID") }
 
         return ReadQuestionDetailResponse(question)
     }
 
     @Transactional(readOnly = true)
-    fun searchQuestions(memberId: UUID, tags: List<String>?, keywords: List<String>?): List<Question> {
-
+    fun searchQuestions(
+        memberId: UUID,
+        tags: List<String>?,
+        keywords: List<String>?,
+    ): List<Question> {
         // 요청을 보낸 멤버가 생성한 문제이고, tags, keywords를 모두 포함하는 문제만 불러옴
         val questions: List<Question> = questionRepository.searchQuestionsList(memberId, tags, keywords)
 
@@ -65,18 +71,22 @@ class QuestionService(
     }
 
     @Transactional(readOnly = true)
-    fun searchQuestionsToAdd(memberId: UUID, workbookId: UUID, tags: List<String>?, keywords: List<String>?): List<SearchQuestionsToAddResponse> {
-
-        val questions: List<SearchQuestionsToAddResponse> = questionRepository.searchQuestionsToAddList(memberId, workbookId, tags, keywords)
+    fun searchQuestionsToAdd(
+        memberId: UUID,
+        workbookId: UUID,
+        tags: List<String>?,
+        keywords: List<String>?,
+    ): List<SearchQuestionsToAddResponse> {
+        val questions: List<SearchQuestionsToAddResponse> =
+            questionRepository.searchQuestionsToAddList(memberId, workbookId, tags, keywords)
 
         return questions
     }
 
     @Transactional
     fun deleteQuestion(id: UUID): DeleteQuestionResponse {
-
         // 존재하지 않는 question id가 아닌지 확인
-        val question = questionRepository.findById(id).orElseThrow { NotFoundException("questionId","존재하지 않는 UUID") }
+        val question = questionRepository.findById(id).orElseThrow { NotFoundException("questionId", "존재하지 않는 UUID") }
 
         // 연결된 workbook의 quantity 감소
         question.questionSet?.forEach { questionSet ->

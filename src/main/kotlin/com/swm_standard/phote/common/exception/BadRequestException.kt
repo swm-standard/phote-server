@@ -1,8 +1,8 @@
 package com.swm_standard.phote.common.exception
 
-class BadRequestException (
+class BadRequestException(
     val fieldName: String = "",
     message: String = "BadRequest"
-): RuntimeException(message) {
+) : RuntimeException(message) {
     constructor(message: String) : this(message = message, fieldName = "")
 }

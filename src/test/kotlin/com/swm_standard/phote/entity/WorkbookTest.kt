@@ -2,12 +2,9 @@ package com.swm_standard.phote.entity
 
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
-
 import java.time.LocalDateTime
-import java.util.*
 
 class WorkbookTest {
-
     @Test
     fun `문제 1개 삭제 시에 quantity가 1만큼 줄어든다`() {
         val workbook: Workbook = createWorkbook()
@@ -33,20 +30,16 @@ class WorkbookTest {
         Assertions.assertThat(workbook.modifiedAt?.second).isEqualTo(LocalDateTime.now().second)
     }
 
-
-    fun createWorkbook(): Workbook {
-        return Workbook(
-            title = "deserunt", description = null, member = Member(
-                id = UUID.randomUUID(),
-                name = "Sandra Downs",
-                email = "eddie.henson@example.com",
-                image = "disputationi",
+    fun createWorkbook(): Workbook =
+        Workbook(
+            title = "deserunt",
+            description = null,
+            member =
+            Member(
+                name = "Kaitlin Kinney",
+                email = "wallace.stark@example.com",
+                image = "auctor",
                 provider = Provider.APPLE,
-                joinedAt = LocalDateTime.now(),
-                deletedAt = null
-            ), emoji = "contentiones"
+            ),
         )
-    }
-
-
 }

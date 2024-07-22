@@ -14,10 +14,8 @@ data class CreateWorkbookRequest(
     @field:NotBlank(message = "문제집 이름을 입력해주세요.")
     @JsonProperty("title")
     private val _title: String?,
-
     @JsonProperty("description")
     private val _description: String?,
-
 ) {
     val title: String get() = _title!!
 
@@ -25,68 +23,52 @@ data class CreateWorkbookRequest(
 }
 
 data class CreateWorkbookResponse(
-    val id: UUID
+    val id: UUID,
 )
 
 data class DeleteWorkbookResponse(
     val id: UUID,
-
-    val deletedAt: LocalDateTime
+    val deletedAt: LocalDateTime,
 )
 
 data class ReadWorkbookDetailResponse(
     val id: UUID,
-
     val title: String,
-
     val description: String?,
-
     val emoji: String,
-
     val quantity: Int,
-
     val modifiedAt: LocalDateTime?,
 )
 
 data class ReadWorkbookListResponse(
     val id: UUID,
-
     val title: String,
-
     val description: String?,
-
     val emoji: String,
-
     val quantity: Int,
-
-    val modifiedAt: LocalDateTime?
-
+    val modifiedAt: LocalDateTime?,
 )
 
 data class AddQuestionsToWorkbookRequest(
     @JsonProperty("questions")
-    private val _questions: List<UUID>?
-){
+    private val _questions: List<UUID>?,
+) {
     val questions: List<UUID> get() = _questions!!
-
 }
 
 data class DeleteQuestionInWorkbookResponse(
     val workbookId: UUID,
-
     val questionId: UUID,
-
-    val deletedAt: LocalDateTime
+    val deletedAt: LocalDateTime,
 )
 
 data class UpdateQuestionSequenceRequest(
     @JsonProperty("id")
     private val _id: UUID?,
-
     @field:PositiveOrZero(message = "sequence는 0 이상의 정수만 가능합니다.")
     @JsonProperty("sequence")
     private val _sequence: Int?,
-){
+) {
     val id: UUID get() = _id!!
 
     val sequence: Int get() = _sequence!!
@@ -104,24 +86,16 @@ data class UpdateWorkbookDetailRequest(
 )
 
 data class UpdateWorkbookDetailResponse(
-    val id: UUID
+    val id: UUID,
 )
-
 
 data class ReadQuestionsInWorkbookResponse(
     val questionSetId: UUID,
-
     val questionId: UUID,
-
     val statement: String,
-
     val options: JsonNode?,
-
     val image: String?,
-
     val category: Category,
-
     val sequence: Int,
-
     val tags: List<Tag>,
-    )
+)
