@@ -30,8 +30,9 @@ class WorkbookController(private val workbookService: WorkbookService) {
     @Operation(summary = "deleteWorkbook", description = "문제집 삭제")
     @SecurityRequirement(name = "bearer Auth")
     @DeleteMapping("/workbook/{workbookId}")
-    fun deleteWorkbook(@PathVariable(required = true) workbookId: UUID): BaseResponse<DeleteWorkbookResponse> {
-
+    fun deleteWorkbook(
+        @PathVariable(required = true) workbookId: UUID,
+    ): BaseResponse<DeleteWorkbookResponse> {
         val deletedWorkbook = workbookService.deleteWorkbook(workbookId)
 
         return BaseResponse(msg = "문제집 삭제 성공", data = deletedWorkbook)
@@ -40,8 +41,9 @@ class WorkbookController(private val workbookService: WorkbookService) {
     @Operation(summary = "readWorkbookDetail", description = "문제집 정보 상세 조회")
     @SecurityRequirement(name = "bearer Auth")
     @GetMapping("/workbook/{workbookId}")
-    fun readWorkbookDetail(@PathVariable(required = true) workbookId: UUID): BaseResponse<ReadWorkbookDetailResponse> {
-
+    fun readWorkbookDetail(
+        @PathVariable(required = true) workbookId: UUID,
+    ): BaseResponse<ReadWorkbookDetailResponse> {
         val workbookDetail = workbookService.readWorkbookDetail(workbookId)
 
         return BaseResponse(msg = "문제집 정보 읽기 성공", data = workbookDetail)
@@ -60,9 +62,17 @@ class WorkbookController(private val workbookService: WorkbookService) {
     @Operation(summary = "addQuestionsToWorkbook", description = "문제집에 문제 추가")
     @SecurityRequirement(name = "bearer Auth")
     @PostMapping("/workbook/{workbookId}")
-    fun addQuestionsToWorkbook(@PathVariable(required = true) workbookId: UUID, @RequestBody @Valid request: AddQuestionsToWorkbookRequest): BaseResponse<Unit> {
-        if(request.questions.isEmpty()) throw InvalidInputException(fieldName = "questions", message = "question을 담아 요청해주세요.")
-        workbookService.addQuestionsToWorkbook(workbookId,request)
+    fun addQuestionsToWorkbook(
+        @PathVariable(required = true) workbookId: UUID,
+        @RequestBody @Valid request: AddQuestionsToWorkbookRequest,
+    ): BaseResponse<Unit> {
+        if (request.questions.isEmpty()) {
+            throw InvalidInputException(
+                fieldName = "questions",
+                message = "question을 담아 요청해주세요.",
+            )
+        }
+        workbookService.addQuestionsToWorkbook(workbookId, request)
 
         return BaseResponse(msg = "문제집에 문제 추가 성공")
     }
@@ -70,16 +80,22 @@ class WorkbookController(private val workbookService: WorkbookService) {
     @Operation(summary = "deleteQuestionInWorkbook", description = "문제집 내 문제 삭제")
     @SecurityRequirement(name = "bearer Auth")
     @DeleteMapping("/workbook/{workbookId}/question/{questionId}")
-    fun deleteQuestionInWorkbook(@PathVariable(required = true) workbookId: UUID, @PathVariable(required = true) questionId: UUID): BaseResponse<DeleteQuestionInWorkbookResponse> {
-
-        return BaseResponse(msg = "문제집의 문제 삭제 성공", data = workbookService.deleteQuestionInWorkbook(workbookId, questionId))
-    }
+    fun deleteQuestionInWorkbook(
+        @PathVariable(required = true) workbookId: UUID,
+        @PathVariable(required = true) questionId: UUID,
+    ): BaseResponse<DeleteQuestionInWorkbookResponse> =
+        BaseResponse(
+            msg = "문제집의 문제 삭제 성공",
+            data = workbookService.deleteQuestionInWorkbook(workbookId, questionId),
+        )
 
     @Operation(summary = "updateQuestionSequence", description = "문제집 내 문제 순서 변경")
     @SecurityRequirement(name = "bearer Auth")
     @PatchMapping("/workbook/question-sequence/{workbookId}")
-    fun updateQuestionSequence(@PathVariable(required = true) workbookId: UUID, @RequestBody @Valid request: List<UpdateQuestionSequenceRequest>): BaseResponse<UpdateQuestionSequenceResponse> {
-
+    fun updateQuestionSequence(
+        @PathVariable(required = true) workbookId: UUID,
+        @RequestBody @Valid request: List<UpdateQuestionSequenceRequest>,
+    ): BaseResponse<UpdateQuestionSequenceResponse> {
         val response = UpdateQuestionSequenceResponse(workbookService.updateQuestionSequence(workbookId, request))
 
         return BaseResponse(msg = "문제집의 문제 순서 변경 성공", data = response)
@@ -88,19 +104,20 @@ class WorkbookController(private val workbookService: WorkbookService) {
     @Operation(summary = "updateWorkbookDetail", description = "문제집 상제 정보 변경")
     @SecurityRequirement(name = "bearer Auth")
     @PutMapping("/workbook/{workbookId}")
-    fun updateWorkbookDetail(@PathVariable(required = true) workbookId: UUID, @RequestBody @Valid request: UpdateWorkbookDetailRequest): BaseResponse<UpdateWorkbookDetailResponse> {
-
-        return BaseResponse(msg = "문제집의 상세정보 수정 성공", data = workbookService.updateWorkbookDetail(workbookId, request))
-    }
+    fun updateWorkbookDetail(
+        @PathVariable(required = true) workbookId: UUID,
+        @RequestBody @Valid request: UpdateWorkbookDetailRequest,
+    ): BaseResponse<UpdateWorkbookDetailResponse> =
+        BaseResponse(msg = "문제집의 상세정보 수정 성공", data = workbookService.updateWorkbookDetail(workbookId, request))
 
     @Operation(summary = "readQuestionsInWorkbook", description = "문제집 내 문제 목록 조회")
     @SecurityRequirement(name = "bearer Auth")
     @GetMapping("/workbook/questions/{workbookId}")
-    fun readQuestionsInWorkbook(@PathVariable(required = true) workbookId: UUID): BaseResponse<List<ReadQuestionsInWorkbookResponse>> {
-
+    fun readQuestionsInWorkbook(
+        @PathVariable(required = true) workbookId: UUID,
+    ): BaseResponse<List<ReadQuestionsInWorkbookResponse>> {
         val response = workbookService.readQuestionsInWorkbook(workbookId)
 
         return BaseResponse(msg = "문제집의 문제 목록 조회 성공", data = response)
-
     }
 }

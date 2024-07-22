@@ -18,9 +18,8 @@ data class ReadQuestionDetailResponse(
     val answer: String,
     val category: Category,
     val tags: List<Tag>? = null,
-    val memo: String? = null
+    val memo: String? = null,
 ) {
-
     constructor(question: Question) : this(
         createdAt = question.createdAt,
         modifiedAt = question.modifiedAt,
@@ -30,13 +29,13 @@ data class ReadQuestionDetailResponse(
         answer = question.answer,
         tags = question.tags,
         category = question.category,
-        memo = question.memo
+        memo = question.memo,
     )
 }
 
-class DeleteQuestionResponse (
+class DeleteQuestionResponse(
     val id: UUID,
-    val deletedAt: LocalDateTime
+    val deletedAt: LocalDateTime,
 )
 
 data class CreateQuestionRequest(
@@ -48,11 +47,11 @@ data class CreateQuestionRequest(
     @field:NotBlank(message = "answer 미입력")
     val answer: String,
     val tags: List<String>? = null,
-    val memo: String? = null
+    val memo: String? = null,
 )
 
 data class CreateQuestionResponse(
-    val id: UUID
+    val id: UUID,
 )
 
 data class SearchQuestionsToAddResponse(
@@ -65,5 +64,5 @@ data class SearchQuestionsToAddResponse(
     val category: Category,
     val tags: List<Tag>? = null,
     val memo: String? = null,
-    var isContain: Boolean = false
+    var isContain: Boolean = false,
 )

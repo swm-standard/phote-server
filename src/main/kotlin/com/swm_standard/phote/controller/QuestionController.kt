@@ -20,7 +20,7 @@ import java.util.*
 @Tag(name = "Question", description = "Question API Document")
 class QuestionController(
     private val questionService: QuestionService,
-    private val s3Service: S3Service
+    private val s3Service: S3Service,
 ) {
 
     @Operation(summary = "createQuestion", description = "문제 생성")
@@ -37,12 +37,12 @@ class QuestionController(
     @Operation(summary = "readQuestionDetail", description = "문제 상세 정보 조회")
     @SecurityRequirement(name = "bearer Auth")
     @GetMapping("/question/{id}")
-    fun readQuestionDetail(@PathVariable(
-        required = true
-    ) id: UUID
-    ): BaseResponse<ReadQuestionDetailResponse> {
-        return BaseResponse(msg = "문제 상세조회 성공", data = questionService.readQuestionDetail(id))
-    }
+    fun readQuestionDetail(
+        @PathVariable(
+            required = true,
+        ) id: UUID,
+    ): BaseResponse<ReadQuestionDetailResponse> =
+        BaseResponse(msg = "문제 상세조회 성공", data = questionService.readQuestionDetail(id))
 
     @Operation(summary = "searchQuestions", description = "문제 검색")
     @SecurityRequirement(name = "bearer Auth")
@@ -51,7 +51,7 @@ class QuestionController(
                         @RequestParam(required = false) tags: List<String>? = null,
                         @RequestParam(required = false) keywords: List<String>? = null): BaseResponse<List<Question>> {
         questionService.searchQuestions(memberId, tags, keywords)
-        return BaseResponse(msg = "문제 검색 성공", data=questionService.searchQuestions(memberId, tags, keywords))
+        return BaseResponse(msg = "문제 검색 성공", data = questionService.searchQuestions(memberId, tags, keywords))
     }
 
     @Operation(summary = "searchQuestionsToAdd", description = "문제집에 추가할 문제 검색")
@@ -67,9 +67,7 @@ class QuestionController(
     @Operation(summary = "deleteQuestion", description = "문제 삭제")
     @SecurityRequirement(name = "bearer Auth")
     @DeleteMapping("/question/{id}")
-    fun deleteQuestion(@PathVariable(required = true) id: UUID)
-    : BaseResponse<DeleteQuestionResponse>{
-        return BaseResponse(msg = "문제 삭제 성공", data = questionService.deleteQuestion(id))
-    }
-
+    fun deleteQuestion(
+        @PathVariable(required = true) id: UUID,
+    ): BaseResponse<DeleteQuestionResponse> = BaseResponse(msg = "문제 삭제 성공", data = questionService.deleteQuestion(id))
 }

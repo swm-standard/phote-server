@@ -8,18 +8,14 @@ import java.util.UUID
 
 @Entity
 data class Member(
-
     val name: String,
-
     val email: String,
-
     val image: String,
-
     @Enumerated(EnumType.STRING)
     val provider: Provider,
-
-){
-    @Id @Column(name = "member_uuid", nullable = false, unique = true)
+) {
+    @Id
+    @Column(name = "member_uuid", nullable = false, unique = true)
     val id: UUID = UUID.randomUUID()
 
     @CreationTimestamp
@@ -28,5 +24,3 @@ data class Member(
     @JsonIgnore
     val deletedAt: LocalDateTime? = null
 }
-
-

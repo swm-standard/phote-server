@@ -1,8 +1,8 @@
 package com.swm_standard.phote.controller
 
+import com.swm_standard.phote.common.responsebody.BaseResponse
 import com.swm_standard.phote.dto.UserInfoResponse
 import com.swm_standard.phote.service.GoogleAuthService
-import com.swm_standard.phote.common.responsebody.BaseResponse
 import com.swm_standard.phote.service.KaKaoAuthService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
@@ -19,33 +19,36 @@ import org.springframework.web.servlet.view.RedirectView
 @Tag(name = "Auth", description = "Auth API Document")
 class AuthController(
     private val googleAuthService: GoogleAuthService,
-    private val kaKaoAuthService: KaKaoAuthService) {
-
+    private val kaKaoAuthService: KaKaoAuthService,
+) {
     @Value("\${GOOGLE_CLIENT_ID}")
-    lateinit var clientId:String
+    lateinit var clientId: String
 
     @Value("\${REDIRECT_URI}")
-    lateinit var redirectUri:String
+    lateinit var redirectUri: String
 
     @Value("\${KAKAO_REST_API_KEY}")
-    lateinit var kakaokey:String
+    lateinit var kakaokey: String
 
     @Value("\${KAKAO_REDIRECT_URI}")
-    lateinit var kakaoRedirectUri:String
+    lateinit var kakaoRedirectUri: String
 
     @Operation(summary = "google-login", description = "구글 로그인/회원가입")
     @GetMapping("/google-login")
     fun googleLogin(): RedirectView {
         val redirectView = RedirectView()
-        redirectView.url = "https://accounts.google.com/o/oauth2/v2/auth?client_id=$clientId&response_type=code&redirect_uri=$redirectUri&scope=https://www.googleapis.com/auth/userinfo.email"
+        redirectView.url =
+            "https://accounts.google.com/o/oauth2/v2/auth?client_id=$clientId&" +
+            "response_type=code&redirect_uri=$redirectUri&scope=https://www.googleapis.com/auth/userinfo.email"
 
         return redirectView
     }
 
     @Operation(summary = "google user info", description = "구글 로그인 유저 정보 조회")
     @GetMapping("/token")
-    fun getUserInfo(@RequestParam code: String): BaseResponse<UserInfoResponse> {
-
+    fun getUserInfo(
+        @RequestParam code: String,
+    ): BaseResponse<UserInfoResponse> {
         val accessToken = googleAuthService.getTokenFromGoogle(code)
         val userInfo = googleAuthService.getUserInfoFromGoogle(accessToken)
 
@@ -57,21 +60,22 @@ class AuthController(
     @GetMapping("/kakao-login")
     fun kakaoLogin(): RedirectView {
         val redirectView = RedirectView()
-        redirectView.url = "https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=$kakaokey&redirect_uri=$kakaoRedirectUri"
+        redirectView.url =
+            "https://kauth.kakao.com/oauth/authorize?response_type=code&" +
+            "client_id=$kakaokey&redirect_uri=$kakaoRedirectUri"
 
         return redirectView
     }
 
     @Operation(summary = "kakao-login", description = "카카오 로그인 유저 정보 조회")
     @GetMapping("/kakao-token")
-    fun getKakaoUserInfo(@RequestParam code: String): BaseResponse<UserInfoResponse> {
-
+    fun getKakaoUserInfo(
+        @RequestParam code: String,
+    ): BaseResponse<UserInfoResponse> {
         val accessToken = kaKaoAuthService.getTokenFromKakao(code)
         val userInfo = kaKaoAuthService.getUserInfoFromKakao(accessToken)
 
         val message = if (userInfo.isMember == false) "회원가입 성공" else "로그인 성공"
         return BaseResponse(msg = message, data = userInfo)
     }
-
-
 }
