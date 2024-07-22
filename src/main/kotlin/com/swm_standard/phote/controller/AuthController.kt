@@ -4,6 +4,9 @@ import com.swm_standard.phote.dto.UserInfoResponse
 import com.swm_standard.phote.service.GoogleAuthService
 import com.swm_standard.phote.common.responsebody.BaseResponse
 import com.swm_standard.phote.service.KaKaoAuthService
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -13,6 +16,7 @@ import org.springframework.web.servlet.view.RedirectView
 
 @RestController
 @RequestMapping("/api/auth")
+@Tag(name = "Auth", description = "Auth API Document")
 class AuthController(
     private val googleAuthService: GoogleAuthService,
     private val kaKaoAuthService: KaKaoAuthService) {
@@ -29,7 +33,7 @@ class AuthController(
     @Value("\${KAKAO_REDIRECT_URI}")
     lateinit var kakaoRedirectUri:String
 
-
+    @Operation(summary = "google-login", description = "구글 로그인/회원가입")
     @GetMapping("/google-login")
     fun googleLogin(): RedirectView {
         val redirectView = RedirectView()
@@ -38,6 +42,7 @@ class AuthController(
         return redirectView
     }
 
+    @Operation(summary = "google user info", description = "구글 로그인 유저 정보 조회")
     @GetMapping("/token")
     fun getUserInfo(@RequestParam code: String): BaseResponse<UserInfoResponse> {
 
@@ -48,6 +53,7 @@ class AuthController(
         return BaseResponse(msg = message, data = userInfo)
     }
 
+    @Operation(summary = "kakao-login", description = "카카오 로그인/회원가입")
     @GetMapping("/kakao-login")
     fun kakaoLogin(): RedirectView {
         val redirectView = RedirectView()
@@ -56,6 +62,7 @@ class AuthController(
         return redirectView
     }
 
+    @Operation(summary = "kakao-login", description = "카카오 로그인 유저 정보 조회")
     @GetMapping("/kakao-token")
     fun getKakaoUserInfo(@RequestParam code: String): BaseResponse<UserInfoResponse> {
 
