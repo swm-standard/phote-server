@@ -5,7 +5,6 @@ import com.swm_standard.phote.dto.UserInfoResponse
 import com.swm_standard.phote.service.GoogleAuthService
 import com.swm_standard.phote.service.KaKaoAuthService
 import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.bind.annotation.GetMapping

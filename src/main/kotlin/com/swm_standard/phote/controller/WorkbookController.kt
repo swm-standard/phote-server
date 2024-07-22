@@ -16,12 +16,16 @@ import java.util.*
 @RestController
 @RequestMapping("/api")
 @Tag(name = "Workbook", description = "Workbook API Document")
-class WorkbookController(private val workbookService: WorkbookService) {
-
+class WorkbookController(
+    private val workbookService: WorkbookService,
+) {
     @Operation(summary = "createWorkbook", description = "문제집 생성")
     @SecurityRequirement(name = "bearer Auth")
     @PostMapping("/workbook")
-    fun createWorkbook(@Valid @RequestBody request: CreateWorkbookRequest, @Parameter(hidden = true) @MemberId memberId: UUID): BaseResponse<CreateWorkbookResponse> {
+    fun createWorkbook(
+        @Valid @RequestBody request: CreateWorkbookRequest,
+        @Parameter(hidden = true) @MemberId memberId: UUID,
+    ): BaseResponse<CreateWorkbookResponse> {
         val workbook = workbookService.createWorkbook(request, memberId)
 
         return BaseResponse(msg = "문제집 생성 성공", data = workbook)
@@ -52,8 +56,9 @@ class WorkbookController(private val workbookService: WorkbookService) {
     @Operation(summary = "readWorkbookList", description = "문제집 목록 조회")
     @SecurityRequirement(name = "bearer Auth")
     @GetMapping("/workbooks")
-    fun readWorkbookList(@Parameter(hidden = true) @MemberId memberId: UUID): BaseResponse<List<ReadWorkbookListResponse>> {
-
+    fun readWorkbookList(
+        @Parameter(hidden = true) @MemberId memberId: UUID,
+    ): BaseResponse<List<ReadWorkbookListResponse>> {
         val readWorkbookList = workbookService.readWorkbookList(memberId)
 
         return BaseResponse(msg = "문제집 목록 조회 성공", data = readWorkbookList)
