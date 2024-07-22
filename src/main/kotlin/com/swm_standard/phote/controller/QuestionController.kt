@@ -22,13 +22,13 @@ class QuestionController(
     private val questionService: QuestionService,
     private val s3Service: S3Service,
 ) {
-
     @Operation(summary = "createQuestion", description = "문제 생성")
     @SecurityRequirement(name = "bearer Auth")
-    @PostMapping( "/question")
-    fun createQuestion(@Parameter(hidden = true) @MemberId memberId: UUID,
-                       @Valid @RequestPart request: CreateQuestionRequest,
-                       @RequestPart image: MultipartFile?
+    @PostMapping("/question")
+    fun createQuestion(
+        @Parameter(hidden = true) @MemberId memberId: UUID,
+        @Valid @RequestPart request: CreateQuestionRequest,
+        @RequestPart image: MultipartFile?,
     ): BaseResponse<CreateQuestionResponse> {
         val imageUrl = image?.let { s3Service.uploadImage(it) }
         return BaseResponse(msg = "문제 생성 성공", data = questionService.createQuestion(memberId, request, imageUrl))
@@ -47,9 +47,11 @@ class QuestionController(
     @Operation(summary = "searchQuestions", description = "문제 검색")
     @SecurityRequirement(name = "bearer Auth")
     @GetMapping("/questions")
-    fun searchQuestions(@Parameter(hidden = true) @MemberId memberId: UUID,
-                        @RequestParam(required = false) tags: List<String>? = null,
-                        @RequestParam(required = false) keywords: List<String>? = null): BaseResponse<List<Question>> {
+    fun searchQuestions(
+        @Parameter(hidden = true) @MemberId memberId: UUID,
+        @RequestParam(required = false) tags: List<String>? = null,
+        @RequestParam(required = false) keywords: List<String>? = null,
+    ): BaseResponse<List<Question>> {
         questionService.searchQuestions(memberId, tags, keywords)
         return BaseResponse(msg = "문제 검색 성공", data = questionService.searchQuestions(memberId, tags, keywords))
     }
@@ -57,12 +59,16 @@ class QuestionController(
     @Operation(summary = "searchQuestionsToAdd", description = "문제집에 추가할 문제 검색")
     @SecurityRequirement(name = "bearer Auth")
     @GetMapping("/questions/workbook/{workbookId}")
-    fun searchQuestionsToAdd(@Parameter(hidden = true) @MemberId memberId: UUID,
-                             @PathVariable(required = true) workbookId: UUID,
-                             @RequestParam(required = false) tags: List<String>? = null,
-                             @RequestParam(required = false) keywords: List<String>? = null): BaseResponse<List<SearchQuestionsToAddResponse>> {
-        return BaseResponse(msg = "문제집에 추가할 문제 목록 검색 성공", data = questionService.searchQuestionsToAdd(memberId, workbookId, tags, keywords))
-    }
+    fun searchQuestionsToAdd(
+        @Parameter(hidden = true) @MemberId memberId: UUID,
+        @PathVariable(required = true) workbookId: UUID,
+        @RequestParam(required = false) tags: List<String>? = null,
+        @RequestParam(required = false) keywords: List<String>? = null,
+    ): BaseResponse<List<SearchQuestionsToAddResponse>> =
+        BaseResponse(
+            msg = "문제집에 추가할 문제 목록 검색 성공",
+            data = questionService.searchQuestionsToAdd(memberId, workbookId, tags, keywords),
+        )
 
     @Operation(summary = "deleteQuestion", description = "문제 삭제")
     @SecurityRequirement(name = "bearer Auth")
@@ -70,4 +76,15 @@ class QuestionController(
     fun deleteQuestion(
         @PathVariable(required = true) id: UUID,
     ): BaseResponse<DeleteQuestionResponse> = BaseResponse(msg = "문제 삭제 성공", data = questionService.deleteQuestion(id))
+
+    @PostMapping("question-transform")
+    fun transformQuestion(
+        @RequestPart image: MultipartFile?,
+    ): BaseResponse<TransformQuestionResponse> {
+        val imageUrl = image?.let { s3Service.uploadImage(it) }
+
+        val response: TransformQuestionResponse = questionService.transformQuestion(imageUrl!!)
+
+        return BaseResponse(data = response, msg = "문제 변환 성공")
+    }
 }

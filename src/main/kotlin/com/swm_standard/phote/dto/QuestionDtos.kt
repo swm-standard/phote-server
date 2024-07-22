@@ -66,3 +66,8 @@ data class SearchQuestionsToAddResponse(
     val memo: String? = null,
     var isContain: Boolean = false,
 )
+
+data class TransformQuestionResponse(
+    val content: String,
+    val options: List<String>,
+)

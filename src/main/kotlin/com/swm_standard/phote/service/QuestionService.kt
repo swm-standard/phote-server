@@ -1,5 +1,6 @@
 package com.swm_standard.phote.service
 
+import com.swm_standard.phote.common.exception.ChatGptErrorException
 import com.swm_standard.phote.common.exception.NotFoundException
 import com.swm_standard.phote.dto.*
 import com.swm_standard.phote.entity.Question
@@ -8,8 +9,10 @@ import com.swm_standard.phote.repository.MemberRepository
 import com.swm_standard.phote.repository.QuestionRepository
 import com.swm_standard.phote.repository.TagRepository
 import com.swm_standard.phote.repository.WorkbookRepository
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.client.RestTemplate
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -19,7 +22,14 @@ class QuestionService(
     private val memberRepository: MemberRepository,
     private val tagRepository: TagRepository,
     private val workbookRepository: WorkbookRepository,
+    private val template: RestTemplate,
 ) {
+    @Value("\${openai.model}")
+    lateinit var model: String
+
+    @Value("\${openai.api.url}")
+    lateinit var url: String
+
     @Transactional
     fun createQuestion(
         memberId: UUID,
@@ -98,5 +108,26 @@ class QuestionService(
         questionRepository.deleteById(id)
 
         return DeleteQuestionResponse(id, LocalDateTime.now())
+    }
+
+    fun transformQuestion(imageUrl: String): TransformQuestionResponse {
+        val request = ChatGPTRequest(model, imageUrl)
+
+        // openAI로 메시지 전송
+        val chatGPTResponse = template.postForObject(url, request, ChatGPTResponse::class.java)
+
+        // openAI로부터 메시지 수신
+        val split: List<String> =
+            chatGPTResponse!!
+                .choices[0]
+                .message.content
+                .split("#")
+
+        if (split[0] == "") {
+            throw ChatGptErrorException(fieldName = "chatGPT")
+        }
+
+        // 문제 문항과 객관식을 분리해서 dto에 저장
+        return TransformQuestionResponse(split[0], split.drop(1))
     }
 }
