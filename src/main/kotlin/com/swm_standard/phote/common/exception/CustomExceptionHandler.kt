@@ -23,7 +23,7 @@ class CustomExceptionHandler {
         ex.bindingResult.allErrors.forEach { error ->
             val fieldName = (error as FieldError).field
             val errorMessage = error.defaultMessage
-            errors[fieldName] = errorMessage ?: "Not Exception Message"
+            errors[fieldName] = errorMessage ?: "Not Exception RequestMessage"
         }
 
         return ResponseEntity(
@@ -39,7 +39,7 @@ class CustomExceptionHandler {
 
     @ExceptionHandler(InvalidInputException::class)
     protected fun invalidInputException(ex: InvalidInputException): ResponseEntity<BaseResponse<Map<String, String>>> {
-        val errors = mapOf(ex.fieldName to (ex.message ?: "Not Exception Message"))
+        val errors = mapOf(ex.fieldName to (ex.message ?: "Not Exception RequestMessage"))
         return ResponseEntity(
             BaseResponse(
                 ErrorCode.ERROR.name,
@@ -53,7 +53,7 @@ class CustomExceptionHandler {
 
     @ExceptionHandler(Exception::class)
     protected fun defaultException(ex: Exception): ResponseEntity<BaseResponse<Map<String, String>>> {
-        val errors = mapOf("서버 내 오류" to (ex.message ?: "Not Exception Message"))
+        val errors = mapOf("서버 내 오류" to (ex.message ?: "Not Exception RequestMessage"))
         return ResponseEntity(
             BaseResponse(
                 ErrorCode.ERROR.name,
@@ -67,7 +67,7 @@ class CustomExceptionHandler {
 
     @ExceptionHandler(BadRequestException::class)
     protected fun badRequestException(ex: BadRequestException): ResponseEntity<BaseResponse<Map<String, String>>> {
-        val errors = mapOf(ex.fieldName to (ex.message ?: "Not Exception Message"))
+        val errors = mapOf(ex.fieldName to (ex.message ?: "Not Exception RequestMessage"))
         return ResponseEntity(
             BaseResponse(
                 ErrorCode.ERROR.name,
@@ -81,7 +81,7 @@ class CustomExceptionHandler {
 
     @ExceptionHandler(NoResourceFoundException::class)
     protected fun noResourceException(ex: Exception): ResponseEntity<BaseResponse<Map<String, String>>> {
-        val errors = mapOf("id" to (ex.message ?: "Not Exception Message"))
+        val errors = mapOf("id" to (ex.message ?: "Not Exception RequestMessage"))
         return ResponseEntity(
             BaseResponse(
                 ErrorCode.ERROR.name,
@@ -97,7 +97,7 @@ class CustomExceptionHandler {
     protected fun alreadyDeletedException(
         ex: AlreadyExistedException,
     ): ResponseEntity<BaseResponse<Map<String, String>>> {
-        val errors = mapOf(ex.fieldName to (ex.message ?: "Not Exception Message"))
+        val errors = mapOf(ex.fieldName to (ex.message ?: "Not Exception RequestMessage"))
         return ResponseEntity(
             BaseResponse(
                 ErrorCode.ERROR.name,
@@ -111,7 +111,7 @@ class CustomExceptionHandler {
 
     @ExceptionHandler(NotFoundException::class)
     protected fun notFoundException(ex: NotFoundException): ResponseEntity<BaseResponse<Map<String, String>>> {
-        val errors = mapOf(ex.fieldName to (ex.message ?: "Not Exception Message"))
+        val errors = mapOf(ex.fieldName to (ex.message ?: "Not Exception RequestMessage"))
         return ResponseEntity(
             BaseResponse(
                 ErrorCode.ERROR.name,
@@ -132,7 +132,7 @@ class CustomExceptionHandler {
         ex.allErrors.forEach { error ->
             val fieldName = (error as FieldError).field
             val errorMessage = error.defaultMessage
-            errors[fieldName] = errorMessage ?: "Not Exception Message"
+            errors[fieldName] = errorMessage ?: "Not Exception RequestMessage"
         }
 
         return ResponseEntity(
@@ -145,7 +145,7 @@ class CustomExceptionHandler {
     protected fun methodArgumentTypeMismatchException(
         ex: MethodArgumentTypeMismatchException,
     ): ResponseEntity<BaseResponse<Map<String, String>>> {
-        val errors = mapOf(ex.name to (ex.message ?: "Not Exception Message"))
+        val errors = mapOf(ex.name to (ex.message ?: "Not Exception RequestMessage"))
         return ResponseEntity(
             BaseResponse(
                 ErrorCode.ERROR.name,
@@ -161,7 +161,7 @@ class CustomExceptionHandler {
     protected fun httpMessageNotReadableException(
         ex: HttpMessageNotReadableException,
     ): ResponseEntity<BaseResponse<Map<String, String>>> {
-        val errors = mapOf("" to (ex.message ?: "Not Exception Message"))
+        val errors = mapOf("" to (ex.message ?: "Not Exception RequestMessage"))
         return ResponseEntity(
             BaseResponse(
                 ErrorCode.ERROR.name,
@@ -170,6 +170,20 @@ class CustomExceptionHandler {
                 errors,
             ),
             HttpStatus.BAD_REQUEST,
+        )
+    }
+
+    @ExceptionHandler(ChatGptErrorException::class)
+    protected fun chatGptErrorException(ex: ChatGptErrorException): ResponseEntity<BaseResponse<Map<String, String>>> {
+        val errors = mapOf(ex.fieldName to (ex.message ?: "Not Exception RequestMessage"))
+        return ResponseEntity(
+            BaseResponse(
+                ErrorCode.ERROR.name,
+                ErrorCode.BAD_GATEWAY.statusCode,
+                ErrorCode.BAD_GATEWAY.msg,
+                errors,
+            ),
+            HttpStatus.BAD_GATEWAY,
         )
     }
 }
