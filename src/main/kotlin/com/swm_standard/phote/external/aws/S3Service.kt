@@ -19,17 +19,39 @@ class S3Service(
     }
 
     fun uploadImage(multipartFile: MultipartFile): String {
-        val originalFilename = multipartFile.originalFilename
-            ?: throw BadRequestException("image 미입력")
+        val originalFilename =
+            multipartFile.originalFilename
+                ?: throw BadRequestException("image 미입력")
         FileValidate.checkImageFormat(originalFilename)
         val fileName = "${UUID.randomUUID()}-$originalFilename"
-        val objectMetadata = setFileDateOption(
-            type = TYPE_IMAGE,
-            file = getFileExtension(originalFilename),
-            multipartFile = multipartFile
-        )
+        val objectMetadata =
+            setFileDateOption(
+                type = TYPE_IMAGE,
+                file = getFileExtension(originalFilename),
+                multipartFile = multipartFile,
+            )
         amazonS3.putObject(bucket, fileName, multipartFile.inputStream, objectMetadata)
         val imageUrl = amazonS3.getUrl(bucket, fileName).toString()
+        return imageUrl
+    }
+
+    fun uploadChatGptImage(multipartFile: MultipartFile): String {
+        val originalFilename =
+            multipartFile.originalFilename
+                ?: throw BadRequestException("image 미입력")
+        FileValidate.checkImageFormat(originalFilename)
+        val fileName = "${UUID.randomUUID()}-$originalFilename"
+        val objectMetadata =
+            setFileDateOption(
+                type = TYPE_IMAGE,
+                file = getFileExtension(originalFilename),
+                multipartFile = multipartFile,
+            )
+
+        // uploadImage() 와 다른 부분
+        amazonS3.putObject("$bucket/chat-gpt", fileName, multipartFile.inputStream, objectMetadata)
+        val imageUrl = amazonS3.getUrl("$bucket/chat-gpt", fileName).toString()
+
         return imageUrl
     }
 
@@ -41,7 +63,7 @@ class S3Service(
     private fun setFileDateOption(
         type: String,
         file: String,
-        multipartFile: MultipartFile
+        multipartFile: MultipartFile,
     ): ObjectMetadata {
         val objectMetadata = ObjectMetadata()
         objectMetadata.contentType = "/$type/${getFileExtension(file)}"
@@ -51,9 +73,9 @@ class S3Service(
 }
 
 class FileValidate {
-
     companion object {
         private val IMAGE_EXTENSIONS: List<String> = listOf("jpg", "png", "gif", "webp")
+
         fun checkImageFormat(fileName: String) {
             val extensionIndex = fileName.lastIndexOf('.')
             if (extensionIndex == -1) {

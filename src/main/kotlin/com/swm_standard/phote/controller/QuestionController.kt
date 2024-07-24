@@ -2,7 +2,12 @@ package com.swm_standard.phote.controller
 
 import com.swm_standard.phote.common.resolver.memberId.MemberId
 import com.swm_standard.phote.common.responsebody.BaseResponse
-import com.swm_standard.phote.dto.*
+import com.swm_standard.phote.dto.CreateQuestionRequest
+import com.swm_standard.phote.dto.CreateQuestionResponse
+import com.swm_standard.phote.dto.DeleteQuestionResponse
+import com.swm_standard.phote.dto.ReadQuestionDetailResponse
+import com.swm_standard.phote.dto.SearchQuestionsToAddResponse
+import com.swm_standard.phote.dto.TransformQuestionResponse
 import com.swm_standard.phote.entity.Question
 import com.swm_standard.phote.external.aws.S3Service
 import com.swm_standard.phote.service.QuestionService
@@ -11,9 +16,16 @@ import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RequestPart
+import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
-import java.util.*
+import java.util.UUID
 
 @RestController
 @RequestMapping("/api")
@@ -81,8 +93,7 @@ class QuestionController(
     fun transformQuestion(
         @RequestPart image: MultipartFile?,
     ): BaseResponse<TransformQuestionResponse> {
-        val imageUrl = image?.let { s3Service.uploadImage(it) }
-
+        val imageUrl = image?.let { s3Service.uploadChatGptImage(it) }
         val response: TransformQuestionResponse = questionService.transformQuestion(imageUrl!!)
 
         return BaseResponse(data = response, msg = "문제 변환 성공")
