@@ -82,7 +82,7 @@ data class UpdateWorkbookDetailRequest(
     @field:NotBlank(message = "title 미입력")
     val title: String,
     @field:NotNull(message = "description 미입력")
-    val description: String,
+    val description: String?,
 )
 
 data class UpdateWorkbookDetailResponse(
