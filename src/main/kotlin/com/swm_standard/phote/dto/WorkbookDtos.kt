@@ -96,6 +96,5 @@ data class ReadQuestionsInWorkbookResponse(
     val options: JsonNode?,
     val image: String?,
     val category: Category,
-    val sequence: Int,
     val tags: List<Tag>,
 )

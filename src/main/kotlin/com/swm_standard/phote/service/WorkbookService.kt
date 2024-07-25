@@ -3,11 +3,24 @@ package com.swm_standard.phote.service
 import com.swm_standard.phote.common.exception.AlreadyExistedException
 import com.swm_standard.phote.common.exception.InvalidInputException
 import com.swm_standard.phote.common.exception.NotFoundException
-import com.swm_standard.phote.dto.*
+import com.swm_standard.phote.dto.AddQuestionsToWorkbookRequest
+import com.swm_standard.phote.dto.CreateWorkbookRequest
+import com.swm_standard.phote.dto.CreateWorkbookResponse
+import com.swm_standard.phote.dto.DeleteQuestionInWorkbookResponse
+import com.swm_standard.phote.dto.DeleteWorkbookResponse
+import com.swm_standard.phote.dto.ReadQuestionsInWorkbookResponse
+import com.swm_standard.phote.dto.ReadWorkbookDetailResponse
+import com.swm_standard.phote.dto.ReadWorkbookListResponse
+import com.swm_standard.phote.dto.UpdateQuestionSequenceRequest
+import com.swm_standard.phote.dto.UpdateWorkbookDetailRequest
+import com.swm_standard.phote.dto.UpdateWorkbookDetailResponse
 import com.swm_standard.phote.entity.Question
 import com.swm_standard.phote.entity.QuestionSet
 import com.swm_standard.phote.entity.Workbook
-import com.swm_standard.phote.repository.*
+import com.swm_standard.phote.repository.MemberRepository
+import com.swm_standard.phote.repository.QuestionRepository
+import com.swm_standard.phote.repository.QuestionSetRepository
+import com.swm_standard.phote.repository.WorkbookRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -20,21 +33,22 @@ class WorkbookService(
     private val questionSetRepository: QuestionSetRepository,
     private val questionRepository: QuestionRepository,
 ) {
-
     @Transactional
-    fun createWorkbook(request: CreateWorkbookRequest, memberId: UUID): CreateWorkbookResponse {
-
+    fun createWorkbook(
+        request: CreateWorkbookRequest,
+        memberId: UUID,
+    ): CreateWorkbookResponse {
         val member = memberRepository.findById(memberId).orElseThrow { NotFoundException(fieldName = "member") }
-        val workbook = Workbook(request.title, request.description, member).apply {
-            matchEmojiByTitle()
-            workbookRepository.save(this)
-        }
+        val workbook =
+            Workbook(request.title, request.description, member).apply {
+                matchEmojiByTitle()
+                workbookRepository.save(this)
+            }
         return CreateWorkbookResponse(workbook.id)
     }
 
     @Transactional
     fun deleteWorkbook(id: UUID): DeleteWorkbookResponse {
-
         workbookRepository.findById(id).orElseThrow { NotFoundException("workbookId", "존재하지 않는 workbook") }
 
         workbookRepository.deleteById(id)
@@ -74,16 +88,23 @@ class WorkbookService(
     }
 
     @Transactional
-    fun addQuestionsToWorkbook(workbookId: UUID, request: AddQuestionsToWorkbookRequest) {
-
-        val workbook: Workbook = workbookRepository.findById(workbookId)
-            .orElseThrow { NotFoundException(fieldName = "workbook", message = "id 를 재확인해주세요.") }
+    fun addQuestionsToWorkbook(
+        workbookId: UUID,
+        request: AddQuestionsToWorkbookRequest,
+    ) {
+        val workbook: Workbook =
+            workbookRepository
+                .findById(workbookId)
+                .orElseThrow { NotFoundException(fieldName = "workbook", message = "id 를 재확인해주세요.") }
         var nextSequence = questionSetRepository.findMaxSequenceByWorkbookId(workbook) + 1
 
         request.questions.forEach { questionId ->
-            val question: Question = questionRepository.findById(questionId)
-                .orElseThrow { NotFoundException(fieldName = "question", message = "id 를 재확인해주세요.") }
-            questionSetRepository.findByQuestionIdAndWorkbookId(questionId, workbook.id)
+            val question: Question =
+                questionRepository
+                    .findById(questionId)
+                    .orElseThrow { NotFoundException(fieldName = "question", message = "id 를 재확인해주세요.") }
+            questionSetRepository
+                .findByQuestionIdAndWorkbookId(questionId, workbook.id)
                 ?.let { throw AlreadyExistedException("questionId ($questionId)") }
             questionSetRepository.save(QuestionSet(question, workbook, nextSequence))
             nextSequence += 1
@@ -93,9 +114,14 @@ class WorkbookService(
     }
 
     @Transactional
-    fun deleteQuestionInWorkbook(workbookId: UUID, questionId: UUID): DeleteQuestionInWorkbookResponse {
-        val workbook = workbookRepository.findById(workbookId)
-            .orElseThrow { NotFoundException(fieldName = "workbook", message = "id 를 재확인해주세요.") }
+    fun deleteQuestionInWorkbook(
+        workbookId: UUID,
+        questionId: UUID,
+    ): DeleteQuestionInWorkbookResponse {
+        val workbook =
+            workbookRepository
+                .findById(workbookId)
+                .orElseThrow { NotFoundException(fieldName = "workbook", message = "id 를 재확인해주세요.") }
 
         questionSetRepository.findByQuestionIdAndWorkbookId(questionId, workbookId)?.also {
             questionSetRepository.delete(it)
@@ -109,17 +135,26 @@ class WorkbookService(
     }
 
     @Transactional
-    fun updateQuestionSequence(workbookId: UUID, request: List<UpdateQuestionSequenceRequest>): UUID {
-        val workbook: Workbook = workbookRepository.findById(workbookId)
-            .orElseThrow { NotFoundException(fieldName = "workbook", message = "id를 재확인해주세요.") }
+    fun updateQuestionSequence(
+        workbookId: UUID,
+        request: List<UpdateQuestionSequenceRequest>,
+    ): UUID {
+        val workbook: Workbook =
+            workbookRepository
+                .findById(workbookId)
+                .orElseThrow { NotFoundException(fieldName = "workbook", message = "id를 재확인해주세요.") }
 
-        if (!workbook.compareQuestionQuantity(request.size)) throw InvalidInputException(
-            fieldName = "question",
-            message = "문제집 내 모든 문제를 포함해주세요."
-        )
+        if (!workbook.compareQuestionQuantity(request.size)) {
+            throw InvalidInputException(
+                fieldName = "question",
+                message = "문제집 내 모든 문제를 포함해주세요.",
+            )
+        }
 
         request.forEach {
-            questionSetRepository.findById(it.id).orElseThrow { InvalidInputException("questionSet") }
+            questionSetRepository
+                .findById(it.id)
+                .orElseThrow { InvalidInputException("questionSet") }
                 .apply {
                     updateSequence(it.sequence)
                 }
@@ -129,9 +164,14 @@ class WorkbookService(
     }
 
     @Transactional
-    fun updateWorkbookDetail(workbookId: UUID, request: UpdateWorkbookDetailRequest): UpdateWorkbookDetailResponse {
-        val workbook: Workbook = workbookRepository.findById(workbookId)
-            .orElseThrow { NotFoundException(fieldName = "workbook", message = "id를 재확인해주세요.") }
+    fun updateWorkbookDetail(
+        workbookId: UUID,
+        request: UpdateWorkbookDetailRequest,
+    ): UpdateWorkbookDetailResponse {
+        val workbook: Workbook =
+            workbookRepository
+                .findById(workbookId)
+                .orElseThrow { NotFoundException(fieldName = "workbook", message = "id를 재확인해주세요.") }
 
         workbook.title = request.title
         workbook.description = request.description
@@ -141,8 +181,8 @@ class WorkbookService(
     }
 
     fun readQuestionsInWorkbook(workbookId: UUID): List<ReadQuestionsInWorkbookResponse> {
-
-        workbookRepository.findById(workbookId)
+        workbookRepository
+            .findById(workbookId)
             .orElseThrow { InvalidInputException(fieldName = "workboook", message = "id를 재확인해주세요.") }
         val questionSets: List<QuestionSet> = questionSetRepository.findByWorkbookIdOrderBySequence(workbookId)
 
@@ -154,8 +194,7 @@ class WorkbookService(
                 set.question.options,
                 set.question.image,
                 set.question.category,
-                set.sequence,
-                set.question.tags
+                set.question.tags,
             )
         }
     }
