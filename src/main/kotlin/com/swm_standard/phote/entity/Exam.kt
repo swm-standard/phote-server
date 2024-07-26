@@ -9,8 +9,6 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToMany
-import org.hibernate.annotations.CreationTimestamp
-import java.time.LocalDateTime
 
 @Entity
 data class Exam(
@@ -25,9 +23,6 @@ data class Exam(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "exam_id")
     val id: Long = 0
-
-    @CreationTimestamp
-    val submittedAt: LocalDateTime = LocalDateTime.now()
 
     val totalCorrect: Int = 0
 
