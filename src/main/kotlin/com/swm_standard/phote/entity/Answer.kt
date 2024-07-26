@@ -19,7 +19,7 @@ data class Answer(
     @Column(name = "submitted_answer")
     private val submittedAnswer: String,
     private val isCorrect: Boolean,
-) {
+) : BaseTimeEntity() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "answer_id")

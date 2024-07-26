@@ -1,14 +1,19 @@
 package com.swm_standard.phote.entity
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import jakarta.persistence.*
+import jakarta.persistence.CascadeType
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.ManyToOne
+import jakarta.persistence.OneToMany
+import jakarta.persistence.OrderBy
 import org.hibernate.annotations.ColumnDefault
-import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.SQLRestriction
-import org.springframework.data.annotation.LastModifiedDate
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 @Entity
 @SQLDelete(sql = "UPDATE workbook SET deleted_at = NOW() WHERE workbook_uuid = ?")
@@ -20,7 +25,7 @@ data class Workbook(
     @JoinColumn(name = "member_id")
     @JsonIgnore
     val member: Member,
-) {
+) : BaseTimeEntity() {
     @Id
     @Column(name = "workbook_uuid", nullable = false, unique = true)
     val id: UUID = UUID.randomUUID()
@@ -33,15 +38,6 @@ data class Workbook(
 
     @ColumnDefault(value = "0")
     var quantity: Int = 0
-
-    @CreationTimestamp
-    val createdAt: LocalDateTime = LocalDateTime.now()
-
-    @JsonIgnore
-    var deletedAt: LocalDateTime? = null
-
-    @LastModifiedDate
-    var modifiedAt: LocalDateTime? = LocalDateTime.now()
 
     fun decreaseQuantity() {
         this.quantity -= 1

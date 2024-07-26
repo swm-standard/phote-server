@@ -18,7 +18,7 @@ data class Exam(
     @ManyToOne
     @JoinColumn(name = "workbook_id")
     private val workbook: Workbook,
-) {
+) : BaseTimeEntity() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "exam_id")
