@@ -7,17 +7,17 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
-import jakarta.persistence.OneToOne
 
 @Entity
 data class Answer(
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "question_id")
     private val question: Question,
     @ManyToOne
     @JoinColumn(name = "exam_id")
     private val exam: Exam,
-    private val answer: String,
+    @Column(name = "submitted_answer")
+    private val submittedAnswer: String,
     private val isCorrect: Boolean,
 ) {
     @Id
