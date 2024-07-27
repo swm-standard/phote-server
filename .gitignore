@@ -155,3 +155,4 @@ application.properties
 .idea
 .gradle
 build
+resources
