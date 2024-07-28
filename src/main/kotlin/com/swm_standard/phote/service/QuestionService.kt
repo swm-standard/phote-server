@@ -100,7 +100,6 @@ class QuestionService(
         question.questionSet?.map {
             val workbook = it.workbook
             workbook.decreaseQuantity()
-            workbookRepository.save(workbook)
         }
 
         questionRepository.deleteById(id)
