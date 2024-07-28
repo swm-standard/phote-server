@@ -15,7 +15,6 @@ import com.swm_standard.phote.entity.Tag
 import com.swm_standard.phote.repository.MemberRepository
 import com.swm_standard.phote.repository.QuestionRepository
 import com.swm_standard.phote.repository.TagRepository
-import com.swm_standard.phote.repository.WorkbookRepository
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -28,7 +27,6 @@ class QuestionService(
     private val questionRepository: QuestionRepository,
     private val memberRepository: MemberRepository,
     private val tagRepository: TagRepository,
-    private val workbookRepository: WorkbookRepository,
     private val template: RestTemplate,
 ) {
     @Value("\${openai.model}")
