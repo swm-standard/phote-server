@@ -40,7 +40,11 @@ class WorkbookService(
         memberId: UUID,
     ): CreateWorkbookResponse {
         val member = memberRepository.findById(memberId).orElseThrow { NotFoundException(fieldName = "member") }
-        val workbook = Workbook.createWorkbook(request.title, request.description, member)
+        val workbook: Workbook =
+            Workbook.createWorkbook(request.title, request.description, member).let {
+                workbookRepository.save(it)
+            }
+
         return CreateWorkbookResponse(workbook.id)
     }
 
