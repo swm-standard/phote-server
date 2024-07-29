@@ -2,13 +2,19 @@ package com.swm_standard.phote.service
 
 import com.swm_standard.phote.common.exception.ChatGptErrorException
 import com.swm_standard.phote.common.exception.NotFoundException
-import com.swm_standard.phote.dto.*
+import com.swm_standard.phote.dto.CreateQuestionRequest
+import com.swm_standard.phote.dto.CreateQuestionResponse
+import com.swm_standard.phote.dto.ReadQuestionDetailResponse
+import com.swm_standard.phote.dto.SearchQuestionsToAddResponse
+import com.swm_standard.phote.dto.DeleteQuestionResponse
+import com.swm_standard.phote.dto.TransformQuestionResponse
+import com.swm_standard.phote.dto.ChatGPTRequest
+import com.swm_standard.phote.dto.ChatGPTResponse
 import com.swm_standard.phote.entity.Question
 import com.swm_standard.phote.entity.Tag
 import com.swm_standard.phote.repository.MemberRepository
 import com.swm_standard.phote.repository.QuestionRepository
 import com.swm_standard.phote.repository.TagRepository
-import com.swm_standard.phote.repository.WorkbookRepository
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -21,7 +27,6 @@ class QuestionService(
     private val questionRepository: QuestionRepository,
     private val memberRepository: MemberRepository,
     private val tagRepository: TagRepository,
-    private val workbookRepository: WorkbookRepository,
     private val template: RestTemplate,
 ) {
     @Value("\${openai.model}")
@@ -54,7 +59,7 @@ class QuestionService(
             )
 
         // 태그 생성
-        request.tags?.forEach {
+        request.tags?.map {
             tagRepository.save(Tag(name = it, question = question))
         }
 
@@ -73,12 +78,7 @@ class QuestionService(
         memberId: UUID,
         tags: List<String>?,
         keywords: List<String>?,
-    ): List<Question> {
-        // 요청을 보낸 멤버가 생성한 문제이고, tags, keywords를 모두 포함하는 문제만 불러옴
-        val questions: List<Question> = questionRepository.searchQuestionsList(memberId, tags, keywords)
-
-        return questions
-    }
+    ): List<Question> = questionRepository.searchQuestionsList(memberId, tags, keywords)
 
     @Transactional(readOnly = true)
     fun searchQuestionsToAdd(
@@ -86,12 +86,8 @@ class QuestionService(
         workbookId: UUID,
         tags: List<String>?,
         keywords: List<String>?,
-    ): List<SearchQuestionsToAddResponse> {
-        val questions: List<SearchQuestionsToAddResponse> =
-            questionRepository.searchQuestionsToAddList(memberId, workbookId, tags, keywords)
-
-        return questions
-    }
+    ): List<SearchQuestionsToAddResponse> =
+        questionRepository.searchQuestionsToAddList(memberId, workbookId, tags, keywords)
 
     @Transactional
     fun deleteQuestion(id: UUID): DeleteQuestionResponse {
@@ -99,10 +95,9 @@ class QuestionService(
         val question = questionRepository.findById(id).orElseThrow { NotFoundException("questionId", "존재하지 않는 UUID") }
 
         // 연결된 workbook의 quantity 감소
-        question.questionSet?.forEach { questionSet ->
-            val workbook = questionSet.workbook
+        question.questionSet?.map {
+            val workbook = it.workbook
             workbook.decreaseQuantity()
-            workbookRepository.save(workbook)
         }
 
         questionRepository.deleteById(id)
