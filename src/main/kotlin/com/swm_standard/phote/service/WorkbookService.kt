@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 import java.util.UUID
+import kotlin.jvm.optionals.getOrElse
 
 @Service
 class WorkbookService(
@@ -54,7 +55,7 @@ class WorkbookService(
 
     @Transactional(readOnly = true)
     fun readWorkbookDetail(id: UUID): ReadWorkbookDetailResponse {
-        val workbook = workbookRepository.findById(id).orElseThrow { NotFoundException() }
+        val workbook = workbookRepository.findById(id).getOrElse { throw NotFoundException() }
 
         return ReadWorkbookDetailResponse(
             workbook.id,
@@ -68,7 +69,7 @@ class WorkbookService(
 
     @Transactional(readOnly = true)
     fun readWorkbookList(memberId: UUID): List<ReadWorkbookListResponse> {
-        val member = memberRepository.findById(memberId).orElseThrow { InvalidInputException("memberId") }
+        val member = memberRepository.findById(memberId).getOrElse { throw InvalidInputException("memberId") }
         val workbooks: List<Workbook> = workbookRepository.findAllByMember(member)
 
         return workbooks.map { workbook ->
@@ -98,7 +99,7 @@ class WorkbookService(
             val question: Question =
                 questionRepository
                     .findById(questionId)
-                    .orElseThrow { NotFoundException(fieldName = "question", message = "id 를 재확인해주세요.") }
+                    .getOrElse { throw NotFoundException(fieldName = "question", message = "id 를 재확인해주세요.") }
 
             if (questionSetRepository
                     .existsByQuestionIdAndWorkbookId(questionId, workbook.id)
@@ -121,7 +122,7 @@ class WorkbookService(
         val workbook =
             workbookRepository
                 .findById(workbookId)
-                .orElseThrow { NotFoundException(fieldName = "workbook", message = "id 를 재확인해주세요.") }
+                .getOrElse { throw NotFoundException(fieldName = "workbook", message = "id 를 재확인해주세요.") }
 
         questionSetRepository.findByQuestionIdAndWorkbookId(questionId, workbookId)?.also {
             questionSetRepository.delete(it)
@@ -142,7 +143,7 @@ class WorkbookService(
         val workbook: Workbook =
             workbookRepository
                 .findById(workbookId)
-                .orElseThrow { NotFoundException(fieldName = "workbook", message = "id를 재확인해주세요.") }
+                .getOrElse { throw NotFoundException(fieldName = "workbook", message = "id를 재확인해주세요.") }
 
         // 질문 : 이런 로직도 비지니스 함수 내부로 넣어야할지
         if (!workbook.compareQuestionQuantity(request.size)) {
@@ -155,7 +156,7 @@ class WorkbookService(
         request.forEach {
             questionSetRepository
                 .findById(it.id)
-                .orElseThrow { InvalidInputException("questionSet") }
+                .getOrElse { throw InvalidInputException("questionSet") }
                 .apply {
                     updateSequence(it.sequence)
                 }
@@ -172,7 +173,7 @@ class WorkbookService(
         val workbook: Workbook =
             workbookRepository
                 .findById(workbookId)
-                .orElseThrow { NotFoundException(fieldName = "workbook", message = "id를 재확인해주세요.") }
+                .getOrElse { throw NotFoundException(fieldName = "workbook", message = "id를 재확인해주세요.") }
 
         workbook.updateWorkbook(request.title, request.description)
 
@@ -182,7 +183,7 @@ class WorkbookService(
     fun readQuestionsInWorkbook(workbookId: UUID): List<ReadQuestionsInWorkbookResponse> {
         workbookRepository
             .findById(workbookId)
-            .orElseThrow { InvalidInputException(fieldName = "workbook", message = "id를 재확인해주세요.") }
+            .getOrElse { throw InvalidInputException(fieldName = "workbook", message = "id를 재확인해주세요.") }
         val questionSets: List<QuestionSet> = questionSetRepository.findByWorkbookIdOrderBySequence(workbookId)
 
         return questionSets.map { set ->
