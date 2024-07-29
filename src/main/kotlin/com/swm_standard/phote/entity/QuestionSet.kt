@@ -31,4 +31,12 @@ data class QuestionSet(
     fun updateSequence(seq: Int) {
         this.sequence = seq
     }
+
+    companion object {
+        fun createSequence(
+            question: Question,
+            workbook: Workbook,
+            nextSequence: Int,
+        ) = QuestionSet(question, workbook, nextSequence)
+    }
 }
