@@ -77,6 +77,7 @@ class QuestionRepositoryTest {
         // when
         questionRepository.deleteById(question.id)
 
+        // then
         assertThrows<NotFoundException> {
             questionRepository.findById(question.id).orElseThrow {
                 NotFoundException()
