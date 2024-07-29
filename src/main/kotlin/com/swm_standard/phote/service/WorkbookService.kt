@@ -39,11 +39,7 @@ class WorkbookService(
         memberId: UUID,
     ): CreateWorkbookResponse {
         val member = memberRepository.findById(memberId).orElseThrow { NotFoundException(fieldName = "member") }
-        val workbook =
-            Workbook(request.title, request.description, member).apply {
-                matchEmojiByTitle()
-                workbookRepository.save(this)
-            }
+        val workbook = Workbook.createWorkbook(request.title, request.description, member)
         return CreateWorkbookResponse(workbook.id)
     }
 
@@ -103,10 +99,14 @@ class WorkbookService(
                 questionRepository
                     .findById(questionId)
                     .orElseThrow { NotFoundException(fieldName = "question", message = "id 를 재확인해주세요.") }
-            questionSetRepository
-                .findByQuestionIdAndWorkbookId(questionId, workbook.id)
-                ?.let { throw AlreadyExistedException("questionId ($questionId)") }
-            questionSetRepository.save(QuestionSet(question, workbook, nextSequence))
+
+            if (questionSetRepository
+                    .existsByQuestionIdAndWorkbookId(questionId, workbook.id)
+            ) {
+                throw AlreadyExistedException("questionId ($questionId)")
+            }
+
+            questionSetRepository.save(QuestionSet.createSequence(question, workbook, nextSequence))
             nextSequence += 1
         }
 
@@ -144,6 +144,7 @@ class WorkbookService(
                 .findById(workbookId)
                 .orElseThrow { NotFoundException(fieldName = "workbook", message = "id를 재확인해주세요.") }
 
+        // 질문 : 이런 로직도 비지니스 함수 내부로 넣어야할지
         if (!workbook.compareQuestionQuantity(request.size)) {
             throw InvalidInputException(
                 fieldName = "question",
@@ -173,9 +174,7 @@ class WorkbookService(
                 .findById(workbookId)
                 .orElseThrow { NotFoundException(fieldName = "workbook", message = "id를 재확인해주세요.") }
 
-        workbook.title = request.title
-        workbook.description = request.description
-        workbook.matchEmojiByTitle()
+        workbook.updateWorkbook(request.title, request.description)
 
         return UpdateWorkbookDetailResponse(workbookId)
     }
@@ -183,7 +182,7 @@ class WorkbookService(
     fun readQuestionsInWorkbook(workbookId: UUID): List<ReadQuestionsInWorkbookResponse> {
         workbookRepository
             .findById(workbookId)
-            .orElseThrow { InvalidInputException(fieldName = "workboook", message = "id를 재확인해주세요.") }
+            .orElseThrow { InvalidInputException(fieldName = "workbook", message = "id를 재확인해주세요.") }
         val questionSets: List<QuestionSet> = questionSetRepository.findByWorkbookIdOrderBySequence(workbookId)
 
         return questionSets.map { set ->
