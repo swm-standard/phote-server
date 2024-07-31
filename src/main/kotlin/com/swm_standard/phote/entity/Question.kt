@@ -43,4 +43,14 @@ data class Question(
     @OneToMany(mappedBy = "question", cascade = [CascadeType.REMOVE])
     var tags: MutableList<Tag> = mutableListOf(),
     val memo: String?,
-) : BaseTimeEntity()
+) : BaseTimeEntity() {
+
+    fun deserializeOptions(): MutableList<String> {
+        val optionsList = mutableListOf<String>()
+        options!!.fields().forEach { option ->
+            optionsList.add(option.value.asText())
+        }
+
+        return optionsList
+    }
+}

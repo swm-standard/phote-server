@@ -7,8 +7,8 @@ import com.swm_standard.phote.dto.CreateQuestionResponse
 import com.swm_standard.phote.dto.DeleteQuestionResponse
 import com.swm_standard.phote.dto.ReadQuestionDetailResponse
 import com.swm_standard.phote.dto.SearchQuestionsToAddResponse
+import com.swm_standard.phote.dto.SearchQuestionsResponse
 import com.swm_standard.phote.dto.TransformQuestionResponse
-import com.swm_standard.phote.entity.Question
 import com.swm_standard.phote.external.aws.S3Service
 import com.swm_standard.phote.service.QuestionService
 import io.swagger.v3.oas.annotations.Operation
@@ -63,7 +63,7 @@ class QuestionController(
         @Parameter(hidden = true) @MemberId memberId: UUID,
         @RequestParam(required = false) tags: List<String>? = null,
         @RequestParam(required = false) keywords: List<String>? = null,
-    ): BaseResponse<List<Question>> {
+    ): BaseResponse<List<SearchQuestionsResponse>> {
         questionService.searchQuestions(memberId, tags, keywords)
         return BaseResponse(msg = "문제 검색 성공", data = questionService.searchQuestions(memberId, tags, keywords))
     }
