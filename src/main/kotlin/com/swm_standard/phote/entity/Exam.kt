@@ -14,10 +14,10 @@ import jakarta.persistence.OneToMany
 data class Exam(
     @ManyToOne
     @JoinColumn(name = "member_id")
-    private val member: Member,
+    val member: Member,
     @ManyToOne
     @JoinColumn(name = "workbook_id")
-    private val workbook: Workbook,
+    val workbook: Workbook,
 ) : BaseTimeEntity() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,4 +28,8 @@ data class Exam(
 
     @OneToMany(mappedBy = "exam", cascade = [(CascadeType.REMOVE)])
     val answers: MutableList<Answer> = mutableListOf()
+
+    val time: Int = 0
+
+    val sequence: Int = 0
 }
