@@ -14,18 +14,18 @@ data class ReadQuestionDetailResponse(
     val modifiedAt: LocalDateTime? = null,
     val statement: String,
     val image: String? = null,
-    val options: JsonNode? = null,
+    val options: List<String>? = null,
     val answer: String,
     val category: Category,
     val tags: List<Tag>? = null,
     val memo: String? = null,
 ) {
-    constructor(question: Question) : this(
+    constructor(question: Question, options: List<String>?) : this(
         createdAt = question.createdAt,
         modifiedAt = question.modifiedAt,
         statement = question.statement,
         image = question.image,
-        options = question.options,
+        options = options,
         answer = question.answer,
         tags = question.tags,
         category = question.category,
@@ -54,12 +54,38 @@ data class CreateQuestionResponse(
     val id: UUID,
 )
 
+data class SearchQuestionsResponse(
+    val id: UUID,
+    val statement: String,
+    val options: List<String>? = null,
+    val image: String? = null,
+    val answer: String? = null,
+    val category: Category,
+    val tags: List<Tag>? = null,
+    val memo: String? = null,
+    val createdAt: LocalDateTime,
+    val modifiedAt: LocalDateTime? = null,
+) {
+    constructor(question: Question, options: List<String>?) : this(
+        id = question.id,
+        statement = question.statement,
+        options = options,
+        image = question.image,
+        answer = question.answer,
+        category = question.category,
+        tags = question.tags,
+        memo = question.memo,
+        createdAt = question.createdAt,
+        modifiedAt = question.modifiedAt
+    )
+}
+
 data class SearchQuestionsToAddResponse(
     val createdAt: LocalDateTime,
     val modifiedAt: LocalDateTime? = null,
     val statement: String,
     val image: String? = null,
-    val options: JsonNode? = null,
+    val options: List<String>? = null,
     val answer: String,
     val category: Category,
     val tags: List<Tag>? = null,

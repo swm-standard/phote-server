@@ -74,12 +74,13 @@ class QuestionCustomRepositoryImpl(
         val questions = searchQuestionsList(memberId, tags, keywords)
 
         return questions.map { question ->
+            val options = question.options?.let { question.deserializeOptions() }
             SearchQuestionsToAddResponse(
                 createdAt = question.createdAt,
                 modifiedAt = question.modifiedAt,
                 statement = question.statement,
                 image = question.image,
-                options = question.options,
+                options = options,
                 answer = question.answer,
                 category = question.category,
                 tags = question.tags,

@@ -8,6 +8,7 @@ import com.swm_standard.phote.dto.ReadQuestionDetailResponse
 import com.swm_standard.phote.dto.SearchQuestionsToAddResponse
 import com.swm_standard.phote.dto.DeleteQuestionResponse
 import com.swm_standard.phote.dto.TransformQuestionResponse
+import com.swm_standard.phote.dto.SearchQuestionsResponse
 import com.swm_standard.phote.dto.ChatGPTRequest
 import com.swm_standard.phote.dto.ChatGPTResponse
 import com.swm_standard.phote.entity.Question
@@ -69,8 +70,8 @@ class QuestionService(
     @Transactional(readOnly = true)
     fun readQuestionDetail(id: UUID): ReadQuestionDetailResponse {
         val question = questionRepository.findById(id).orElseThrow { NotFoundException("questionId", "존재하지 않는 UUID") }
-
-        return ReadQuestionDetailResponse(question)
+        val options = question.options?.let { question.deserializeOptions() }
+        return ReadQuestionDetailResponse(question, options)
     }
 
     @Transactional(readOnly = true)
@@ -78,7 +79,12 @@ class QuestionService(
         memberId: UUID,
         tags: List<String>?,
         keywords: List<String>?,
-    ): List<Question> = questionRepository.searchQuestionsList(memberId, tags, keywords)
+    ): List<SearchQuestionsResponse> {
+        return questionRepository.searchQuestionsList(memberId, tags, keywords).map { question ->
+            val options = question.options?.let { question.deserializeOptions() }
+            SearchQuestionsResponse(question, options)
+        }
+    }
 
     @Transactional(readOnly = true)
     fun searchQuestionsToAdd(
