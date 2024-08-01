@@ -17,21 +17,30 @@ data class Exam(
     @ManyToOne
     @JoinColumn(name = "workbook_id")
     val workbook: Workbook,
+    val sequence: Int,
 ) : BaseTimeEntity() {
     @Id
     @Column(name = "exam_id", nullable = false, unique = true)
     val id: UUID = UUID.randomUUID()
 
-    val totalCorrect: Int = 0
+    var totalCorrect: Int = 0
 
     @OneToMany(mappedBy = "exam", cascade = [(CascadeType.REMOVE)])
     val answers: MutableList<Answer> = mutableListOf()
 
     val time: Int = 0
 
-    val sequence: Int = 0
+    fun calculateTotalQuantity(): Int = answers.size
 
-    fun calculateTotalQuantity(): Int {
-        return answers.size
+    companion object {
+        fun createExam(
+            member: Member,
+            workbook: Workbook,
+            sequence: Int,
+        ) = Exam(member, workbook, sequence)
+    }
+
+    fun increaseTotalCorrect() {
+        totalCorrect += 1
     }
 }

@@ -11,14 +11,14 @@ data class ReadExamHistoryDetail(
     val answer: String,
     val submittedAnswer: String,
     val isCorrect: Boolean,
-    val sequence: Int
+    val sequence: Int,
 )
 
 data class ReadExamHistoryDetailResponse(
     val id: UUID,
     val totalCorrect: Int,
     val time: Int,
-    val questions: List<ReadExamHistoryDetail>
+    val questions: List<ReadExamHistoryDetail>,
 )
 
 data class ReadExamHistoryListResponse(
@@ -26,5 +26,24 @@ data class ReadExamHistoryListResponse(
     val totalQuantity: Int,
     val totalCorrect: Int,
     val time: Int,
-    val sequence: Int
+    val sequence: Int,
+)
+
+data class GradeExamRequest(
+    val questionId: UUID,
+    val submittedAnswer: String,
+)
+
+data class GradeExamResponse(
+    val examId: UUID,
+    val totalCorrect: Int,
+    val questionQuantity: Int,
+    val answers: List<AnswerResponse>,
+)
+
+data class AnswerResponse(
+    val questionId: UUID,
+    val submittedAnswer: String,
+    val correctAnswer: String,
+    val isCorrect: Boolean,
 )
