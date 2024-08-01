@@ -7,10 +7,20 @@ plugins {
     kotlin("plugin.jpa") version "1.9.24"
     kotlin("jvm") version "1.9.24"
     kotlin("plugin.spring") version "1.9.24"
+    id("jacoco")
 
     // for querydsl
     kotlin("kapt") version "1.7.10"
 }
+
+subprojects {
+    apply(plugin = "jacoco")
+
+    jacoco {
+        toolVersion = "0.8.6"
+    }
+}
+
 val queryDslVersion: String by extra
 
 group = "com.swm-standard"
@@ -126,4 +136,14 @@ tasks.named("clean") {
 }
 kapt {
     generateStubs = true
+}
+
+tasks.jacocoTestReport {
+    reports {
+        html.required.set(false)
+        xml.required.set(true)
+        csv.required.set(false)
+
+        xml.outputLocation = file(project.layout.buildDirectory.dir("jacoco/index.xml"))
+    }
 }
