@@ -12,13 +12,13 @@ import jakarta.persistence.ManyToOne
 data class Answer(
     @ManyToOne
     @JoinColumn(name = "question_id")
-    private val question: Question,
+    val question: Question,
     @ManyToOne
     @JoinColumn(name = "exam_id")
-    private val exam: Exam,
+    val exam: Exam,
     @Column(name = "submitted_answer")
-    private val submittedAnswer: String,
-    private val isCorrect: Boolean,
+    val submittedAnswer: String,
+    val isCorrect: Boolean,
 ) : BaseTimeEntity() {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
