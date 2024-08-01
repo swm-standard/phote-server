@@ -1,9 +1,6 @@
-name: test-automation
+name: develop-ci
 
 on:
-    push:
-        branches:
-            - 'develop'
     pull_request:
         branches:
             - 'develop'
@@ -11,7 +8,7 @@ on:
 permissions: write-all
 
 jobs:
-    code-coverage:
+    build:
         runs-on: ubuntu-latest
 
         steps:
