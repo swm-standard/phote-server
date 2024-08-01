@@ -7,5 +7,5 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class JenkinsTestController {
     @GetMapping("/test")
-    fun test(): BaseResponse<Unit> = BaseResponse(msg = "test")
+    fun test(): BaseResponse<Unit> = BaseResponse(msg = "this is a test.")
 }
