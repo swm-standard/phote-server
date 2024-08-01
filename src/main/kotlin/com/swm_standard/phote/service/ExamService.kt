@@ -6,13 +6,14 @@ import com.swm_standard.phote.dto.ReadExamHistoryDetailResponse
 import com.swm_standard.phote.repository.ExamRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.util.UUID
 
 @Service
 class ExamService(
     private val examRepository: ExamRepository
 ) {
     @Transactional(readOnly = true)
-    fun readExamHistoryDetail(id: Long): ReadExamHistoryDetailResponse {
+    fun readExamHistoryDetail(id: UUID): ReadExamHistoryDetailResponse {
         val exam = examRepository.findById(id).orElseThrow { NotFoundException("examId", "존재하지 않는 examId") }
 
         val responses = buildList {

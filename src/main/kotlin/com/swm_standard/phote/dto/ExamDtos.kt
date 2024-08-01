@@ -1,6 +1,7 @@
 package com.swm_standard.phote.dto
 
 import com.swm_standard.phote.entity.Category
+import java.util.UUID
 
 data class ReadExamHistoryDetail(
     val statement: String,
@@ -14,7 +15,7 @@ data class ReadExamHistoryDetail(
 )
 
 data class ReadExamHistoryDetailResponse(
-    val id: Long,
+    val id: UUID,
     val totalCorrect: Int,
     val time: Int,
     val questions: List<ReadExamHistoryDetail>

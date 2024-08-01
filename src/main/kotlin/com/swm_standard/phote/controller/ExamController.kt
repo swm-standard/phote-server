@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
+import java.util.UUID
 
 @RestController
 @RequestMapping("/api")
@@ -23,7 +24,7 @@ class ExamController(
     fun readExamHistoryDetail(
         @PathVariable(
             required = true
-        ) id: Long
+        ) id: UUID
     ): BaseResponse<ReadExamHistoryDetailResponse> =
         BaseResponse(msg = "문제풀이 기록 상세조회 성공", data = examService.readExamHistoryDetail(id))
 }

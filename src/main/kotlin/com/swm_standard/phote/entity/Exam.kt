@@ -3,12 +3,11 @@ package com.swm_standard.phote.entity
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToMany
+import java.util.UUID
 
 @Entity
 data class Exam(
@@ -20,9 +19,8 @@ data class Exam(
     val workbook: Workbook,
 ) : BaseTimeEntity() {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "exam_id")
-    val id: Long = 0
+    @Column(name = "exam_id", nullable = false, unique = true)
+    val id: UUID = UUID.randomUUID()
 
     val totalCorrect: Int = 0
 
