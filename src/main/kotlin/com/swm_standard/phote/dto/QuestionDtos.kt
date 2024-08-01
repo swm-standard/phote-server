@@ -11,14 +11,14 @@ import java.util.*
 
 data class ReadQuestionDetailResponse(
     val createdAt: LocalDateTime,
-    val modifiedAt: LocalDateTime? = null,
+    val modifiedAt: LocalDateTime?,
     val statement: String,
-    val image: String? = null,
-    val options: List<String>? = null,
+    val image: String?,
+    val options: List<String>?,
     val answer: String,
     val category: Category,
-    val tags: List<Tag>? = null,
-    val memo: String? = null,
+    val tags: List<Tag>?,
+    val memo: String?,
 ) {
     constructor(question: Question, options: List<String>?) : this(
         createdAt = question.createdAt,
@@ -57,14 +57,14 @@ data class CreateQuestionResponse(
 data class SearchQuestionsResponse(
     val id: UUID,
     val statement: String,
-    val options: List<String>? = null,
-    val image: String? = null,
-    val answer: String? = null,
+    val options: List<String>?,
+    val image: String?,
+    val answer: String,
     val category: Category,
-    val tags: List<Tag>? = null,
-    val memo: String? = null,
+    val tags: List<Tag>?,
+    val memo: String?,
     val createdAt: LocalDateTime,
-    val modifiedAt: LocalDateTime? = null,
+    val modifiedAt: LocalDateTime?,
 ) {
     constructor(question: Question, options: List<String>?) : this(
         id = question.id,
@@ -85,10 +85,10 @@ data class SearchQuestionsToAddResponse(
     val modifiedAt: LocalDateTime? = null,
     val statement: String,
     val image: String? = null,
-    val options: List<String>? = null,
+    val options: List<String>?,
     val answer: String,
     val category: Category,
-    val tags: List<Tag>? = null,
+    val tags: List<Tag>?,
     val memo: String? = null,
     var isContain: Boolean = false,
 )
