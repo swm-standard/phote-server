@@ -14,21 +14,22 @@ class ExamService(
     @Transactional(readOnly = true)
     fun readExamHistoryDetail(id: Long): ReadExamHistoryDetailResponse {
         val exam = examRepository.findById(id).orElseThrow { NotFoundException("examId", "존재하지 않는 examId") }
-        val responses = mutableListOf<ReadExamHistoryDetail>()
 
-        exam.answers.map { answer ->
-            responses.add(
-                ReadExamHistoryDetail(
-                    statement = answer.question.statement,
-                    options = answer.question.options?.let { answer.question.deserializeOptions() },
-                    image = answer.question.image,
-                    category = answer.question.category,
-                    answer = answer.question.answer,
-                    submittedAnswer = answer.submittedAnswer,
-                    isCorrect = answer.isCorrect,
-                    sequence = answer.sequence
+        val responses = buildList {
+            exam.answers.forEach { answer ->
+                add(
+                    ReadExamHistoryDetail(
+                        statement = answer.question.statement,
+                        options = answer.question.options?.let { answer.question.deserializeOptions() },
+                        image = answer.question.image,
+                        category = answer.question.category,
+                        answer = answer.question.answer,
+                        submittedAnswer = answer.submittedAnswer,
+                        isCorrect = answer.isCorrect,
+                        sequence = answer.sequence
+                    )
                 )
-            )
+            }
         }
 
         return ReadExamHistoryDetailResponse(
