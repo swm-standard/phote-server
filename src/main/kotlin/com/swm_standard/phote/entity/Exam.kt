@@ -30,4 +30,8 @@ data class Exam(
     val time: Int = 0
 
     val sequence: Int = 0
+
+    fun calculateTotalQuantity(): Int {
+        return answers.size
+    }
 }

@@ -3,6 +3,7 @@ package com.swm_standard.phote.service
 import com.swm_standard.phote.common.exception.NotFoundException
 import com.swm_standard.phote.dto.ReadExamHistoryDetail
 import com.swm_standard.phote.dto.ReadExamHistoryDetailResponse
+import com.swm_standard.phote.dto.ReadExamHistoryListResponse
 import com.swm_standard.phote.repository.ExamRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -39,5 +40,19 @@ class ExamService(
             time = exam.time,
             questions = responses
         )
+    }
+
+    @Transactional(readOnly = true)
+    fun readExamHistoryList(workbookId: UUID): List<ReadExamHistoryListResponse> {
+        val exams = examRepository.findAllByWorkbookId(workbookId)
+        return exams.map { exam ->
+            ReadExamHistoryListResponse(
+                examId = exam.id,
+                totalQuantity = exam.calculateTotalQuantity(),
+                totalCorrect = exam.totalCorrect,
+                time = exam.time,
+                sequence = exam.sequence
+            )
+        }
     }
 }

@@ -20,3 +20,11 @@ data class ReadExamHistoryDetailResponse(
     val time: Int,
     val questions: List<ReadExamHistoryDetail>
 )
+
+data class ReadExamHistoryListResponse(
+    val examId: UUID,
+    val totalQuantity: Int,
+    val totalCorrect: Int,
+    val time: Int,
+    val sequence: Int
+)
