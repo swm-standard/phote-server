@@ -25,6 +25,7 @@ data class Workbook(
     @JoinColumn(name = "member_id")
     @JsonIgnore
     val member: Member,
+    var emoji: String,
 ) : BaseTimeEntity() {
     @Id
     @Column(name = "workbook_uuid", nullable = false, unique = true)
@@ -34,10 +35,34 @@ data class Workbook(
     @OrderBy("sequence asc")
     val questionSet: List<QuestionSet>? = null
 
-    var emoji: String = "📚"
-
     @ColumnDefault(value = "0")
     var quantity: Int = 0
+
+    companion object {
+        fun createWorkbook(
+            title: String,
+            description: String?,
+            member: Member,
+        ) = Workbook(
+            title,
+            description,
+            member,
+            matchEmojiByTitle(title),
+        )
+
+        private fun matchEmojiByTitle(title: String): String {
+            val math: List<String> = listOf("수학", "math", "미적분", "확통", "수1", "수2", "기하", "대수")
+            val language: List<String> = listOf("국어", "언매", "화작", "비문학", "문학", "독서", "듣기", "영어", "eng", "토익", "외국")
+            val science: List<String> = listOf("과학", "화학", "생물", "생명", "물리", "지구")
+
+            return when {
+                math.size != math.filter { !title.contains(it) }.size -> "➗"
+                language.size != language.filter { !title.contains(it) }.size -> "💬"
+                science.size != science.filter { !title.contains(it) }.size -> "🧪"
+                else -> "📚"
+            }
+        }
+    }
 
     fun decreaseQuantity() {
         this.quantity -= 1
@@ -51,17 +76,12 @@ data class Workbook(
 
     fun compareQuestionQuantity(num: Int) = num == this.quantity
 
-    fun matchEmojiByTitle() {
-        val math: List<String> = listOf("수학", "math", "미적분", "확통", "수1", "수2", "기하", "대수")
-        val language: List<String> = listOf("국어", "언매", "화작", "비문학", "문학", "독서", "듣기", "영어", "eng", "토익", "외국")
-        val science: List<String> = listOf("과학", "화학", "생물", "생명", "물리", "지구")
-
-        emoji =
-            when {
-                math.size != math.filter { !title.contains(it) }.size -> "➗"
-                language.size != language.filter { !title.contains(it) }.size -> "💬"
-                science.size != science.filter { !title.contains(it) }.size -> "🧪"
-                else -> "📚"
-            }
+    fun updateWorkbook(
+        title: String,
+        description: String?,
+    ) {
+        this.title = title
+        this.description = description
+        this.emoji = matchEmojiByTitle(title)
     }
 }
