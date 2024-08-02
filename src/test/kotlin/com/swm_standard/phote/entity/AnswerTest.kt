@@ -90,7 +90,7 @@ class AnswerTest {
             memo = null,
         ),
         exam = createExam(),
-        submittedAnswer = "euismod",
+        submittedAnswer = submittedAnswer,
         sequence = 2017,
     )
 }
