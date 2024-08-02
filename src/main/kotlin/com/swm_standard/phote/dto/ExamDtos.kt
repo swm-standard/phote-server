@@ -9,7 +9,7 @@ data class ReadExamHistoryDetail(
     val image: String?,
     val category: Category,
     val answer: String,
-    val submittedAnswer: String,
+    val submittedAnswer: String?,
     val isCorrect: Boolean,
     val sequence: Int,
 )
@@ -43,7 +43,7 @@ data class GradeExamResponse(
 
 data class AnswerResponse(
     val questionId: UUID,
-    val submittedAnswer: String,
+    val submittedAnswer: String?,
     val correctAnswer: String,
     val isCorrect: Boolean,
 )

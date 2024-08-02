@@ -19,14 +19,14 @@ class ExamTest {
         val answer =
             Answer(
                 question =
-                    Question(
-                        member = member,
-                        statement = "모든 각이 동일한 삼각형은?",
-                        image = "http://example.com/image.jpg",
-                        answer = "정삼각형",
-                        category = Category.ESSAY,
-                        memo = "삼각형 내각의 합은 180도이다.",
-                    ),
+                Question(
+                    member = member,
+                    statement = "모든 각이 동일한 삼각형은?",
+                    image = "http://example.com/image.jpg",
+                    answer = "정삼각형",
+                    category = Category.ESSAY,
+                    memo = "삼각형 내각의 합은 180도이다.",
+                ),
                 exam = exam,
                 submittedAnswer = "정삼각형",
                 sequence = 1,

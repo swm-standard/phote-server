@@ -30,6 +30,19 @@ class AnswerTest {
         Assertions.assertFalse(checkAnswer)
     }
 
+    @Test
+    fun `답안이 null이면 isCorrect는 false로 체크한다`() {
+        val category = Category.MULTIPLE
+        val submittedAnswer = null
+        val correctAnswer = "5"
+        val answer = createAnswer(category, submittedAnswer, correctAnswer)
+
+        val checkAnswer = answer.isMultipleAndCheckAnswer()
+
+        Assertions.assertTrue(checkAnswer)
+        Assertions.assertFalse(answer.isCorrect)
+    }
+
     fun createWorkbook(): Workbook =
         Workbook(
             title = "hinc",
@@ -55,7 +68,7 @@ class AnswerTest {
 
     fun createAnswer(
         category: Category,
-        submittedAnswer: String,
+        submittedAnswer: String?,
         correctAnswer: String,
     ) = Answer(
         question =

@@ -17,7 +17,7 @@ data class Answer(
     @JoinColumn(name = "exam_id")
     val exam: Exam,
     @Column(name = "submitted_answer")
-    val submittedAnswer: String,
+    val submittedAnswer: String?,
     val sequence: Int,
 ) : BaseTimeEntity() {
     @Id
@@ -31,7 +31,7 @@ data class Answer(
         fun createAnswer(
             question: Question,
             exam: Exam,
-            submittedAnswer: String,
+            submittedAnswer: String?,
             sequence: Int,
         ) = Answer(
             question,

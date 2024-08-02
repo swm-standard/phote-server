@@ -122,9 +122,11 @@ class ExamService(
                         sequence = index + 1,
                     )
 
-                if (!savingAnswer.isMultipleAndCheckAnswer()) {
+                if (savingAnswer.submittedAnswer == null) {
+                    savingAnswer.isCorrect = false
+                } else if (!savingAnswer.isMultipleAndCheckAnswer()) {
                     val chatGptRequest =
-                        ChatGPTRequest(model, savingAnswer.submittedAnswer, savingAnswer.question.answer)
+                        ChatGPTRequest(model, savingAnswer.submittedAnswer!!, savingAnswer.question.answer)
 
                     val chatGPTResponse = template.postForObject(url, chatGptRequest, ChatGPTResponse::class.java)
 
