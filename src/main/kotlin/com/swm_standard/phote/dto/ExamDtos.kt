@@ -31,7 +31,7 @@ data class ReadExamHistoryListResponse(
 
 data class GradeExamRequest(
     val questionId: UUID,
-    val submittedAnswer: String,
+    val submittedAnswer: String?,
 )
 
 data class GradeExamResponse(
