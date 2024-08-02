@@ -1,7 +1,8 @@
 package com.swm_standard.phote.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.swm_standard.phote.external.chatgpt.PROMPT
+import com.swm_standard.phote.external.chatgpt.CHECK_ANSWER_PROMPT
+import com.swm_standard.phote.external.chatgpt.TRANSFORM_QUESTION_PROMPT
 
 data class RequestMessage(
     val role: String,
@@ -38,7 +39,18 @@ data class ChatGPTRequest(
             mutableListOf(
                 RequestMessage(
                     "user",
-                    mutableListOf(TextContent(PROMPT), ImageContent(ImageInfo(imageUrl))),
+                    mutableListOf(TextContent(TRANSFORM_QUESTION_PROMPT), ImageContent(ImageInfo(imageUrl))),
+                ),
+            ),
+        )
+
+    constructor(model: String, submittedAnswer: String, correctAnswer: String) :
+        this(
+            model,
+            mutableListOf(
+                RequestMessage(
+                    "user",
+                    mutableListOf(TextContent("$CHECK_ANSWER_PROMPT\n$submittedAnswer \n$correctAnswer")),
                 ),
             ),
         )

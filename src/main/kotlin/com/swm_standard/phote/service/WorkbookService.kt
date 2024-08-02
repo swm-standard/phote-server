@@ -105,7 +105,8 @@ class WorkbookService(
                     .findById(questionId)
                     .getOrElse { throw NotFoundException(fieldName = "question", message = "id 를 재확인해주세요.") }
 
-            if (questionSetRepository.existsByQuestionIdAndWorkbookId(questionId, workbook.id)
+            if (questionSetRepository
+                .existsByQuestionIdAndWorkbookId(questionId, workbook.id)
             ) {
                 throw AlreadyExistedException("questionId ($questionId)")
             }

@@ -6,7 +6,7 @@ import com.swm_standard.phote.entity.Category
 import com.swm_standard.phote.entity.Tag
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
-import jakarta.validation.constraints.PositiveOrZero
+import jakarta.validation.constraints.Positive
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -65,7 +65,7 @@ data class DeleteQuestionInWorkbookResponse(
 data class UpdateQuestionSequenceRequest(
     @JsonProperty("id")
     private val _id: UUID?,
-    @field:PositiveOrZero(message = "sequence는 0 이상의 정수만 가능합니다.")
+    @field:Positive(message = "sequence는 1 이상의 정수만 가능합니다.")
     @JsonProperty("sequence")
     private val _sequence: Int?,
 ) {

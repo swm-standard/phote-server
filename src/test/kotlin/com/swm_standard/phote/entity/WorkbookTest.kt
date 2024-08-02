@@ -7,7 +7,7 @@ import java.time.LocalDateTime
 class WorkbookTest {
     @Test
     fun `문제집을 생성한다`() {
-        val member: Member = createmember()
+        val member: Member = createMember()
         val testTitle = "테스트 제목 수학"
 
         val workbook: Workbook = Workbook.createWorkbook(title = testTitle, description = "", member = member)
@@ -58,11 +58,11 @@ class WorkbookTest {
         Workbook(
             title = "hinc",
             description = null,
-            member = createmember(),
+            member = createMember(),
             emoji = "📚",
         )
 
-    fun createmember(): Member =
+    fun createMember(): Member =
         Member(
             name = "Mayra Payne",
             email = "penelope.mccarty@example.com",

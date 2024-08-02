@@ -3,6 +3,8 @@ package com.swm_standard.phote.entity
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
@@ -17,21 +19,31 @@ data class Exam(
     @ManyToOne
     @JoinColumn(name = "workbook_id")
     val workbook: Workbook,
+    val sequence: Int,
+    val time: Int,
 ) : BaseTimeEntity() {
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "exam_id", nullable = false, unique = true)
-    val id: UUID = UUID.randomUUID()
+    var id: UUID? = null
 
-    val totalCorrect: Int = 0
+    var totalCorrect: Int = 0
 
     @OneToMany(mappedBy = "exam", cascade = [(CascadeType.REMOVE)])
     val answers: MutableList<Answer> = mutableListOf()
 
-    val time: Int = 0
+    fun calculateTotalQuantity(): Int = answers.size
 
-    val sequence: Int = 0
+    companion object {
+        fun createExam(
+            member: Member,
+            workbook: Workbook,
+            sequence: Int,
+            time: Int,
+        ) = Exam(member, workbook, sequence, time)
+    }
 
-    fun calculateTotalQuantity(): Int {
-        return answers.size
+    fun increaseTotalCorrect(count: Int) {
+        totalCorrect += count
     }
 }
