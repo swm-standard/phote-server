@@ -14,6 +14,7 @@ class ExamTest {
                 member = member,
                 workbook = workbook,
                 sequence = 1,
+                time = 30,
             )
 
         val answer =
@@ -57,8 +58,9 @@ class ExamTest {
         val workbook = createWorkbook()
         val member = createMember()
         val sequence: Int = 2
+        val time = 20
 
-        val exam = Exam.createExam(member, workbook, sequence)
+        val exam = Exam.createExam(member, workbook, sequence, time)
 
         Assertions.assertThat(exam.workbook).isEqualTo(workbook)
         Assertions.assertThat(exam.member).isEqualTo(member)

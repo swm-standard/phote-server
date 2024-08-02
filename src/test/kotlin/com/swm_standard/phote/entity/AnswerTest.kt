@@ -64,6 +64,7 @@ class AnswerTest {
             member = createMember(),
             workbook = createWorkbook(),
             sequence = 4282,
+            time = 40,
         )
 
     fun createAnswer(

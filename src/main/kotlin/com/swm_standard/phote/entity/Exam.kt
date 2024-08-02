@@ -20,6 +20,7 @@ data class Exam(
     @JoinColumn(name = "workbook_id")
     val workbook: Workbook,
     val sequence: Int,
+    val time: Int,
 ) : BaseTimeEntity() {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -31,8 +32,6 @@ data class Exam(
     @OneToMany(mappedBy = "exam", cascade = [(CascadeType.REMOVE)])
     val answers: MutableList<Answer> = mutableListOf()
 
-    val time: Int = 0
-
     fun calculateTotalQuantity(): Int = answers.size
 
     companion object {
@@ -40,7 +39,8 @@ data class Exam(
             member: Member,
             workbook: Workbook,
             sequence: Int,
-        ) = Exam(member, workbook, sequence)
+            time: Int,
+        ) = Exam(member, workbook, sequence, time)
     }
 
     fun increaseTotalCorrect(count: Int) {

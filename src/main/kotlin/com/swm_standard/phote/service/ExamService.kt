@@ -9,6 +9,7 @@ import com.swm_standard.phote.dto.GradeExamResponse
 import com.swm_standard.phote.dto.ReadExamHistoryDetail
 import com.swm_standard.phote.dto.ReadExamHistoryDetailResponse
 import com.swm_standard.phote.dto.ReadExamHistoryListResponse
+import com.swm_standard.phote.dto.SubmittedAnswerRequest
 import com.swm_standard.phote.entity.Answer
 import com.swm_standard.phote.entity.Exam
 import com.swm_standard.phote.entity.Question
@@ -86,7 +87,7 @@ class ExamService(
     @Transactional
     fun gradeExam(
         workbookId: UUID,
-        request: List<GradeExamRequest>,
+        request: GradeExamRequest,
         memberId: UUID,
     ): GradeExamResponse {
         val workbook =
@@ -102,13 +103,14 @@ class ExamService(
                         memberRepository.findById(memberId).getOrElse { throw NotFoundException(fieldName = "member") },
                         workbook,
                         examRepository.findMaxSequenceByWorkbookId(workbook) + 1,
+                        request.time,
                     ),
             )
 
         var totalCorrect = 0
 
         val response =
-            request.mapIndexed { index: Int, answer: GradeExamRequest ->
+            request.answers.mapIndexed { index: Int, answer: SubmittedAnswerRequest ->
                 val question: Question =
                     questionRepository.findById(answer.questionId).getOrElse {
                         throw NotFoundException(fieldName = "questionId (${answer.questionId})")

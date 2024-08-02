@@ -51,7 +51,7 @@ class ExamController(
     @PostMapping("/exam/{workbookId}")
     fun gradeExam(
         @PathVariable(required = true) workbookId: UUID,
-        @Valid @RequestBody request: List<GradeExamRequest>,
+        @Valid @RequestBody request: GradeExamRequest,
         @Parameter(hidden = true) @MemberId memberId: UUID,
     ): BaseResponse<GradeExamResponse> {
         val response = examService.gradeExam(workbookId, request, memberId)

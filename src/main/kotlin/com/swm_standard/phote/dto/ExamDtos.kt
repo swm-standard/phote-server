@@ -30,6 +30,11 @@ data class ReadExamHistoryListResponse(
 )
 
 data class GradeExamRequest(
+    val time: Int,
+    val answers: List<SubmittedAnswerRequest>,
+)
+
+data class SubmittedAnswerRequest(
     val questionId: UUID,
     val submittedAnswer: String?,
 )
