@@ -66,13 +66,14 @@ class ExamTest {
     }
 
     @Test
-    fun `totalCorrect가 1 증가한다`() {
+    fun `totalCorrect가 증가한다`() {
         val exam = createExam()
+        val count = 3
         val totalCorrect = exam.totalCorrect
 
-        exam.increaseTotalCorrect()
+        exam.increaseTotalCorrect(count)
 
-        Assertions.assertThat(exam.totalCorrect).isEqualTo(totalCorrect + 1)
+        Assertions.assertThat(exam.totalCorrect).isEqualTo(totalCorrect + count)
     }
 
     fun createWorkbook(): Workbook =

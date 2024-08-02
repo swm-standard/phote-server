@@ -18,6 +18,18 @@ class AnswerTest {
         Assertions.assertFalse(answer.isCorrect)
     }
 
+    @Test
+    fun `문제가 주관식이면 false를 반환한다`() {
+        val category = Category.ESSAY
+        val submittedAnswer = "essay test"
+        val correctAnswer = "essay test"
+        val answer = createAnswer(category, submittedAnswer, correctAnswer)
+
+        val checkAnswer = answer.isMultipleAndCheckAnswer()
+
+        Assertions.assertFalse(checkAnswer)
+    }
+
     fun createWorkbook(): Workbook =
         Workbook(
             title = "hinc",

@@ -33,7 +33,7 @@ class ExamService(
     private val answerRepository: AnswerRepository,
     private val template: RestTemplate,
 ) {
-    @Value("\${openai.model}")
+    @Value("\${openai.model.grading}")
     lateinit var model: String
 
     @Value("\${openai.api.url}")
@@ -62,7 +62,7 @@ class ExamService(
             }
 
         return ReadExamHistoryDetailResponse(
-            id = exam.id,
+            id = exam.id!!,
             totalCorrect = exam.totalCorrect,
             time = exam.time,
             questions = responses,
@@ -74,7 +74,7 @@ class ExamService(
         val exams = examRepository.findAllByWorkbookId(workbookId)
         return exams.map { exam ->
             ReadExamHistoryListResponse(
-                examId = exam.id,
+                examId = exam.id!!,
                 totalQuantity = exam.calculateTotalQuantity(),
                 totalCorrect = exam.totalCorrect,
                 time = exam.time,
@@ -105,6 +105,8 @@ class ExamService(
                     ),
             )
 
+        var totalCorrect = 0
+
         val response =
             request.mapIndexed { index: Int, answer: GradeExamRequest ->
                 val question: Question =
@@ -113,13 +115,11 @@ class ExamService(
                     }
 
                 val savingAnswer: Answer =
-                    answerRepository.save(
-                        Answer.createAnswer(
-                            question = question,
-                            submittedAnswer = answer.submittedAnswer,
-                            exam = exam,
-                            sequence = index,
-                        ),
+                    Answer.createAnswer(
+                        question = question,
+                        submittedAnswer = answer.submittedAnswer,
+                        exam = exam,
+                        sequence = index + 1,
                     )
 
                 if (!savingAnswer.isMultipleAndCheckAnswer()) {
@@ -133,20 +133,26 @@ class ExamService(
                             "true" -> true
                             else -> false
                         }
-
-                    if (savingAnswer.isCorrect) exam.increaseTotalCorrect()
                 }
 
+                if (savingAnswer.isCorrect) {
+                    totalCorrect += 1
+                }
+
+                val savedAnswer = answerRepository.save(savingAnswer)
+
                 AnswerResponse(
-                    questionId = savingAnswer.question.id,
-                    submittedAnswer = savingAnswer.submittedAnswer,
-                    correctAnswer = savingAnswer.question.answer,
-                    isCorrect = savingAnswer.isCorrect,
+                    questionId = savedAnswer.question.id,
+                    submittedAnswer = savedAnswer.submittedAnswer,
+                    correctAnswer = savedAnswer.question.answer,
+                    isCorrect = savedAnswer.isCorrect,
                 )
             }
 
+        exam.increaseTotalCorrect(totalCorrect)
+
         return GradeExamResponse(
-            examId = exam.id,
+            examId = exam.id!!,
             totalCorrect = exam.totalCorrect,
             questionQuantity = response.size,
             answers = response,
