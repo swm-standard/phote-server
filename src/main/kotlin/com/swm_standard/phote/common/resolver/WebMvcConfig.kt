@@ -18,6 +18,7 @@ class WebMvcConfig(
         registry.addMapping("/**")
             .allowedOriginPatterns("*")
             .allowedMethods("*")
+            .allowedHeaders("*")
             .allowCredentials(true)
     }
 }
