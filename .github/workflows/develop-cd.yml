@@ -47,11 +47,11 @@ jobs:
                   docker push ${{ secrets.DOCKER_USERNAME }}/phote:latest
 
             - name: Deploy
-              uses: appleboy/ssh-action@master
+              uses: appleboy/ssh-action@v0.1.4
               with:
                   host: ${{ secrets.DEV_HOST }}
                   username: ${{ secrets.USERNAME }}}
-                  password: ${{ secrets.DEV_PASSWORD }}
+                  key: ${{ secrets.PRIVATE_KEY }}
                   port: ${{ secrets.DEV_PORT }}
                   script: |
                       docker pull ${{ secrets.DOCKER_USERNAME }}/phote:latest
