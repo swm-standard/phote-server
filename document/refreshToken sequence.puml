@@ -40,14 +40,4 @@ else refreshToken이 만료된 경우
 
 deactivate Redis
 
-== refreshToken 생성하기 ==
-Client -> Server: refreshToken 생성 요청
-activate Server
-Server -> Server: refreshToken 생성
-Server -> Redis: refreshToken 저장
-activate Redis
-Redis --> Server: refreshToken
-deactivate Redis
-Server --> Client: refreshToken
-
 @enduml
