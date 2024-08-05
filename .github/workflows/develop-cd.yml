@@ -52,6 +52,7 @@ jobs:
                   host: ${{ secrets.DEV_HOST }}
                   username: ${{ secrets.USERNAME }}}
                   key: ${{ secrets.DEV_PRIVATE_KEY }}
+                  port: ${{ secrets.DEV_PORT }}
                   script: |
                       docker pull ${{ secrets.DOCKER_USERNAME }}/phote:latest
                       docker stop $(docker ps -a -q)
