@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component
 import java.util.Date
 import java.util.UUID
 
-const val ACCESS_TOKEN_EXPIRATION: Long = 1000 * 60
+const val ACCESS_TOKEN_EXPIRATION: Long = 1000 * 60 * 60
 
 @Component
 class JwtTokenProvider {
