@@ -51,7 +51,7 @@ jobs:
               with:
                   host: ${{ secrets.DEV_HOST }}
                   username: ${{ secrets.USERNAME }}}
-                  key: ${{ secrets.DEV_PRIVATE_KEY }}
+                  password: ${{ secrets.DEV_PASSWORD }}
                   port: ${{ secrets.DEV_PORT }}
                   script: |
                       docker pull ${{ secrets.DOCKER_USERNAME }}/phote:latest
