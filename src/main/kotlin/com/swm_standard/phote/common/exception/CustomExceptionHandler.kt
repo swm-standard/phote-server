@@ -94,7 +94,7 @@ class CustomExceptionHandler {
     }
 
     @ExceptionHandler(AlreadyExistedException::class)
-    protected fun alreadyDeletedException(
+    protected fun alreadyExistedException(
         ex: AlreadyExistedException,
     ): ResponseEntity<BaseResponse<Map<String, String>>> {
         val errors = mapOf(ex.fieldName to (ex.message ?: "Not Exception RequestMessage"))
@@ -106,6 +106,20 @@ class CustomExceptionHandler {
                 errors,
             ),
             HttpStatus.BAD_REQUEST,
+        )
+    }
+
+    @ExceptionHandler(ExpiredTokenException::class)
+    protected fun expiredTokenException(ex: ExpiredTokenException): ResponseEntity<BaseResponse<Map<String, String>>> {
+        val errors = mapOf(ex.fieldName to (ex.message ?: "Not Exception RequestMessage"))
+        return ResponseEntity(
+            BaseResponse(
+                ErrorCode.ERROR.name,
+                ErrorCode.EXPIRED_TOKEN.statusCode,
+                ErrorCode.EXPIRED_TOKEN.msg,
+                errors,
+            ),
+            HttpStatus.UNAUTHORIZED,
         )
     }
 

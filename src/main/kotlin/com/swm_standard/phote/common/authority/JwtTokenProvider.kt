@@ -1,7 +1,12 @@
 package com.swm_standard.phote.common.authority
 
-import com.swm_standard.phote.dto.UserInfoResponse
-import io.jsonwebtoken.*
+import com.swm_standard.phote.common.exception.ExpiredTokenException
+import io.jsonwebtoken.Claims
+import io.jsonwebtoken.ExpiredJwtException
+import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.MalformedJwtException
+import io.jsonwebtoken.SignatureAlgorithm
+import io.jsonwebtoken.UnsupportedJwtException
 import io.jsonwebtoken.io.Decoders
 import io.jsonwebtoken.security.Keys
 import io.jsonwebtoken.security.SecurityException
@@ -16,9 +21,7 @@ import org.springframework.stereotype.Component
 import java.util.Date
 import java.util.UUID
 
-const val ACCESS_TOKEN_EXPIRATION: Long = 1000 * 60 * 60 * 24
-
-const val REFRESH_TOKEN_EXPIRATION: Long = 1000 * 60 * 60
+const val ACCESS_TOKEN_EXPIRATION: Long = 1000 * 60
 
 @Component
 class JwtTokenProvider {
@@ -29,17 +32,14 @@ class JwtTokenProvider {
         Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey))
     }
 
-    fun createToken(
-        userInfoResponseDto: UserInfoResponse,
-        memberId: UUID,
-    ): String {
+    fun createToken(memberId: UUID): String {
         val now = Date()
         val accessExpiration = Date(now.time + ACCESS_TOKEN_EXPIRATION)
 
         val accessToken =
             Jwts
                 .builder()
-                .setSubject(userInfoResponseDto.email)
+                .setSubject(memberId.toString())
                 .claim("memberId", memberId)
                 .setIssuedAt(now)
                 .setExpiration(accessExpiration)
@@ -48,17 +48,6 @@ class JwtTokenProvider {
 
         return "Bearer $accessToken"
     }
-
-//    fun createRefreshToken(): String {
-//        val now = Date()
-//        val refreshExpiration = Date(now.time + REFRESH_TOKEN_EXPIRATION)
-//
-//        return Jwts.builder()
-//            .setIssuedAt(now)
-//            .setExpiration(refreshExpiration)
-//            .signWith(key, SignatureAlgorithm.HS256)
-//            .compact()
-//    }
 
     fun getAuthentication(token: String): Authentication {
         val claims: Claims = getClaims(token)
@@ -75,15 +64,17 @@ class JwtTokenProvider {
         return UsernamePasswordAuthenticationToken(principal, "", authorities)
     }
 
-    fun validateToken(token: String): Boolean {
+    fun validateToken(accessToken: String): Boolean {
         try {
-            getClaims(token)
+            getClaims(accessToken)
             return true
         } catch (e: Exception) {
             when (e) {
                 is SecurityException -> {}
                 is MalformedJwtException -> {}
-                is ExpiredJwtException -> {}
+                is ExpiredJwtException -> {
+                    throw ExpiredTokenException()
+                }
                 is UnsupportedJwtException -> {}
                 is IllegalArgumentException -> {}
                 else -> {}
@@ -100,7 +91,7 @@ class JwtTokenProvider {
             .parseClaimsJws(token)
             .body
 
-    public fun getJwtContents(bearerToken: String): UUID {
+    fun getJwtContents(bearerToken: String): UUID {
         val token = bearerToken.substring(7)
         val claims = getClaims(token)
         val auth = claims["memberId"] ?: throw RuntimeException("잘못된 토큰입니다.")

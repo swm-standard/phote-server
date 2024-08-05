@@ -20,9 +20,9 @@ import org.springframework.web.client.RestTemplate
 @Service
 class KaKaoAuthService(
     private val memberRepository: MemberRepository,
-    private val jwtTokenProvider: JwtTokenProvider
+    private val jwtTokenProvider: JwtTokenProvider,
+    private val tokenService: TokenService,
 ) {
-
     @Value("\${KAKAO_REST_API_KEY}")
     lateinit var kakaokey: String
 
@@ -30,7 +30,6 @@ class KaKaoAuthService(
     lateinit var kakaoRedirectUri: String
 
     fun getTokenFromKakao(code: String): String {
-
         val headers = HttpHeaders()
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8")
 
@@ -41,12 +40,13 @@ class KaKaoAuthService(
         body.add("code", code)
 
         val kakaoTokenRequest = HttpEntity(body, headers)
-        val response = RestTemplate().exchange(
-            "https://kauth.kakao.com/oauth/token",
-            HttpMethod.POST,
-            kakaoTokenRequest,
-            String::class.java
-        )
+        val response =
+            RestTemplate().exchange(
+                "https://kauth.kakao.com/oauth/token",
+                HttpMethod.POST,
+                kakaoTokenRequest,
+                String::class.java,
+            )
 
         val responseBody = response.body
         val objectMapper = ObjectMapper()
@@ -56,18 +56,18 @@ class KaKaoAuthService(
     }
 
     fun getUserInfoFromKakao(token: String): UserInfoResponse {
-
         val headers = HttpHeaders()
         headers.add("Authorization", "Bearer $token")
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8")
 
         val kakaoUserInfoRequest = HttpEntity<MultiValueMap<String, String>>(headers)
-        val response = RestTemplate().exchange(
-            "https://kapi.kakao.com/v2/user/me",
-            HttpMethod.POST,
-            kakaoUserInfoRequest,
-            String::class.java
-        )
+        val response =
+            RestTemplate().exchange(
+                "https://kapi.kakao.com/v2/user/me",
+                HttpMethod.POST,
+                kakaoUserInfoRequest,
+                String::class.java,
+            )
 
         val responseBody = response.body
         val objectMapper = ObjectMapper()
@@ -80,15 +80,15 @@ class KaKaoAuthService(
         val isMember: Boolean
 
         if (member == null) {
-
             val nicknameGenerator = NicknameGenerator()
 
-            member = Member(
-                name = nicknameGenerator.randomNickname(),
-                email = email,
-                image = ProfileImageGenerator().imageGenerator(),
-                provider = Provider.KAKAO
-            )
+            member =
+                Member(
+                    name = nicknameGenerator.randomNickname(),
+                    email = email,
+                    image = ProfileImageGenerator().imageGenerator(),
+                    provider = Provider.KAKAO,
+                )
 
             memberRepository.save(member)
 
@@ -97,12 +97,17 @@ class KaKaoAuthService(
             isMember = true
         }
 
-        val dto = UserInfoResponse(
-            name = member.name, email = member.email,
-            picture = member.image, isMember = isMember, userId = member.id
-        )
+        val dto =
+            UserInfoResponse(
+                name = member.name,
+                email = member.email,
+                picture = member.image,
+                isMember = isMember,
+                userId = member.id,
+                accessToken = jwtTokenProvider.createToken(member.id),
+            )
 
-        dto.accessToken = jwtTokenProvider.createToken(dto, member.id)
+        dto.refreshToken = tokenService.generateRefreshToken(member.id)
 
         return dto
     }

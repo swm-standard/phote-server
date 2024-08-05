@@ -23,4 +23,10 @@ data class UserInfoResponse(
     var picture: String,
     var isMember: Boolean? = true,
     var userId: UUID?,
+) {
+    var refreshToken: UUID? = null
+}
+
+data class RenewAccessTokenResponse(
+    val accessToken: String,
 )
