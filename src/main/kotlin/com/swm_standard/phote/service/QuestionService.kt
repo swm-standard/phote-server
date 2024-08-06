@@ -47,8 +47,7 @@ class QuestionService(
     @Transactional
     fun createQuestion(
         memberId: UUID,
-        request: CreateQuestionRequest,
-        imageUrl: String?,
+        request: CreateQuestionRequest
     ): CreateQuestionResponse {
         // 문제 생성 유저 확인
         val member = memberRepository.findById(memberId).orElseThrow { NotFoundException("존재하지 않는 member") }
@@ -59,7 +58,7 @@ class QuestionService(
                 Question(
                     member = member,
                     statement = request.statement,
-                    image = imageUrl,
+                    image = request.imageUrl,
                     category = request.category,
                     options = request.options,
                     answer = request.answer,
