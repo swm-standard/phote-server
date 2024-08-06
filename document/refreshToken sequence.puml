@@ -1,0 +1,43 @@
+@startuml
+Actor Client
+Participant Server
+Database MySql
+Database Redis
+
+== 로그인/회원가입 시 ==
+activate Client
+Client -> Server: 로그인/회원가입 요청
+activate Server
+Server -> MySql: 회원 정보 요청
+activate MySql
+MySql --> Server: 회원 정보
+deactivate MySql
+Server -> Redis: refreshToken 저장
+Redis --> Server: refreshToken
+Server --> Client: 회원 정보/accessToken/refreshToken 반환
+deactivate Server
+
+== api 요청 시 accessToken 이 만료된 경우==
+Client -> Server: api 요청
+activate Server
+Server -> Server: accessToken 유효성 체크
+Server --> Client: 403 에러 반환
+deactivate Server
+
+== refreshToken으로 accessToken 갱신==
+Client -> Server:  accessToken 갱신 요청(refreshToken)
+activate Server
+Server -> Redis: refreshToken 조회
+activate Redis
+alt refreshToken이 존재할 경우
+    Redis --> Server: refreshToken entity
+    Server -> Server: accessToken 갱신
+    Server --> Client: accessToken
+else refreshToken이 만료된 경우
+    Redis --> Server!!:
+    Server --> Client: 401 에러
+    end
+
+deactivate Redis
+
+@enduml

@@ -1,0 +1,12 @@
+services:
+    redis:
+        image: redis
+        container_name: redis
+        volumes:
+             - /var/lib/docker/volumes/redis-volume/_data:/data
+        ports:
+            - "6379:6379"
+        hostname: redis
+
+
+

@@ -13,9 +13,8 @@ import java.util.*
 
 @Component
 class MemberIdResolver(
-    private val jwtTokenProvider: JwtTokenProvider
+    private val jwtTokenProvider: JwtTokenProvider,
 ) : HandlerMethodArgumentResolver {
-
     // supportsParameter: 어떤 파라미터를 처리할 것인지
     override fun supportsParameter(parameter: MethodParameter): Boolean {
         parameter.getParameterAnnotation(MemberId::class.java) ?: return false
@@ -31,7 +30,7 @@ class MemberIdResolver(
         parameter: MethodParameter,
         mavContainer: ModelAndViewContainer?,
         webRequest: NativeWebRequest,
-        binderFactory: WebDataBinderFactory?
+        binderFactory: WebDataBinderFactory?,
     ): Any? {
         val request = webRequest.nativeRequest as HttpServletRequest
 

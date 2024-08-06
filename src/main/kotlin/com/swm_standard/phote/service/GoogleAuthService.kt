@@ -19,6 +19,7 @@ import org.springframework.web.client.RestTemplate
 class GoogleAuthService(
     private val memberRepository: MemberRepository,
     private val jwtTokenProvider: JwtTokenProvider,
+    private val tokenService: TokenService,
 ) {
     @Value("\${GOOGLE_CLIENT_ID}")
     lateinit var clientId: String
@@ -75,7 +76,8 @@ class GoogleAuthService(
             member = memberRepository.save(Member(initName, dto.email, dto.picture, Provider.GOOGLE))
         }
 
-        dto.accessToken = jwtTokenProvider.createToken(dto, member.id)
+        dto.accessToken = jwtTokenProvider.createToken(member.id)
+        dto.refreshToken = tokenService.generateRefreshToken(member.id)
         dto.userId = member.id
         dto.name = member.name
 
