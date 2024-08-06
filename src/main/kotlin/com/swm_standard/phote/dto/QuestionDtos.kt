@@ -41,6 +41,7 @@ class DeleteQuestionResponse(
 data class CreateQuestionRequest(
     @field:NotBlank(message = "statement 미입력")
     val statement: String,
+    val imageUrl: String? = null,
     @field:NotNull(message = "category 미입력")
     val category: Category,
     val options: JsonNode? = null,
