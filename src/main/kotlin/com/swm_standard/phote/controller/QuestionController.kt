@@ -92,9 +92,10 @@ class QuestionController(
     @PostMapping("question-transform")
     fun transformQuestion(
         @RequestPart image: MultipartFile?,
+        @RequestPart imageCoordinates: List<List<Int>>? = null
     ): BaseResponse<TransformQuestionResponse> {
         val imageUrl = image?.let { s3Service.uploadChatGptImage(it) }
-        val response: TransformQuestionResponse = questionService.transformQuestion(imageUrl!!)
+        val response: TransformQuestionResponse = questionService.transformQuestion(imageUrl!!, imageCoordinates)
 
         return BaseResponse(data = response, msg = "문제 변환 성공")
     }

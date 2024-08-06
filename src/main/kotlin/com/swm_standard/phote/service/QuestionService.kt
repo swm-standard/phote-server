@@ -17,8 +17,13 @@ import com.swm_standard.phote.repository.MemberRepository
 import com.swm_standard.phote.repository.QuestionRepository
 import com.swm_standard.phote.repository.TagRepository
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.HttpEntity
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.util.LinkedMultiValueMap
+import org.springframework.util.MultiValueMap
 import org.springframework.web.client.RestTemplate
 import java.time.LocalDateTime
 import java.util.UUID
@@ -35,6 +40,9 @@ class QuestionService(
 
     @Value("\${openai.api.url}")
     lateinit var url: String
+
+    @Value("\${lambda.url}")
+    lateinit var lambdaUrl: String
 
     @Transactional
     fun createQuestion(
@@ -111,7 +119,28 @@ class QuestionService(
         return DeleteQuestionResponse(id, LocalDateTime.now())
     }
 
-    fun transformQuestion(imageUrl: String): TransformQuestionResponse {
+    fun transformQuestion(imageUrl: String, imageCoordinates: List<List<Int>>?): TransformQuestionResponse {
+        // 문제 그림 추출
+
+        val transformedImageUrl: String? = imageCoordinates?.let {
+
+            val headers = HttpHeaders()
+            headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8")
+
+            val body: MultiValueMap<String, Any> = LinkedMultiValueMap()
+            body.add("url", imageUrl)
+            body.add("coor", imageCoordinates)
+
+            val transformImageRequest = HttpEntity(body, headers)
+            val lambdaResponse = RestTemplate().exchange(
+                lambdaUrl,
+                HttpMethod.POST,
+                transformImageRequest,
+                String::class.java
+            )
+            lambdaResponse.body?.split("\"")?.get(1)
+        }
+
         val request = ChatGPTRequest(model, imageUrl)
 
         // openAI로 메시지 전송
@@ -129,6 +158,6 @@ class QuestionService(
         }
 
         // 문제 문항과 객관식을 분리해서 dto에 저장
-        return TransformQuestionResponse(split[0], split.drop(1))
+        return TransformQuestionResponse(split[0], split.drop(1), transformedImageUrl)
     }
 }

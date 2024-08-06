@@ -96,4 +96,5 @@ data class SearchQuestionsToAddResponse(
 data class TransformQuestionResponse(
     val content: String,
     val options: List<String>,
+    val transformedImageUrl: String?
 )
