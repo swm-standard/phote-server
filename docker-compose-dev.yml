@@ -1,12 +1,22 @@
 services:
-    redis:
-        image: redis
-        container_name: redis
-        volumes:
-             - /var/lib/docker/volumes/redis-volume/_data:/data
-        ports:
-            - "6379:6379"
+    redisimage:
+        image: redis:latest
+        restart: unless-stopped
+        container_name: myredis
         hostname: redis
-
+        environment:
+            - TZ=Asia/Seoul
+        ports:
+            - 6379:6379
+        volumes:
+            - /var/lib/docker/volumes/redis-volume/_data:/data
+    jarimage:
+        image: ${{ secrets.DOCKER_USERNAME }}/phote:latest
+        restart: unless-stopped
+        container_name: myphote
+        environment:
+            - TZ=Asia/Seoul
+        ports:
+            - 8080:8080
 
 
