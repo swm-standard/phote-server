@@ -14,7 +14,7 @@ services:
             - phote-network
 
     jarimage:
-        image: ${{ secrets.DOCKER_USERNAME }}/phote:latest
+        image: ${DOCKER_USERNAME}/phote:latest
         restart: unless-stopped
         container_name: myphote
         environment:
