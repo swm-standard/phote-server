@@ -235,8 +235,7 @@ class WorkbookService(
         workbook: Workbook,
         sequence: Int,
     ): Int {
-        if (!questionSetRepository
-                .existsByQuestionIdAndWorkbookId(question.id, workbook.id)
+        if (!questionSetRepository.existsByQuestionIdAndWorkbookId(question.id, workbook.id)
         ) {
             questionSetRepository.save(QuestionSet.createSequence(question, workbook, sequence))
             return sequence + 1
