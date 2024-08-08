@@ -44,7 +44,6 @@ data class Question(
     var tags: MutableList<Tag> = mutableListOf(),
     val memo: String?,
 ) : BaseTimeEntity() {
-
     fun deserializeOptions(): MutableList<String> {
         val optionsList = mutableListOf<String>()
         options!!.fields().forEach { option ->
@@ -52,5 +51,23 @@ data class Question(
         }
 
         return optionsList
+    }
+
+    companion object {
+        fun createSharedQuestions(
+            questions: List<Question>,
+            member: Member,
+        ) = questions.map { question ->
+            Question(
+                member = member,
+                statement = question.statement,
+                options = question.options,
+                answer = question.answer,
+                category = question.category,
+                tags = question.tags,
+                image = question.image,
+                memo = question.memo,
+            )
+        }
     }
 }

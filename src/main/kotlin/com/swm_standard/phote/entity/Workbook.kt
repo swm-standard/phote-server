@@ -50,6 +50,16 @@ data class Workbook(
             matchEmojiByTitle(title),
         )
 
+        fun createSharedWorkbook(
+            workbook: Workbook,
+            member: Member,
+        ) = Workbook(
+            "${workbook.title} created by ${workbook.member.name}",
+            workbook.description,
+            member,
+            workbook.emoji,
+        )
+
         private fun matchEmojiByTitle(title: String): String {
             val math: List<String> = listOf("수학", "math", "미적분", "확통", "수1", "수2", "기하", "대수")
             val language: List<String> = listOf("국어", "언매", "화작", "비문학", "문학", "독서", "듣기", "영어", "eng", "토익", "외국")

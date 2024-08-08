@@ -1,6 +1,5 @@
 package com.swm_standard.phote.service
 
-import com.swm_standard.phote.common.exception.AlreadyExistedException
 import com.swm_standard.phote.common.exception.InvalidInputException
 import com.swm_standard.phote.common.exception.NotFoundException
 import com.swm_standard.phote.dto.AddQuestionsToWorkbookRequest
@@ -11,6 +10,8 @@ import com.swm_standard.phote.dto.DeleteWorkbookResponse
 import com.swm_standard.phote.dto.ReadQuestionsInWorkbookResponse
 import com.swm_standard.phote.dto.ReadWorkbookDetailResponse
 import com.swm_standard.phote.dto.ReadWorkbookListResponse
+import com.swm_standard.phote.dto.ReceiveSharedWorkbookRequest
+import com.swm_standard.phote.dto.ReceiveSharedWorkbookResponse
 import com.swm_standard.phote.dto.UpdateQuestionSequenceRequest
 import com.swm_standard.phote.dto.UpdateWorkbookDetailRequest
 import com.swm_standard.phote.dto.UpdateWorkbookDetailResponse
@@ -97,7 +98,8 @@ class WorkbookService(
             workbookRepository
                 .findById(workbookId)
                 .orElseThrow { NotFoundException(fieldName = "workbook", message = "id 를 재확인해주세요.") }
-        var nextSequence = questionSetRepository.findMaxSequenceByWorkbookId(workbook) + 1
+        var nextSeq = questionSetRepository.findMaxSequenceByWorkbookId(workbook) + 1
+        val initialSeq = nextSeq
 
         request.questions.forEach { questionId ->
             val question: Question =
@@ -105,17 +107,25 @@ class WorkbookService(
                     .findById(questionId)
                     .getOrElse { throw NotFoundException(fieldName = "question", message = "id 를 재확인해주세요.") }
 
-            if (questionSetRepository
-                .existsByQuestionIdAndWorkbookId(questionId, workbook.id)
-            ) {
-                throw AlreadyExistedException("questionId ($questionId)")
-            }
-
-            questionSetRepository.save(QuestionSet.createSequence(question, workbook, nextSequence))
-            nextSequence += 1
+            nextSeq = insertQuestion(question, workbook, nextSeq)
         }
 
-        workbook.increaseQuantity(request.questions.size)
+        workbook.increaseQuantity(nextSeq - initialSeq)
+    }
+
+    private fun insertQuestion(
+        question: Question,
+        workbook: Workbook,
+        sequence: Int,
+    ): Int {
+        if (!questionSetRepository
+                .existsByQuestionIdAndWorkbookId(question.id, workbook.id)
+        ) {
+            questionSetRepository.save(QuestionSet.createSequence(question, workbook, sequence))
+            return sequence + 1
+        }
+
+        return sequence
     }
 
     @Transactional
@@ -201,5 +211,39 @@ class WorkbookService(
                 set.question.tags,
             )
         }
+    }
+
+    @Transactional
+    fun receiveSharedWorkbook(
+        request: ReceiveSharedWorkbookRequest,
+        memberId: UUID,
+    ): ReceiveSharedWorkbookResponse {
+        val workbook =
+            workbookRepository
+                .findById(
+                    request.workbookId,
+                ).getOrElse { throw NotFoundException(fieldName = "workbook") }
+        val member = memberRepository.findById(memberId).getOrElse { throw NotFoundException(fieldName = "member") }
+
+        val sharedWorkbook =
+            Workbook
+                .createSharedWorkbook(workbook, member)
+                .let { workbookRepository.save(it) }
+
+        val questionSets = workbook.questionSet
+        requireNotNull(questionSets)
+        val map = questionSets.map { q -> q.question }
+
+        val sharedQuestions = questionRepository.saveAll(Question.createSharedQuestions(map, member))
+
+        var nextSeq = 0
+
+        sharedQuestions.forEach { question ->
+            nextSeq = insertQuestion(question, sharedWorkbook, nextSeq)
+        }
+
+        sharedWorkbook.increaseQuantity(nextSeq)
+
+        return ReceiveSharedWorkbookResponse(sharedWorkbook.id)
     }
 }

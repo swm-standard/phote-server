@@ -125,4 +125,16 @@ class WorkbookController(
 
         return BaseResponse(msg = "문제집의 문제 목록 조회 성공", data = response)
     }
+
+    @Operation(summary = "readQuestionsInWorkbook", description = "문제집 내 문제 목록 조회")
+    @SecurityRequirement(name = "bearer Auth")
+    @PostMapping("/shared-workbook")
+    fun receiveSharedWorkbook(
+        @Valid @RequestBody receiveSharedWorkbookRequest: ReceiveSharedWorkbookRequest,
+        @MemberId memberId: UUID,
+    ): BaseResponse<ReceiveSharedWorkbookResponse> {
+        val response = workbookService.receiveSharedWorkbook(receiveSharedWorkbookRequest, memberId)
+
+        return BaseResponse(data = response, msg = "문제집 공유 받기 성공")
+    }
 }
