@@ -15,6 +15,7 @@ import com.swm_standard.phote.dto.ReceiveSharedWorkbookResponse
 import com.swm_standard.phote.dto.UpdateQuestionSequenceRequest
 import com.swm_standard.phote.dto.UpdateWorkbookDetailRequest
 import com.swm_standard.phote.dto.UpdateWorkbookDetailResponse
+import com.swm_standard.phote.entity.Member
 import com.swm_standard.phote.entity.Question
 import com.swm_standard.phote.entity.QuestionSet
 import com.swm_standard.phote.entity.Workbook
@@ -29,6 +30,7 @@ import java.util.UUID
 import kotlin.jvm.optionals.getOrElse
 
 @Service
+@Transactional(readOnly = true)
 class WorkbookService(
     private val workbookRepository: WorkbookRepository,
     private val memberRepository: MemberRepository,
@@ -40,7 +42,7 @@ class WorkbookService(
         request: CreateWorkbookRequest,
         memberId: UUID,
     ): CreateWorkbookResponse {
-        val member = memberRepository.findById(memberId).orElseThrow { NotFoundException(fieldName = "member") }
+        val member = getMember(memberId)
         val workbook: Workbook =
             Workbook.createWorkbook(request.title, request.description, member).let {
                 workbookRepository.save(it)
@@ -51,16 +53,15 @@ class WorkbookService(
 
     @Transactional
     fun deleteWorkbook(id: UUID): DeleteWorkbookResponse {
-        workbookRepository.findById(id).orElseThrow { NotFoundException("workbookId", "존재하지 않는 workbook") }
+        getWorkbook(id)
 
         workbookRepository.deleteById(id)
 
         return DeleteWorkbookResponse(id, LocalDateTime.now())
     }
 
-    @Transactional(readOnly = true)
     fun readWorkbookDetail(id: UUID): ReadWorkbookDetailResponse {
-        val workbook = workbookRepository.findById(id).getOrElse { throw NotFoundException() }
+        val workbook = getWorkbook(id)
 
         return ReadWorkbookDetailResponse(
             workbook.id,
@@ -72,9 +73,8 @@ class WorkbookService(
         )
     }
 
-    @Transactional(readOnly = true)
     fun readWorkbookList(memberId: UUID): List<ReadWorkbookListResponse> {
-        val member = memberRepository.findById(memberId).getOrElse { throw InvalidInputException("memberId") }
+        val member = getMember(memberId)
         val workbooks: List<Workbook> = workbookRepository.findAllByMember(member)
 
         return workbooks.map { workbook ->
@@ -94,10 +94,7 @@ class WorkbookService(
         workbookId: UUID,
         request: AddQuestionsToWorkbookRequest,
     ) {
-        val workbook: Workbook =
-            workbookRepository
-                .findById(workbookId)
-                .orElseThrow { NotFoundException(fieldName = "workbook", message = "id 를 재확인해주세요.") }
+        val workbook: Workbook = getWorkbook(workbookId)
         var nextSeq = questionSetRepository.findMaxSequenceByWorkbookId(workbook) + 1
         val initialSeq = nextSeq
 
@@ -113,30 +110,12 @@ class WorkbookService(
         workbook.increaseQuantity(nextSeq - initialSeq)
     }
 
-    private fun insertQuestion(
-        question: Question,
-        workbook: Workbook,
-        sequence: Int,
-    ): Int {
-        if (!questionSetRepository
-                .existsByQuestionIdAndWorkbookId(question.id, workbook.id)
-        ) {
-            questionSetRepository.save(QuestionSet.createSequence(question, workbook, sequence))
-            return sequence + 1
-        }
-
-        return sequence
-    }
-
     @Transactional
     fun deleteQuestionInWorkbook(
         workbookId: UUID,
         questionId: UUID,
     ): DeleteQuestionInWorkbookResponse {
-        val workbook =
-            workbookRepository
-                .findById(workbookId)
-                .getOrElse { throw NotFoundException(fieldName = "workbook", message = "id 를 재확인해주세요.") }
+        val workbook = getWorkbook(workbookId)
 
         questionSetRepository.findByQuestionIdAndWorkbookId(questionId, workbookId)?.also {
             questionSetRepository.delete(it)
@@ -154,12 +133,8 @@ class WorkbookService(
         workbookId: UUID,
         request: List<UpdateQuestionSequenceRequest>,
     ): UUID {
-        val workbook: Workbook =
-            workbookRepository
-                .findById(workbookId)
-                .getOrElse { throw NotFoundException(fieldName = "workbook", message = "id를 재확인해주세요.") }
+        val workbook = getWorkbook(workbookId)
 
-        // 질문 : 이런 로직도 비지니스 함수 내부로 넣어야할지
         if (!workbook.compareQuestionQuantity(request.size)) {
             throw InvalidInputException(
                 fieldName = "question",
@@ -184,10 +159,7 @@ class WorkbookService(
         workbookId: UUID,
         request: UpdateWorkbookDetailRequest,
     ): UpdateWorkbookDetailResponse {
-        val workbook: Workbook =
-            workbookRepository
-                .findById(workbookId)
-                .getOrElse { throw NotFoundException(fieldName = "workbook", message = "id를 재확인해주세요.") }
+        val workbook = getWorkbook(workbookId)
 
         workbook.updateWorkbook(request.title, request.description)
 
@@ -195,9 +167,8 @@ class WorkbookService(
     }
 
     fun readQuestionsInWorkbook(workbookId: UUID): List<ReadQuestionsInWorkbookResponse> {
-        workbookRepository
-            .findById(workbookId)
-            .getOrElse { throw InvalidInputException(fieldName = "workbook", message = "id를 재확인해주세요.") }
+        getWorkbook(workbookId)
+
         val questionSets: List<QuestionSet> = questionSetRepository.findByWorkbookIdOrderBySequence(workbookId)
 
         return questionSets.map { set ->
@@ -218,12 +189,8 @@ class WorkbookService(
         request: ReceiveSharedWorkbookRequest,
         memberId: UUID,
     ): ReceiveSharedWorkbookResponse {
-        val workbook =
-            workbookRepository
-                .findById(
-                    request.workbookId,
-                ).getOrElse { throw NotFoundException(fieldName = "workbook") }
-        val member = memberRepository.findById(memberId).getOrElse { throw NotFoundException(fieldName = "member") }
+        val workbook = getWorkbook(request.workbookId)
+        val member = getMember(memberId)
 
         val sharedWorkbook =
             Workbook
@@ -245,5 +212,36 @@ class WorkbookService(
         sharedWorkbook.increaseQuantity(nextSeq)
 
         return ReceiveSharedWorkbookResponse(sharedWorkbook.id)
+    }
+
+    private fun getWorkbook(workbookId: UUID): Workbook {
+        val workbook: Workbook =
+            workbookRepository
+                .findById(workbookId)
+                .orElseThrow { NotFoundException(fieldName = "workbook", message = "id 를 재확인해주세요.") }
+        return workbook
+    }
+
+    private fun getMember(memberId: UUID): Member {
+        val member =
+            memberRepository.findById(memberId).getOrElse {
+                throw InvalidInputException(fieldName = "memberId", message = "id 를 재확인해주세요.")
+            }
+        return member
+    }
+
+    private fun insertQuestion(
+        question: Question,
+        workbook: Workbook,
+        sequence: Int,
+    ): Int {
+        if (!questionSetRepository
+                .existsByQuestionIdAndWorkbookId(question.id, workbook.id)
+        ) {
+            questionSetRepository.save(QuestionSet.createSequence(question, workbook, sequence))
+            return sequence + 1
+        }
+
+        return sequence
     }
 }
