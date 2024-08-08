@@ -20,12 +20,6 @@ class AuthController(
     private val googleAuthService: GoogleAuthService,
     private val kaKaoAuthService: KaKaoAuthService,
 ) {
-    @Value("\${GOOGLE_CLIENT_ID}")
-    lateinit var clientId: String
-
-    @Value("\${REDIRECT_URI}")
-    lateinit var redirectUri: String
-
     @Value("\${KAKAO_REST_API_KEY}")
     lateinit var kakaokey: String
 
@@ -34,18 +28,7 @@ class AuthController(
 
     @Operation(summary = "google-login", description = "구글 로그인/회원가입")
     @GetMapping("/google-login")
-    fun googleLogin(): RedirectView {
-        val redirectView = RedirectView()
-        redirectView.url =
-            "https://accounts.google.com/o/oauth2/v2/auth?client_id=$clientId&" +
-            "response_type=code&redirect_uri=$redirectUri&scope=https://www.googleapis.com/auth/userinfo.email"
-
-        return redirectView
-    }
-
-    @Operation(summary = "google user info", description = "구글 로그인 유저 정보 조회")
-    @GetMapping("/token")
-    fun getUserInfo(
+    fun googleLogin(
         @RequestParam code: String,
     ): BaseResponse<UserInfoResponse> {
         val accessToken = googleAuthService.getTokenFromGoogle(code)
