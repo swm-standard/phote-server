@@ -14,7 +14,7 @@ services:
             - phote-network
 
     jarimage:
-        image: ${DOCKER_USERNAME}/phote:latest
+        image: rinpark/phote:latest
         restart: unless-stopped
         container_name: myphote
         environment:
@@ -23,8 +23,6 @@ services:
             - 8080:8080
         networks:
             - phote-network
-        env_file:
-            -   ./docker-compose-dev.env
 
 networks:
     phote-network:
