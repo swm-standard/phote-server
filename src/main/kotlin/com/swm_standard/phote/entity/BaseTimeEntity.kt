@@ -14,9 +14,11 @@ import java.time.LocalDateTime
 abstract class BaseTimeEntity {
     @CreatedDate
     @Column(updatable = false)
+    @JsonIgnore
     var createdAt: LocalDateTime = LocalDateTime.now()
 
     @LastModifiedDate
+    @JsonIgnore
     var modifiedAt: LocalDateTime? = null
 
     @JsonIgnore

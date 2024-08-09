@@ -67,6 +67,7 @@ class ExamService(
             totalCorrect = exam.totalCorrect,
             time = exam.time,
             questions = responses,
+            createdAt = exam.createdAt,
         )
     }
 
