@@ -98,3 +98,11 @@ data class ReadQuestionsInWorkbookResponse(
     val category: Category,
     val tags: List<Tag>,
 )
+
+data class ReceiveSharedWorkbookRequest(
+    val workbookId: UUID
+)
+
+data class ReceiveSharedWorkbookResponse(
+    val id: UUID,
+)
