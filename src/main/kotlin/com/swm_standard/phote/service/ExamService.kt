@@ -33,6 +33,7 @@ import java.util.UUID
 import kotlin.jvm.optionals.getOrElse
 
 @Service
+@Transactional(readOnly = true)
 class ExamService(
     private val examRepository: ExamRepository,
     private val questionRepository: QuestionRepository,
@@ -47,7 +48,6 @@ class ExamService(
     @Value("\${openai.api.url}")
     lateinit var url: String
 
-    @Transactional(readOnly = true)
     fun readExamHistoryDetail(id: UUID): ReadExamHistoryDetailResponse {
         val exam = examRepository.findById(id).orElseThrow { NotFoundException("examId", "존재하지 않는 examId") }
 
@@ -77,7 +77,6 @@ class ExamService(
         )
     }
 
-    @Transactional(readOnly = true)
     fun readExamHistoryList(workbookId: UUID): List<ReadExamHistoryListResponse> {
         val exams = examRepository.findAllByWorkbookId(workbookId)
         return exams.map { exam ->
