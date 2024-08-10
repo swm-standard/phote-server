@@ -48,23 +48,23 @@ class AnswerTest {
         correctAnswer: String,
     ) = Answer(
         question =
-            Question(
-                id = UUID.randomUUID(),
-                member =
-                    Member(
-                        name = "Erik Ashley",
-                        email = "jay.combs@example.com",
-                        image = "per",
-                        provider = Provider.APPLE,
-                    ),
-                statement = "Kentucky",
-                options = null,
-                image = null,
-                answer = correctAnswer,
-                category = category,
-                questionSet = listOf(),
-                memo = null,
+        Question(
+            id = UUID.randomUUID(),
+            member =
+            Member(
+                name = "Erik Ashley",
+                email = "jay.combs@example.com",
+                image = "per",
+                provider = Provider.APPLE,
             ),
+            statement = "Kentucky",
+            options = null,
+            image = null,
+            answer = correctAnswer,
+            category = category,
+            questionSet = listOf(),
+            memo = null,
+        ),
         exam = createExam(),
         submittedAnswer = submittedAnswer,
         sequence = 2017,
