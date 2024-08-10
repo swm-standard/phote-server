@@ -1,6 +1,7 @@
 package com.swm_standard.phote.dto
 
 import com.swm_standard.phote.entity.Category
+import java.time.LocalDateTime
 import java.util.UUID
 
 data class ReadExamHistoryDetail(
@@ -19,6 +20,7 @@ data class ReadExamHistoryDetailResponse(
     val totalCorrect: Int,
     val time: Int,
     val questions: List<ReadExamHistoryDetail>,
+    val createdAt: LocalDateTime,
 )
 
 data class ReadExamHistoryListResponse(
