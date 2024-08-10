@@ -23,7 +23,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -119,46 +118,44 @@ class ExamService(
         var totalCorrect = 0
 
         val response =
-            runBlocking {
-                request.answers.mapIndexed { index: Int, answer: SubmittedAnswerRequest ->
-                    val question: Question =
-                        questionRepository.findById(answer.questionId).getOrElse {
-                            throw NotFoundException(fieldName = "questionId (${answer.questionId})")
-                        }
-
-                    val savingAnswer: Answer =
-                        Answer.createAnswer(
-                            question = question,
-                            submittedAnswer = answer.submittedAnswer,
-                            exam = exam,
-                            sequence = index + 1,
-                        )
-
-                    GlobalScope.launch(Dispatchers.IO) {
-                        if (savingAnswer.submittedAnswer == null) {
-                            savingAnswer.isCorrect = false
-                        } else {
-                            when (question.category) {
-                                Category.MULTIPLE -> savingAnswer.checkMultipleAnswer()
-                                Category.ESSAY ->
-                                    savingAnswer.isCorrect =
-                                        async { gradeByChatGpt(savingAnswer) }.await()
-                            }
-                        }
-                        if (savingAnswer.isCorrect) {
-                            totalCorrect += 1
-                        }
+            request.answers.mapIndexed { index: Int, answer: SubmittedAnswerRequest ->
+                val question: Question =
+                    questionRepository.findById(answer.questionId).getOrElse {
+                        throw NotFoundException(fieldName = "questionId (${answer.questionId})")
                     }
 
-                    val savedAnswer = answerRepository.save(savingAnswer)
-
-                    AnswerResponse(
-                        questionId = savedAnswer.question.id,
-                        submittedAnswer = savedAnswer.submittedAnswer,
-                        correctAnswer = savedAnswer.question.answer,
-                        isCorrect = savedAnswer.isCorrect,
+                val savingAnswer: Answer =
+                    Answer.createAnswer(
+                        question = question,
+                        submittedAnswer = answer.submittedAnswer,
+                        exam = exam,
+                        sequence = index + 1,
                     )
+
+                GlobalScope.launch(Dispatchers.IO) {
+                    if (savingAnswer.submittedAnswer == null) {
+                        savingAnswer.isCorrect = false
+                    } else {
+                        when (question.category) {
+                            Category.MULTIPLE -> savingAnswer.checkMultipleAnswer()
+                            Category.ESSAY ->
+                                savingAnswer.isCorrect =
+                                    async { gradeByChatGpt(savingAnswer) }.await()
+                        }
+                    }
+                    if (savingAnswer.isCorrect) {
+                        totalCorrect += 1
+                    }
                 }
+
+                val savedAnswer = answerRepository.save(savingAnswer)
+
+                AnswerResponse(
+                    questionId = savedAnswer.question.id,
+                    submittedAnswer = savedAnswer.submittedAnswer,
+                    correctAnswer = savedAnswer.question.answer,
+                    isCorrect = savedAnswer.isCorrect,
+                )
             }
 
         exam.increaseTotalCorrect(totalCorrect)
