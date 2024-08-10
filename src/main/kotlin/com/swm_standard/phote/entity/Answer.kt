@@ -41,16 +41,7 @@ data class Answer(
         )
     }
 
-    /**
-     * 객관식 문제면 정오답 체크를 하고 true 반환,
-     * 주관식 문제면 정오답 여부 판별 없이 false 반환 -> ChatGPT를 이용해야 하기 때문
-     **/
-    fun isMultipleAndCheckAnswer(): Boolean {
-        if (question.category == Category.MULTIPLE) {
-            isCorrect = submittedAnswer == question.answer
-            return true
-        } else {
-            return false
-        }
+    fun checkMultipleAnswer() {
+        isCorrect = submittedAnswer == question.answer
     }
 }

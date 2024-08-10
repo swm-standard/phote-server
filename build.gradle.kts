@@ -62,6 +62,7 @@ dependencies {
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
     implementation("org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0-RC")
 
     // querydsl
     implementation("com.querydsl:querydsl-jpa:5.0.0:jakarta")

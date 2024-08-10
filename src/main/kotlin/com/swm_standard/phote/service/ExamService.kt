@@ -11,6 +11,7 @@ import com.swm_standard.phote.dto.ReadExamHistoryDetailResponse
 import com.swm_standard.phote.dto.ReadExamHistoryListResponse
 import com.swm_standard.phote.dto.SubmittedAnswerRequest
 import com.swm_standard.phote.entity.Answer
+import com.swm_standard.phote.entity.Category
 import com.swm_standard.phote.entity.Exam
 import com.swm_standard.phote.entity.Question
 import com.swm_standard.phote.repository.AnswerRepository
@@ -18,6 +19,11 @@ import com.swm_standard.phote.repository.ExamRepository
 import com.swm_standard.phote.repository.MemberRepository
 import com.swm_standard.phote.repository.QuestionRepository
 import com.swm_standard.phote.repository.WorkbookRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -26,6 +32,7 @@ import java.util.UUID
 import kotlin.jvm.optionals.getOrElse
 
 @Service
+@Transactional(readOnly = true)
 class ExamService(
     private val examRepository: ExamRepository,
     private val questionRepository: QuestionRepository,
@@ -40,7 +47,6 @@ class ExamService(
     @Value("\${openai.api.url}")
     lateinit var url: String
 
-    @Transactional(readOnly = true)
     fun readExamHistoryDetail(id: UUID): ReadExamHistoryDetailResponse {
         val exam = examRepository.findById(id).orElseThrow { NotFoundException("examId", "존재하지 않는 examId") }
 
@@ -71,7 +77,6 @@ class ExamService(
         )
     }
 
-    @Transactional(readOnly = true)
     fun readExamHistoryList(workbookId: UUID): List<ReadExamHistoryListResponse> {
         val exams = examRepository.findAllByWorkbookId(workbookId)
         return exams.map { exam ->
@@ -101,7 +106,10 @@ class ExamService(
             examRepository.save(
                 Exam
                     .createExam(
-                        memberRepository.findById(memberId).getOrElse { throw NotFoundException(fieldName = "member") },
+                        memberRepository
+                            .findById(
+                                memberId,
+                            ).getOrElse { throw NotFoundException(fieldName = "member") },
                         workbook,
                         examRepository.findMaxSequenceByWorkbookId(workbook) + 1,
                         request.time,
@@ -125,23 +133,20 @@ class ExamService(
                         sequence = index + 1,
                     )
 
-                if (savingAnswer.submittedAnswer == null) {
-                    savingAnswer.isCorrect = false
-                } else if (!savingAnswer.isMultipleAndCheckAnswer()) {
-                    val chatGptRequest =
-                        ChatGPTRequest(model, savingAnswer.submittedAnswer!!, savingAnswer.question.answer)
-
-                    val chatGPTResponse = template.postForObject(url, chatGptRequest, ChatGPTResponse::class.java)
-
-                    savingAnswer.isCorrect =
-                        when (chatGPTResponse!!.choices[0].message.content) {
-                            "true" -> true
-                            else -> false
+                CoroutineScope(Dispatchers.IO).launch {
+                    if (savingAnswer.submittedAnswer == null) {
+                        savingAnswer.isCorrect = false
+                    } else {
+                        when (question.category) {
+                            Category.MULTIPLE -> savingAnswer.checkMultipleAnswer()
+                            Category.ESSAY ->
+                                savingAnswer.isCorrect =
+                                    async { gradeByChatGpt(savingAnswer) }.await()
                         }
-                }
-
-                if (savingAnswer.isCorrect) {
-                    totalCorrect += 1
+                    }
+                    if (savingAnswer.isCorrect) {
+                        totalCorrect += 1
+                    }
                 }
 
                 val savedAnswer = answerRepository.save(savingAnswer)
@@ -162,5 +167,20 @@ class ExamService(
             questionQuantity = response.size,
             answers = response,
         )
+    }
+
+    private suspend fun gradeByChatGpt(savingAnswer: Answer): Boolean {
+        val chatGptRequest =
+            ChatGPTRequest(model, savingAnswer.submittedAnswer!!, savingAnswer.question.answer)
+
+        val chatGPTResponse =
+            withContext(Dispatchers.IO) {
+                template.postForObject(url, chatGptRequest, ChatGPTResponse::class.java)
+            }
+
+        return when (chatGPTResponse!!.choices[0].message.content) {
+            "true" -> true
+            else -> false
+        }
     }
 }
