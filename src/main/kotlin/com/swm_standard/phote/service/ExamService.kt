@@ -19,8 +19,8 @@ import com.swm_standard.phote.repository.ExamRepository
 import com.swm_standard.phote.repository.MemberRepository
 import com.swm_standard.phote.repository.QuestionRepository
 import com.swm_standard.phote.repository.WorkbookRepository
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -132,7 +132,7 @@ class ExamService(
                         sequence = index + 1,
                     )
 
-                GlobalScope.launch(Dispatchers.IO) {
+                CoroutineScope(Dispatchers.IO).launch {
                     if (savingAnswer.submittedAnswer == null) {
                         savingAnswer.isCorrect = false
                     } else {
