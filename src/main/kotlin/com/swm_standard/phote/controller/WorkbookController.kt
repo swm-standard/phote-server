@@ -126,7 +126,7 @@ class WorkbookController(
         return BaseResponse(msg = "문제집의 문제 목록 조회 성공", data = response)
     }
 
-    @Operation(summary = "readQuestionsInWorkbook", description = "문제집 내 문제 목록 조회")
+    @Operation(summary = "receiveSharedWorkbook", description = "공유받은 문제집 저장")
     @SecurityRequirement(name = "bearer Auth")
     @PostMapping("/shared-workbook")
     fun receiveSharedWorkbook(

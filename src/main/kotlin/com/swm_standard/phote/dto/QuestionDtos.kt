@@ -7,7 +7,7 @@ import com.swm_standard.phote.entity.Tag
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 data class ReadQuestionDetailResponse(
     val createdAt: LocalDateTime,
@@ -41,7 +41,7 @@ class DeleteQuestionResponse(
 data class CreateQuestionRequest(
     @field:NotBlank(message = "statement 미입력")
     val statement: String,
-    val imageUrl: String? = null,
+    val image: String? = null,
     @field:NotNull(message = "category 미입력")
     val category: Category,
     val options: JsonNode? = null,
@@ -77,7 +77,7 @@ data class SearchQuestionsResponse(
         tags = question.tags,
         memo = question.memo,
         createdAt = question.createdAt,
-        modifiedAt = question.modifiedAt
+        modifiedAt = question.modifiedAt,
     )
 }
 
@@ -95,7 +95,7 @@ data class SearchQuestionsToAddResponse(
 )
 
 data class TransformQuestionResponse(
-    val content: String,
+    val statement: String,
     val options: List<String>,
-    val transformedImageUrl: String?
+    val image: String?,
 )
