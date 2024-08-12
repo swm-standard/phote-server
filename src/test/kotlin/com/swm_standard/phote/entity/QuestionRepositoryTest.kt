@@ -17,16 +17,15 @@ class QuestionRepositoryTest {
     @Mock
     private lateinit var questionRepository: QuestionRepository
 
-    private fun createQuestion(): Question {
-        return Question(
-            member = Member("phote", "phote@test.com", "imageUrl", Provider.KAKAO),
+    private fun createQuestion(): Question =
+        Question(
+            member = Member("phote", "phote@test.com", "image", Provider.KAKAO),
             statement = "모든 각이 동일한 삼각형은?",
             image = "http://example.com/image.jpg",
             answer = "정삼각형",
             category = Category.ESSAY,
-            memo = "삼각형 내각의 합은 180도이다."
+            memo = "삼각형 내각의 합은 180도이다.",
         )
-    }
 
     @Test
     fun `문제를 생성한다`() {

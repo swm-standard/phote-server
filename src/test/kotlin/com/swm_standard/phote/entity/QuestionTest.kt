@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 class QuestionTest {
-
     private fun createQuestion(): Question {
         val objectMapper = ObjectMapper()
         val jsonString = """
@@ -27,7 +26,7 @@ class QuestionTest {
             options = options,
             answer = "1",
             category = Category.MULTIPLE,
-            memo = "삼각형은 꼭짓점이 3개다"
+            memo = "삼각형은 꼭짓점이 3개다",
         )
     }
 

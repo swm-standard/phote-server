@@ -7,7 +7,7 @@ import org.springframework.data.redis.core.RedisHash
 import java.time.LocalDateTime
 import java.util.UUID
 
-@RedisHash(value = "refreshToken", timeToLive = 129600)
+@RedisHash(value = "refreshToken", timeToLive = 1296000)
 data class RefreshToken(
     @Id
     val refreshToken: UUID,

@@ -2,15 +2,15 @@ package com.swm_standard.phote.service
 
 import com.swm_standard.phote.common.exception.ChatGptErrorException
 import com.swm_standard.phote.common.exception.NotFoundException
-import com.swm_standard.phote.dto.CreateQuestionRequest
-import com.swm_standard.phote.dto.CreateQuestionResponse
-import com.swm_standard.phote.dto.ReadQuestionDetailResponse
-import com.swm_standard.phote.dto.SearchQuestionsToAddResponse
-import com.swm_standard.phote.dto.DeleteQuestionResponse
-import com.swm_standard.phote.dto.TransformQuestionResponse
-import com.swm_standard.phote.dto.SearchQuestionsResponse
 import com.swm_standard.phote.dto.ChatGPTRequest
 import com.swm_standard.phote.dto.ChatGPTResponse
+import com.swm_standard.phote.dto.CreateQuestionRequest
+import com.swm_standard.phote.dto.CreateQuestionResponse
+import com.swm_standard.phote.dto.DeleteQuestionResponse
+import com.swm_standard.phote.dto.ReadQuestionDetailResponse
+import com.swm_standard.phote.dto.SearchQuestionsResponse
+import com.swm_standard.phote.dto.SearchQuestionsToAddResponse
+import com.swm_standard.phote.dto.TransformQuestionResponse
 import com.swm_standard.phote.entity.Question
 import com.swm_standard.phote.entity.Tag
 import com.swm_standard.phote.repository.MemberRepository
@@ -47,7 +47,7 @@ class QuestionService(
     @Transactional
     fun createQuestion(
         memberId: UUID,
-        request: CreateQuestionRequest
+        request: CreateQuestionRequest,
     ): CreateQuestionResponse {
         // 문제 생성 유저 확인
         val member = memberRepository.findById(memberId).orElseThrow { NotFoundException("존재하지 않는 member") }
@@ -58,7 +58,7 @@ class QuestionService(
                 Question(
                     member = member,
                     statement = request.statement,
-                    image = request.imageUrl,
+                    image = request.image,
                     category = request.category,
                     options = request.options,
                     answer = request.answer,
@@ -86,12 +86,11 @@ class QuestionService(
         memberId: UUID,
         tags: List<String>?,
         keywords: List<String>?,
-    ): List<SearchQuestionsResponse> {
-        return questionRepository.searchQuestionsList(memberId, tags, keywords).map { question ->
+    ): List<SearchQuestionsResponse> =
+        questionRepository.searchQuestionsList(memberId, tags, keywords).map { question ->
             val options = question.options?.let { question.deserializeOptions() }
             SearchQuestionsResponse(question, options)
         }
-    }
 
     @Transactional(readOnly = true)
     fun searchQuestionsToAdd(
@@ -118,27 +117,31 @@ class QuestionService(
         return DeleteQuestionResponse(id, LocalDateTime.now())
     }
 
-    fun transformQuestion(imageUrl: String, imageCoordinates: List<List<Int>>?): TransformQuestionResponse {
+    fun transformQuestion(
+        imageUrl: String,
+        imageCoordinates: List<List<Int>>?,
+    ): TransformQuestionResponse {
         // 문제 그림 추출
 
-        val transformedImageUrl: String? = imageCoordinates?.let {
+        val transformedImageUrl: String? =
+            imageCoordinates?.let {
+                val headers = HttpHeaders()
+                headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8")
 
-            val headers = HttpHeaders()
-            headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8")
+                val body: MultiValueMap<String, Any> = LinkedMultiValueMap()
+                body.add("url", imageUrl)
+                body.add("coor", imageCoordinates)
 
-            val body: MultiValueMap<String, Any> = LinkedMultiValueMap()
-            body.add("url", imageUrl)
-            body.add("coor", imageCoordinates)
-
-            val transformImageRequest = HttpEntity(body, headers)
-            val lambdaResponse = RestTemplate().exchange(
-                lambdaUrl,
-                HttpMethod.POST,
-                transformImageRequest,
-                String::class.java
-            )
-            lambdaResponse.body?.split("\"")?.get(1)
-        }
+                val transformImageRequest = HttpEntity(body, headers)
+                val lambdaResponse =
+                    RestTemplate().exchange(
+                        lambdaUrl,
+                        HttpMethod.POST,
+                        transformImageRequest,
+                        String::class.java,
+                    )
+                lambdaResponse.body?.split("\"")?.get(1)
+            }
 
         val request = ChatGPTRequest(model, imageUrl)
 
