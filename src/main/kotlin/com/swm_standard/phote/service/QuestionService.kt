@@ -2,13 +2,25 @@ package com.swm_standard.phote.service
 
 import com.swm_standard.phote.common.exception.ChatGptErrorException
 import com.swm_standard.phote.common.exception.NotFoundException
-import com.swm_standard.phote.dto.*
+import com.swm_standard.phote.dto.CreateQuestionRequest
+import com.swm_standard.phote.dto.CreateQuestionResponse
+import com.swm_standard.phote.dto.ReadQuestionDetailResponse
+import com.swm_standard.phote.dto.SearchQuestionsResponse
+import com.swm_standard.phote.dto.SearchQuestionsToAddResponse
+import com.swm_standard.phote.dto.DeleteQuestionResponse
+import com.swm_standard.phote.dto.TransformQuestionResponse
+import com.swm_standard.phote.dto.ChatGPTRequest
+import com.swm_standard.phote.dto.ChatGPTResponse
 import com.swm_standard.phote.entity.Question
 import com.swm_standard.phote.entity.Tag
 import com.swm_standard.phote.repository.MemberRepository
 import com.swm_standard.phote.repository.QuestionRepository
 import com.swm_standard.phote.repository.TagRepository
-import kotlinx.coroutines.*
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.withContext
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
@@ -19,7 +31,7 @@ import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.MultiValueMap
 import org.springframework.web.client.RestTemplate
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 @Service
 class QuestionService(
