@@ -131,7 +131,7 @@ class QuestionService(
 
             // 문제 그림 추출
             val transformedImageUrlDeferred = CoroutineScope(Dispatchers.IO).async {
-                imageCoordinates?.let { transformImage(lambdaUrl, imageUrl, it) }
+                imageCoordinates?.let { transformImage(imageUrl, it) }
             }.await()
 
             // openAI로 메시지 전송
@@ -157,25 +157,25 @@ class QuestionService(
         // 문제 문항과 객관식을 분리해서 dto에 저장
         return TransformQuestionResponse(split[0], split.drop(1), transformedImageUrl)
     }
-}
 
-suspend fun transformImage(lambdaUrl: String, imageUrl: String, imageCoordinates: List<List<Int>>?): String? {
-    val headers = HttpHeaders()
-    headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8")
+    suspend fun transformImage(imageUrl: String, imageCoordinates: List<List<Int>>?): String? {
+        val headers = HttpHeaders()
+        headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8")
 
-    val body: MultiValueMap<String, Any> = LinkedMultiValueMap()
-    body.add("url", imageUrl)
-    body.add("coor", imageCoordinates)
+        val body: MultiValueMap<String, Any> = LinkedMultiValueMap()
+        body.add("url", imageUrl)
+        body.add("coor", imageCoordinates)
 
-    val transformImageRequest = HttpEntity(body, headers)
-    val lambdaResponse =
-        withContext(Dispatchers.IO) {
-            RestTemplate().exchange(
-                lambdaUrl,
-                HttpMethod.POST,
-                transformImageRequest,
-                String::class.java,
-            )
-        }
-    return lambdaResponse.body?.split("\"")?.get(1)
+        val transformImageRequest = HttpEntity(body, headers)
+        val lambdaResponse =
+            withContext(Dispatchers.IO) {
+                RestTemplate().exchange(
+                    lambdaUrl,
+                    HttpMethod.POST,
+                    transformImageRequest,
+                    String::class.java,
+                )
+            }
+        return lambdaResponse.body?.split("\"")?.get(1)
+    }
 }
