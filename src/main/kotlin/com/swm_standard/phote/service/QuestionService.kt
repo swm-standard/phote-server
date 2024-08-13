@@ -2,20 +2,25 @@ package com.swm_standard.phote.service
 
 import com.swm_standard.phote.common.exception.ChatGptErrorException
 import com.swm_standard.phote.common.exception.NotFoundException
-import com.swm_standard.phote.dto.ChatGPTRequest
-import com.swm_standard.phote.dto.ChatGPTResponse
 import com.swm_standard.phote.dto.CreateQuestionRequest
 import com.swm_standard.phote.dto.CreateQuestionResponse
-import com.swm_standard.phote.dto.DeleteQuestionResponse
 import com.swm_standard.phote.dto.ReadQuestionDetailResponse
 import com.swm_standard.phote.dto.SearchQuestionsResponse
 import com.swm_standard.phote.dto.SearchQuestionsToAddResponse
+import com.swm_standard.phote.dto.DeleteQuestionResponse
 import com.swm_standard.phote.dto.TransformQuestionResponse
+import com.swm_standard.phote.dto.ChatGPTRequest
+import com.swm_standard.phote.dto.ChatGPTResponse
 import com.swm_standard.phote.entity.Question
 import com.swm_standard.phote.entity.Tag
 import com.swm_standard.phote.repository.MemberRepository
 import com.swm_standard.phote.repository.QuestionRepository
 import com.swm_standard.phote.repository.TagRepository
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.withContext
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
@@ -121,32 +126,22 @@ class QuestionService(
         imageUrl: String,
         imageCoordinates: List<List<Int>>?,
     ): TransformQuestionResponse {
-        // 문제 그림 추출
 
-        val transformedImageUrl: String? =
-            imageCoordinates?.let {
-                val headers = HttpHeaders()
-                headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8")
+        val (transformedImageUrl, chatGPTResponse) = runBlocking {
 
-                val body: MultiValueMap<String, Any> = LinkedMultiValueMap()
-                body.add("url", imageUrl)
-                body.add("coor", imageCoordinates)
+            // 문제 그림 추출
+            val transformedImageUrlDeferred = CoroutineScope(Dispatchers.IO).async {
+                imageCoordinates?.let { transformImage(imageUrl, it) }
+            }.await()
 
-                val transformImageRequest = HttpEntity(body, headers)
-                val lambdaResponse =
-                    RestTemplate().exchange(
-                        lambdaUrl,
-                        HttpMethod.POST,
-                        transformImageRequest,
-                        String::class.java,
-                    )
-                lambdaResponse.body?.split("\"")?.get(1)
-            }
+            // openAI로 메시지 전송
+            val chatGPTResponseDeferred = CoroutineScope(Dispatchers.IO).async {
+                val request = ChatGPTRequest(model, imageUrl)
+                template.postForObject(url, request, ChatGPTResponse::class.java)
+            }.await()
 
-        val request = ChatGPTRequest(model, imageUrl)
-
-        // openAI로 메시지 전송
-        val chatGPTResponse = template.postForObject(url, request, ChatGPTResponse::class.java)
+            Pair(transformedImageUrlDeferred, chatGPTResponseDeferred)
+        }
 
         // openAI로부터 메시지 수신
         val split: List<String> =
@@ -161,5 +156,26 @@ class QuestionService(
 
         // 문제 문항과 객관식을 분리해서 dto에 저장
         return TransformQuestionResponse(split[0], split.drop(1), transformedImageUrl)
+    }
+
+    suspend fun transformImage(imageUrl: String, imageCoordinates: List<List<Int>>?): String? {
+        val headers = HttpHeaders()
+        headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8")
+
+        val body: MultiValueMap<String, Any> = LinkedMultiValueMap()
+        body.add("url", imageUrl)
+        body.add("coor", imageCoordinates)
+
+        val transformImageRequest = HttpEntity(body, headers)
+        val lambdaResponse =
+            withContext(Dispatchers.IO) {
+                RestTemplate().exchange(
+                    lambdaUrl,
+                    HttpMethod.POST,
+                    transformImageRequest,
+                    String::class.java,
+                )
+            }
+        return lambdaResponse.body?.split("\"")?.get(1)
     }
 }
