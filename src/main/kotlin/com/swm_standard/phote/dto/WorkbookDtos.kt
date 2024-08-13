@@ -23,16 +23,16 @@ data class CreateWorkbookRequest(
 }
 
 data class CreateWorkbookResponse(
-    val id: UUID,
+    val workbookId: UUID,
 )
 
 data class DeleteWorkbookResponse(
-    val id: UUID,
+    val workbookId: UUID,
     val deletedAt: LocalDateTime,
 )
 
 data class ReadWorkbookDetailResponse(
-    val id: UUID,
+    val workbookId: UUID,
     val title: String,
     val description: String?,
     val emoji: String,
@@ -41,7 +41,7 @@ data class ReadWorkbookDetailResponse(
 )
 
 data class ReadWorkbookListResponse(
-    val id: UUID,
+    val workbookId: UUID,
     val title: String,
     val description: String?,
     val emoji: String,
@@ -63,19 +63,19 @@ data class DeleteQuestionInWorkbookResponse(
 )
 
 data class UpdateQuestionSequenceRequest(
-    @JsonProperty("id")
-    private val _id: UUID?,
+    @JsonProperty("questionSetId")
+    private val _questionSetId: UUID?,
     @field:Positive(message = "sequence는 1 이상의 정수만 가능합니다.")
     @JsonProperty("sequence")
     private val _sequence: Int?,
 ) {
-    val id: UUID get() = _id!!
+    val questionSetId: UUID get() = _questionSetId!!
 
     val sequence: Int get() = _sequence!!
 }
 
 data class UpdateQuestionSequenceResponse(
-    val id: UUID,
+    val workbookId: UUID,
 )
 
 data class UpdateWorkbookDetailRequest(
@@ -86,7 +86,7 @@ data class UpdateWorkbookDetailRequest(
 )
 
 data class UpdateWorkbookDetailResponse(
-    val id: UUID,
+    val workbookId: UUID,
 )
 
 data class ReadQuestionsInWorkbookResponse(
@@ -104,5 +104,5 @@ data class ReceiveSharedWorkbookRequest(
 )
 
 data class ReceiveSharedWorkbookResponse(
-    val id: UUID,
+    val workbookId: UUID,
 )

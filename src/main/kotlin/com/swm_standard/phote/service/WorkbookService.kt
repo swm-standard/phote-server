@@ -144,7 +144,7 @@ class WorkbookService(
 
         request.forEach {
             questionSetRepository
-                .findById(it.id)
+                .findById(it.questionSetId)
                 .getOrElse { throw InvalidInputException("questionSet") }
                 .apply {
                     updateSequence(it.sequence)

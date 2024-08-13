@@ -69,7 +69,7 @@ class ExamService(
             }
 
         return ReadExamHistoryDetailResponse(
-            id = exam.id!!,
+            examId = exam.id!!,
             totalCorrect = exam.totalCorrect,
             time = exam.time,
             questions = responses,

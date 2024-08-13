@@ -16,7 +16,7 @@ data class ReadExamHistoryDetail(
 )
 
 data class ReadExamHistoryDetailResponse(
-    val id: UUID,
+    val examId: UUID,
     val totalCorrect: Int,
     val time: Int,
     val questions: List<ReadExamHistoryDetail>,
