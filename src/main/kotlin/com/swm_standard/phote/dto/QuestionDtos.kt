@@ -82,6 +82,7 @@ data class SearchQuestionsResponse(
 }
 
 data class SearchQuestionsToAddResponse(
+    val questionId: UUID,
     val createdAt: LocalDateTime,
     val modifiedAt: LocalDateTime? = null,
     val statement: String,
