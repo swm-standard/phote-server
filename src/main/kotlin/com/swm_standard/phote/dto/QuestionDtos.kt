@@ -34,7 +34,7 @@ data class ReadQuestionDetailResponse(
 }
 
 class DeleteQuestionResponse(
-    val id: UUID,
+    val questionId: UUID,
     val deletedAt: LocalDateTime,
 )
 
@@ -52,11 +52,11 @@ data class CreateQuestionRequest(
 )
 
 data class CreateQuestionResponse(
-    val id: UUID,
+    val questionId: UUID,
 )
 
 data class SearchQuestionsResponse(
-    val id: UUID,
+    val questionId: UUID,
     val statement: String,
     val options: List<String>?,
     val image: String?,
@@ -68,7 +68,7 @@ data class SearchQuestionsResponse(
     val modifiedAt: LocalDateTime?,
 ) {
     constructor(question: Question, options: List<String>?) : this(
-        id = question.id,
+        questionId = question.id,
         statement = question.statement,
         options = options,
         image = question.image,
