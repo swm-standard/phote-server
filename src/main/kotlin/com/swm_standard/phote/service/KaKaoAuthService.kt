@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.swm_standard.phote.common.authority.JwtTokenProvider
 import com.swm_standard.phote.common.module.NicknameGenerator
 import com.swm_standard.phote.common.module.ProfileImageGenerator
+import com.swm_standard.phote.dto.LoginRequest
 import com.swm_standard.phote.dto.UserInfoResponse
 import com.swm_standard.phote.entity.Member
 import com.swm_standard.phote.entity.Provider
@@ -26,18 +27,15 @@ class KaKaoAuthService(
     @Value("\${KAKAO_REST_API_KEY}")
     lateinit var kakaokey: String
 
-    @Value("\${KAKAO_REDIRECT_URI}")
-    lateinit var kakaoRedirectUri: String
-
-    fun getTokenFromKakao(code: String): String {
+    fun getTokenFromKakao(request: LoginRequest): String {
         val headers = HttpHeaders()
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8")
 
         val body: MultiValueMap<String, String> = LinkedMultiValueMap()
         body.add("grant_type", "authorization_code")
         body.add("client_id", kakaokey)
-        body.add("redirect_uri", kakaoRedirectUri)
-        body.add("code", code)
+        body.add("redirect_uri", request.redirectUri)
+        body.add("code", request.code)
 
         val kakaoTokenRequest = HttpEntity(body, headers)
         val response =

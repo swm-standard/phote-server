@@ -30,3 +30,8 @@ data class UserInfoResponse(
 data class RenewAccessTokenResponse(
     val accessToken: String,
 )
+
+data class LoginRequest(
+    val code: String,
+    val redirectUri: String,
+)
