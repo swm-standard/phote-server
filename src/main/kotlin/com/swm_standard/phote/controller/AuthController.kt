@@ -1,6 +1,7 @@
 package com.swm_standard.phote.controller
 
 import com.swm_standard.phote.common.responsebody.BaseResponse
+import com.swm_standard.phote.dto.LoginRequest
 import com.swm_standard.phote.dto.RenewAccessTokenResponse
 import com.swm_standard.phote.dto.UserInfoResponse
 import com.swm_standard.phote.service.GoogleAuthService
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 
@@ -37,11 +39,11 @@ class AuthController(
     }
 
     @Operation(summary = "kakao-login", description = "카카오 로그인/회원가입")
-    @GetMapping("/kakao-login")
+    @PostMapping("/kakao-login")
     fun kakaoLogin(
-        @RequestParam code: String,
+        @RequestBody request: LoginRequest
     ): BaseResponse<UserInfoResponse> {
-        val accessToken = kaKaoAuthService.getTokenFromKakao(code)
+        val accessToken = kaKaoAuthService.getTokenFromKakao(request)
         val userInfo = kaKaoAuthService.getUserInfoFromKakao(accessToken)
 
         val message = if (userInfo.isMember == false) "회원가입 성공" else "로그인 성공"
