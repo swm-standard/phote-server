@@ -4,6 +4,7 @@ import com.swm_standard.phote.common.authority.JwtTokenProvider
 import com.swm_standard.phote.common.module.NicknameGenerator
 import com.swm_standard.phote.common.module.ProfileImageGenerator
 import com.swm_standard.phote.dto.GoogleAccessResponse
+import com.swm_standard.phote.dto.LoginRequest
 import com.swm_standard.phote.dto.UserInfoResponse
 import com.swm_standard.phote.entity.Member
 import com.swm_standard.phote.entity.Provider
@@ -27,10 +28,7 @@ class GoogleAuthService(
     @Value("\${GOOGLE_CLIENT_SECRET}")
     lateinit var clientSecret: String
 
-    @Value("\${REDIRECT_URI}")
-    lateinit var redirectUri: String
-
-    fun getTokenFromGoogle(code: String): String {
+    fun getTokenFromGoogle(request: LoginRequest): String {
         val restTemplate = RestTemplate()
         val headers = HttpHeaders()
         val params: MutableMap<String, Any> = HashMap()
@@ -40,7 +38,8 @@ class GoogleAuthService(
             restTemplate
                 .exchange(
                     "https://oauth2.googleapis.com/token?grant_type=authorization_code&" +
-                        "client_id=$clientId&client_secret=$clientSecret&code=$code&redirect_uri=$redirectUri",
+                        "client_id=$clientId&client_secret=$clientSecret&code=${request.code}" +
+                        "&redirect_uri=${request.redirectUri}",
                     HttpMethod.POST,
                     googleTokenRequest,
                     GoogleAccessResponse::class.java,

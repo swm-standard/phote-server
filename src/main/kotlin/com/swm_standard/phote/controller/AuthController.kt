@@ -9,12 +9,10 @@ import com.swm_standard.phote.service.KaKaoAuthService
 import com.swm_standard.phote.service.TokenService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
-import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 
@@ -27,11 +25,11 @@ class AuthController(
     private val tokenService: TokenService,
 ) {
     @Operation(summary = "google-login", description = "구글 로그인/회원가입")
-    @GetMapping("/google-login")
+    @PostMapping("/google-login")
     fun googleLogin(
-        @RequestParam code: String,
+        @RequestBody request: LoginRequest,
     ): BaseResponse<UserInfoResponse> {
-        val accessToken = googleAuthService.getTokenFromGoogle(code)
+        val accessToken = googleAuthService.getTokenFromGoogle(request)
         val userInfo = googleAuthService.getUserInfoFromGoogle(accessToken)
 
         val message = if (userInfo.isMember == false) "회원가입 성공" else "로그인 성공"
@@ -41,7 +39,7 @@ class AuthController(
     @Operation(summary = "kakao-login", description = "카카오 로그인/회원가입")
     @PostMapping("/kakao-login")
     fun kakaoLogin(
-        @RequestBody request: LoginRequest
+        @RequestBody request: LoginRequest,
     ): BaseResponse<UserInfoResponse> {
         val accessToken = kaKaoAuthService.getTokenFromKakao(request)
         val userInfo = kaKaoAuthService.getUserInfoFromKakao(accessToken)
