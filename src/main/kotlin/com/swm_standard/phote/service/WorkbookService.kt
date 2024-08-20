@@ -176,7 +176,7 @@ class WorkbookService(
                 set.id,
                 set.question.id,
                 set.question.statement,
-                set.question.options,
+                set.question.options?.let { set.question.deserializeOptions() },
                 set.question.image,
                 set.question.category,
                 set.question.tags,
