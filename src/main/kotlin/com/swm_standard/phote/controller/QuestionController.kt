@@ -90,10 +90,11 @@ class QuestionController(
     @Operation(summary = "transformQuestion", description = "문제 변환")
     @SecurityRequirement(name = "bearer Auth")
     @PostMapping("question-transform")
-    fun transformQuestion(
+    suspend fun transformQuestion(
         @RequestPart image: MultipartFile?,
         @RequestPart imageCoordinates: List<List<Int>>? = null,
     ): BaseResponse<TransformQuestionResponse> {
+
         val imageUrl = image?.let { s3Service.uploadChatGptImage(it) }
         val response: TransformQuestionResponse = questionService.transformQuestion(imageUrl!!, imageCoordinates)
 

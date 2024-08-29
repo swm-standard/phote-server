@@ -16,7 +16,6 @@ import com.swm_standard.phote.entity.Tag
 import com.swm_standard.phote.repository.MemberRepository
 import com.swm_standard.phote.repository.QuestionRepository
 import com.swm_standard.phote.repository.TagRepository
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -122,40 +121,28 @@ class QuestionService(
         return DeleteQuestionResponse(id, LocalDateTime.now())
     }
 
-    fun transformQuestion(
+    suspend fun transformQuestion(
         imageUrl: String,
         imageCoordinates: List<List<Int>>?,
     ): TransformQuestionResponse {
 
-        val (transformedImageUrl, chatGPTResponse) = runBlocking {
+        val transformedImageUrl = CoroutineScope(Dispatchers.IO).async {
 
             // 문제 그림 추출
-            val transformedImageUrlDeferred = CoroutineScope(Dispatchers.IO).async {
-                imageCoordinates?.let { transformImage(imageUrl, it) }
-            }.await()
+            imageCoordinates?.let { transformImage(imageUrl, it) }
+        }.await()
 
+        val chatGPTResponseSplit = CoroutineScope(Dispatchers.IO).async {
             // openAI로 메시지 전송
-            val chatGPTResponseDeferred = CoroutineScope(Dispatchers.IO).async {
-                val request = ChatGPTRequest(model, imageUrl)
-                template.postForObject(url, request, ChatGPTResponse::class.java)
-            }.await()
+            val request = ChatGPTRequest(model, imageUrl)
+            val chatGPTResponse = template.postForObject(url, request, ChatGPTResponse::class.java)
 
-            Pair(transformedImageUrlDeferred, chatGPTResponseDeferred)
-        }
-
-        // openAI로부터 메시지 수신
-        val split: List<String> =
-            chatGPTResponse!!
-                .choices[0]
-                .message.content
-                .split("#")
-
-        if (split[0] == "") {
-            throw ChatGptErrorException(fieldName = "chatGPT")
-        }
+            // openAI로부터 메시지 수신
+            splitChatGPTResponse(chatGPTResponse)
+        }.await()
 
         // 문제 문항과 객관식을 분리해서 dto에 저장
-        return TransformQuestionResponse(split[0], split.drop(1), transformedImageUrl)
+        return TransformQuestionResponse(chatGPTResponseSplit[0], chatGPTResponseSplit.drop(1), transformedImageUrl)
     }
 
     suspend fun transformImage(imageUrl: String, imageCoordinates: List<List<Int>>?): String? {
@@ -177,5 +164,18 @@ class QuestionService(
                 )
             }
         return lambdaResponse.body?.split("\"")?.get(1)
+    }
+
+    fun splitChatGPTResponse(chatGPTResponse: ChatGPTResponse?): List<String> {
+        val split: List<String> =
+            chatGPTResponse!!
+                .choices[0]
+                .message.content
+                .split("#")
+
+        if (split[0] == "") {
+            throw ChatGptErrorException(fieldName = "chatGPT")
+        }
+        return split
     }
 }
