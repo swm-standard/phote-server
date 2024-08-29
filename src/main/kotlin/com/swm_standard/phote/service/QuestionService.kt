@@ -1,5 +1,6 @@
 package com.swm_standard.phote.service
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.swm_standard.phote.common.exception.ChatGptErrorException
 import com.swm_standard.phote.common.exception.NotFoundException
 import com.swm_standard.phote.dto.CreateQuestionRequest
@@ -19,16 +20,17 @@ import com.swm_standard.phote.repository.TagRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.withContext
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpMethod
+import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.MultiValueMap
 import org.springframework.web.client.RestTemplate
+import org.springframework.web.reactive.function.BodyInserters
+import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.awaitBodyOrNull
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -146,24 +148,23 @@ class QuestionService(
     }
 
     suspend fun transformImage(imageUrl: String, imageCoordinates: List<List<Int>>?): String? {
-        val headers = HttpHeaders()
-        headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8")
+        val webClient = WebClient.builder()
+            .baseUrl(lambdaUrl)
+            .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded;charset=utf-8")
+            .build()
 
-        val body: MultiValueMap<String, Any> = LinkedMultiValueMap()
+        val body: MultiValueMap<String, String> = LinkedMultiValueMap()
         body.add("url", imageUrl)
-        body.add("coor", imageCoordinates)
+        body.add("coor", ObjectMapper().writeValueAsString(imageCoordinates))
 
-        val transformImageRequest = HttpEntity(body, headers)
-        val lambdaResponse =
-            withContext(Dispatchers.IO) {
-                RestTemplate().exchange(
-                    lambdaUrl,
-                    HttpMethod.POST,
-                    transformImageRequest,
-                    String::class.java,
-                )
-            }
-        return lambdaResponse.body?.split("\"")?.get(1)
+        val lambdaResponse: String? =
+            webClient.post()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromFormData(body))
+                .retrieve()
+                .awaitBodyOrNull<String>()
+
+        return lambdaResponse?.split("\"")?.get(1)
     }
 
     fun splitChatGPTResponse(chatGPTResponse: ChatGPTResponse?): List<String> {
