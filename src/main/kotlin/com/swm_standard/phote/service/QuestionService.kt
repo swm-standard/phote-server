@@ -1,5 +1,6 @@
 package com.swm_standard.phote.service
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.swm_standard.phote.common.exception.ChatGptErrorException
 import com.swm_standard.phote.common.exception.NotFoundException
 import com.swm_standard.phote.dto.CreateQuestionRequest
@@ -16,20 +17,20 @@ import com.swm_standard.phote.entity.Tag
 import com.swm_standard.phote.repository.MemberRepository
 import com.swm_standard.phote.repository.QuestionRepository
 import com.swm_standard.phote.repository.TagRepository
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.withContext
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpMethod
+import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.MultiValueMap
 import org.springframework.web.client.RestTemplate
+import org.springframework.web.reactive.function.BodyInserters
+import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.awaitBodyOrNull
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -122,28 +123,51 @@ class QuestionService(
         return DeleteQuestionResponse(id, LocalDateTime.now())
     }
 
-    fun transformQuestion(
+    suspend fun transformQuestion(
         imageUrl: String,
         imageCoordinates: List<List<Int>>?,
     ): TransformQuestionResponse {
 
-        val (transformedImageUrl, chatGPTResponse) = runBlocking {
+        val transformedImageUrl = CoroutineScope(Dispatchers.IO).async {
 
             // 문제 그림 추출
-            val transformedImageUrlDeferred = CoroutineScope(Dispatchers.IO).async {
-                imageCoordinates?.let { transformImage(imageUrl, it) }
-            }.await()
+            imageCoordinates?.let { transformImage(imageUrl, it) }
+        }.await()
 
+        val chatGPTResponseSplit = CoroutineScope(Dispatchers.IO).async {
             // openAI로 메시지 전송
-            val chatGPTResponseDeferred = CoroutineScope(Dispatchers.IO).async {
-                val request = ChatGPTRequest(model, imageUrl)
-                template.postForObject(url, request, ChatGPTResponse::class.java)
-            }.await()
+            val request = ChatGPTRequest(model, imageUrl)
+            val chatGPTResponse = template.postForObject(url, request, ChatGPTResponse::class.java)
 
-            Pair(transformedImageUrlDeferred, chatGPTResponseDeferred)
-        }
+            // openAI로부터 메시지 수신
+            splitChatGPTResponse(chatGPTResponse)
+        }.await()
 
-        // openAI로부터 메시지 수신
+        // 문제 문항과 객관식을 분리해서 dto에 저장
+        return TransformQuestionResponse(chatGPTResponseSplit[0], chatGPTResponseSplit.drop(1), transformedImageUrl)
+    }
+
+    suspend fun transformImage(imageUrl: String, imageCoordinates: List<List<Int>>?): String? {
+        val webClient = WebClient.builder()
+            .baseUrl(lambdaUrl)
+            .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded;charset=utf-8")
+            .build()
+
+        val body: MultiValueMap<String, String> = LinkedMultiValueMap()
+        body.add("url", imageUrl)
+        body.add("coor", ObjectMapper().writeValueAsString(imageCoordinates))
+
+        val lambdaResponse: String? =
+            webClient.post()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromFormData(body))
+                .retrieve()
+                .awaitBodyOrNull<String>()
+
+        return lambdaResponse?.split("\"")?.get(1)
+    }
+
+    fun splitChatGPTResponse(chatGPTResponse: ChatGPTResponse?): List<String> {
         val split: List<String> =
             chatGPTResponse!!
                 .choices[0]
@@ -153,29 +177,6 @@ class QuestionService(
         if (split[0] == "") {
             throw ChatGptErrorException(fieldName = "chatGPT")
         }
-
-        // 문제 문항과 객관식을 분리해서 dto에 저장
-        return TransformQuestionResponse(split[0], split.drop(1), transformedImageUrl)
-    }
-
-    suspend fun transformImage(imageUrl: String, imageCoordinates: List<List<Int>>?): String? {
-        val headers = HttpHeaders()
-        headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8")
-
-        val body: MultiValueMap<String, Any> = LinkedMultiValueMap()
-        body.add("url", imageUrl)
-        body.add("coor", imageCoordinates)
-
-        val transformImageRequest = HttpEntity(body, headers)
-        val lambdaResponse =
-            withContext(Dispatchers.IO) {
-                RestTemplate().exchange(
-                    lambdaUrl,
-                    HttpMethod.POST,
-                    transformImageRequest,
-                    String::class.java,
-                )
-            }
-        return lambdaResponse.body?.split("\"")?.get(1)
+        return split
     }
 }
