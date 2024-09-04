@@ -10,7 +10,7 @@ plugins {
     id("jacoco")
 
     // for querydsl
-    kotlin("kapt") version "1.7.10"
+    kotlin("kapt") version "1.9.24"
 }
 
 subprojects {
@@ -90,6 +90,7 @@ kotlin {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    finalizedBy("jacocoTestReport")
 }
 
 tasks.test {
@@ -152,5 +153,69 @@ tasks.jacocoTestReport {
 
         html.outputLocation = file(project.layout.buildDirectory.dir("jacoco/index.html"))
         xml.outputLocation = file(project.layout.buildDirectory.dir("jacoco/index.xml"))
+    }
+
+    val qDomains = emptyList<String>().toMutableList()
+
+    for (c in 'A'..'Z') {
+        val qPattern = "**/*Q$c*"
+        qDomains.add("$qPattern*")
+    }
+
+    val excludes =
+        listOf(
+            "**/service/*",
+            "**/dto/*",
+            "**/controller/*",
+            "**/external/*",
+            "**/repository/*",
+            "**/common/*",
+            "**/*PhoteApplication*",
+        ) + qDomains
+
+    classDirectories.setFrom(
+        sourceSets["main"].output.asFileTree.matching {
+            exclude(excludes)
+        },
+    )
+    finalizedBy("jacocoTestCoverageVerification")
+}
+
+tasks.jacocoTestCoverageVerification {
+
+    violationRules {
+        rule {
+            element = "CLASS"
+
+            limit {
+                counter = "BRANCH"
+                value = "COVEREDRATIO"
+                minimum = 0.00.toBigDecimal()
+            }
+
+            limit {
+                counter = "METHOD"
+                value = "COVEREDRATIO"
+                minimum = 0.00.toBigDecimal()
+            }
+
+            val qDomains = emptyList<String>().toMutableList()
+
+            for (c in 'A'..'Z') {
+                val qPattern = "**.*Q$c*"
+                qDomains.add("$qPattern*")
+            }
+
+            excludes =
+                listOf(
+                    "**.service.*",
+                    "**.dto.*",
+                    "**.controller.*",
+                    "**.external.*",
+                    "**.repository.*",
+                    "**.common.*",
+                    "**.*PhoteApplication*",
+                ) + qDomains
+        }
     }
 }
