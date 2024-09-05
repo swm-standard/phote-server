@@ -65,6 +65,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0-RC")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.9.0-RC")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
+    testImplementation("com.navercorp.fixturemonkey:fixture-monkey-kotlin:1.0.23")
 
     // querydsl
     implementation("com.querydsl:querydsl-jpa:5.0.0:jakarta")
@@ -190,13 +191,13 @@ tasks.jacocoTestCoverageVerification {
             limit {
                 counter = "BRANCH"
                 value = "COVEREDRATIO"
-                minimum = 0.00.toBigDecimal()
+                minimum = 0.40.toBigDecimal()
             }
 
             limit {
                 counter = "METHOD"
                 value = "COVEREDRATIO"
-                minimum = 0.00.toBigDecimal()
+                minimum = 0.40.toBigDecimal()
             }
 
             val qDomains = emptyList<String>().toMutableList()

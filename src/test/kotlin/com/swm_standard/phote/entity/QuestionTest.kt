@@ -2,10 +2,22 @@ package com.swm_standard.phote.entity
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.navercorp.fixturemonkey.FixtureMonkey
+import com.navercorp.fixturemonkey.kotlin.KotlinPlugin
+import com.navercorp.fixturemonkey.kotlin.giveMeBuilder
+import com.navercorp.fixturemonkey.kotlin.giveMeOne
+import com.navercorp.fixturemonkey.kotlin.size
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import kotlin.test.assertNotNull
 
 class QuestionTest {
+    private val fixtureMonkey: FixtureMonkey =
+        FixtureMonkey
+            .builder()
+            .plugin(KotlinPlugin())
+            .build()
+
     private fun createQuestion(): Question {
         val objectMapper = ObjectMapper()
         val jsonString = """
@@ -41,5 +53,22 @@ class QuestionTest {
         // then
         val expectedList = listOf("삼각형", "사각형", "마름모", "평행사변형", "원")
         assertEquals(expectedList, deserializedOptions)
+    }
+
+    @Test
+    fun `공유받은 문제를 복사해서 저장한다`() {
+        val questions = fixtureMonkey.giveMeBuilder<Question>().size(Question::tags, 0).sampleList(5)
+        val member: Member = fixtureMonkey.giveMeOne()
+
+        assertNotNull(questions[0])
+
+        println("fixtureMonkey = ${questions[0]}")
+
+        val sharedQuestions = Question.createSharedQuestions(questions, member)
+
+        assertEquals(sharedQuestions.size, questions.size)
+        assertEquals(sharedQuestions[0].member, member)
+        assertEquals(sharedQuestions[1].category, questions[1].category)
+        assertEquals(sharedQuestions[2].answer, questions[2].answer)
     }
 }

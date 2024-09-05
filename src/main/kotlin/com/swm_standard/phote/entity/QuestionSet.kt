@@ -33,7 +33,7 @@ data class QuestionSet(
     }
 
     companion object {
-        fun createSequence(
+        fun createQuestionSet(
             question: Question,
             workbook: Workbook,
             nextSequence: Int,
