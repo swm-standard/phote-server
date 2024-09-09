@@ -33,6 +33,15 @@ jobs:
               shell: bash
 
 
+            - name: Set up newrelic.yml
+              run: |
+                  cd newrelic
+                  touch newrelic.yml
+                echo "${{ secrets.NEW_RELIC_FILE }}" > newrelic.yml
+
+              shell: bash
+
+
             - name: Grant execute permission for gradlew
               run: chmod +x gradlew
 

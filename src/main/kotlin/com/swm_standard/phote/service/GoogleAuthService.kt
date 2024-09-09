@@ -15,6 +15,8 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
+import java.net.URLDecoder
+import java.nio.charset.StandardCharsets
 
 @Service
 class GoogleAuthService(
@@ -33,12 +35,14 @@ class GoogleAuthService(
         val headers = HttpHeaders()
         val params: MutableMap<String, Any> = HashMap()
 
+        val decodedCode = URLDecoder.decode(request.code, StandardCharsets.UTF_8)
+
         val googleTokenRequest: HttpEntity<MutableMap<String, Any>> = HttpEntity(params, headers)
         val response: GoogleAccessResponse =
             restTemplate
                 .exchange(
                     "https://oauth2.googleapis.com/token?grant_type=authorization_code&" +
-                        "client_id=$clientId&client_secret=$clientSecret&code=${request.code}" +
+                        "client_id=$clientId&client_secret=$clientSecret&code=$decodedCode" +
                         "&redirect_uri=${request.redirectUri}",
                     HttpMethod.POST,
                     googleTokenRequest,
