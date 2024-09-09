@@ -4,12 +4,10 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.navercorp.fixturemonkey.FixtureMonkey
 import com.navercorp.fixturemonkey.kotlin.KotlinPlugin
-import com.navercorp.fixturemonkey.kotlin.giveMeBuilder
 import com.navercorp.fixturemonkey.kotlin.giveMeOne
-import com.navercorp.fixturemonkey.kotlin.size
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import kotlin.test.assertNotNull
+import java.util.UUID
 
 class QuestionTest {
     private val fixtureMonkey: FixtureMonkey =
@@ -39,6 +37,32 @@ class QuestionTest {
             answer = "1",
             category = Category.MULTIPLE,
             memo = "삼각형은 꼭짓점이 3개다",
+            tags =
+            mutableListOf(
+                Tag(
+                    id = 1,
+                    name = "수학",
+                    question =
+                    Question(
+                        id = UUID.randomUUID(),
+                        member =
+                        Member(
+                            name = "Luella Kline",
+                            email = "logan.houston@example.com",
+                            image = "et",
+                            provider = Provider.APPLE,
+                        ),
+                        statement = "Louisiana",
+                        options = null,
+                        image = null,
+                        answer = "hac",
+                        category = Category.MULTIPLE,
+                        questionSet = listOf(),
+                        tags = mutableListOf(),
+                        memo = null,
+                    ),
+                ),
+            ),
         )
     }
 
@@ -57,18 +81,16 @@ class QuestionTest {
 
     @Test
     fun `공유받은 문제를 복사해서 저장한다`() {
-        val questions = fixtureMonkey.giveMeBuilder<Question>().size(Question::tags, 0).sampleList(5)
+        val questions = listOf(createQuestion(), createQuestion(), createQuestion())
+        // val questions = fixtureMonkey.giveMeBuilder<Question>().size(Question::tags, 0).sampleList(5)
         val member: Member = fixtureMonkey.giveMeOne()
-
-        assertNotNull(questions[0])
-
-        println("fixtureMonkey = ${questions[0]}")
 
         val sharedQuestions = Question.createSharedQuestions(questions, member)
 
         assertEquals(sharedQuestions.size, questions.size)
         assertEquals(sharedQuestions[0].member, member)
-        assertEquals(sharedQuestions[1].category, questions[1].category)
         assertEquals(sharedQuestions[2].answer, questions[2].answer)
+        assertEquals(sharedQuestions[1].tags[0].name, questions[1].tags[0].name)
+        assertEquals(sharedQuestions[1].tags[0].id, questions[1].tags[0].id)
     }
 }

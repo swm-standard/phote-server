@@ -91,7 +91,6 @@ kotlin {
 
 tasks.withType<Test> {
     useJUnitPlatform()
-    finalizedBy("jacocoTestReport")
 }
 
 tasks.test {
@@ -112,17 +111,6 @@ buildscript {
         classpath("org.jlleitschuh.gradle:ktlint-gradle:11.1.0")
     }
 }
-
-// sentry {
-// 	// Generates a JVM (Java, Kotlin, etc.) source bundle and uploads your source code to Sentry.
-// 	// This enables source context, allowing you to see your source
-// 	// code as part of your stack traces in Sentry.
-// 	includeSourceContext = true
-//
-// 	org = "swm-standard"
-// 	projectName = "phote"
-// 	authToken ="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"
-// }
 
 // Querydsl
 val generated = file("src/main/generated")
@@ -172,6 +160,7 @@ tasks.jacocoTestReport {
             "**/repository/*",
             "**/common/*",
             "**/*PhoteApplication*",
+            "**/entity/*RefreshToken*",
         ) + qDomains
 
     classDirectories.setFrom(
@@ -191,7 +180,7 @@ tasks.jacocoTestCoverageVerification {
             limit {
                 counter = "BRANCH"
                 value = "COVEREDRATIO"
-                minimum = 0.40.toBigDecimal()
+                minimum = 0.50.toBigDecimal()
             }
 
             limit {
@@ -216,6 +205,7 @@ tasks.jacocoTestCoverageVerification {
                     "**.repository.*",
                     "**.common.*",
                     "**.*PhoteApplication*",
+                    "**.entity.*RefreshToken*",
                 ) + qDomains
         }
     }

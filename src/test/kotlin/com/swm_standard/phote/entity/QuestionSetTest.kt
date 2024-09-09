@@ -24,7 +24,7 @@ class QuestionSetTest {
 
     @Test
     fun `questionSet을 생성하는데 성공한다`() {
-        val question = fixtureMonkey.giveMeOne(Question::class.java)
+        val question = createQuestion()
         val workbook = fixtureMonkey.giveMeOne(Workbook::class.java)
         val newSequence = 1
 
@@ -39,4 +39,14 @@ class QuestionSetTest {
         assertEquals(workbook, questionSet.workbook)
         assertEquals(question, questionSet.question)
     }
+
+    private fun createQuestion(): Question =
+        Question(
+            member = Member("phote", "phote@test.com", "image", Provider.KAKAO),
+            statement = "모든 각이 동일한 삼각형은?",
+            image = "http://example.com/image.jpg",
+            answer = "정삼각형",
+            category = Category.ESSAY,
+            memo = "삼각형 내각의 합은 180도이다.",
+        )
 }
