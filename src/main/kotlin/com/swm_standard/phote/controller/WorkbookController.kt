@@ -131,7 +131,7 @@ class WorkbookController(
     @PostMapping("/shared-workbook")
     fun receiveSharedWorkbook(
         @Valid @RequestBody receiveSharedWorkbookRequest: ReceiveSharedWorkbookRequest,
-        @MemberId memberId: UUID,
+        @Parameter(hidden = true) @MemberId memberId: UUID,
     ): BaseResponse<ReceiveSharedWorkbookResponse> {
         val response = workbookService.receiveSharedWorkbook(receiveSharedWorkbookRequest, memberId)
 
