@@ -14,6 +14,7 @@ class WorkbookTest {
 
         Assertions.assertThat(workbook.title).isEqualTo(testTitle)
         Assertions.assertThat(workbook.emoji).isEqualTo("➗")
+        Assertions.assertThat(workbook.member.email).isEqualTo(member.email)
     }
 
     @Test

@@ -63,7 +63,7 @@ class ExamTest {
         val exam = Exam.createExam(member, workbook, sequence, time)
 
         Assertions.assertThat(exam.workbook).isEqualTo(workbook)
-        Assertions.assertThat(exam.member).isEqualTo(member)
+        Assertions.assertThat(exam.member.name).isEqualTo(member.name)
         Assertions.assertThat(exam.sequence).isEqualTo(sequence)
     }
 

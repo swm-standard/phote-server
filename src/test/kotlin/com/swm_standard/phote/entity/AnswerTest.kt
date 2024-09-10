@@ -1,10 +1,19 @@
 package com.swm_standard.phote.entity
 
-import org.junit.jupiter.api.Assertions
+import com.navercorp.fixturemonkey.FixtureMonkey
+import com.navercorp.fixturemonkey.kotlin.KotlinPlugin
+import com.navercorp.fixturemonkey.kotlin.giveMeOne
+import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
 class AnswerTest {
+    private val fixtureMonkey: FixtureMonkey =
+        FixtureMonkey
+            .builder()
+            .plugin(KotlinPlugin())
+            .build()
+
     @Test
     fun `문제가 객관식이면 정오답 체크한다`() {
         val category = Category.MULTIPLE
@@ -14,29 +23,41 @@ class AnswerTest {
 
         answer.checkMultipleAnswer()
 
-        Assertions.assertEquals(submittedAnswer == correctAnswer, answer.isCorrect)
-        Assertions.assertFalse(answer.isCorrect)
+        Assertions.assertThat(submittedAnswer == correctAnswer).isEqualTo(answer.isCorrect)
+        Assertions.assertThat(answer.isCorrect).isFalse()
+    }
+
+    @Test
+    fun `제출한 답안을 생성한다`() {
+        val exam = createExam()
+        val submittedAnswer = "1"
+        val question = createQuestion(answer = submittedAnswer)
+        val sequence = 2
+
+        val createAnswer =
+            Answer.createAnswer(
+                question = question,
+                exam = exam,
+                submittedAnswer = submittedAnswer,
+                sequence = sequence,
+            )
+
+        Assertions.assertThat(createAnswer.submittedAnswer).isEqualTo(submittedAnswer)
+        Assertions.assertThat(createAnswer.exam).isEqualTo(exam)
+        Assertions.assertThat(createAnswer.sequence).isEqualTo(sequence)
     }
 
     fun createWorkbook(): Workbook =
         Workbook(
             title = "hinc",
             description = null,
-            member = createMember(),
+            member = fixtureMonkey.giveMeOne(),
             emoji = "📚",
-        )
-
-    fun createMember(): Member =
-        Member(
-            name = "Mayra Payne",
-            email = "penelope.mccarty@example.com",
-            image = "dicant",
-            provider = Provider.APPLE,
         )
 
     fun createExam() =
         Exam(
-            member = createMember(),
+            member = fixtureMonkey.giveMeOne(),
             workbook = createWorkbook(),
             sequence = 4282,
             time = 40,
@@ -69,4 +90,24 @@ class AnswerTest {
         submittedAnswer = submittedAnswer,
         sequence = 2017,
     )
+
+    private fun createQuestion(answer: String) =
+        Question(
+            id = UUID.randomUUID(),
+            member =
+            Member(
+                name = "Charmaine Joseph",
+                email = "dorothea.avila@example.com",
+                image = "maiorum",
+                provider = Provider.APPLE,
+            ),
+            statement = "Missouri",
+            options = null,
+            image = null,
+            answer = answer,
+            category = Category.MULTIPLE,
+            questionSet = listOf(),
+            tags = mutableListOf(),
+            memo = null,
+        )
 }
