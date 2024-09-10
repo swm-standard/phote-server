@@ -24,7 +24,7 @@ import java.util.UUID
 data class Question(
     @Id @Column(name = "question_uuid", nullable = false, unique = true)
     val id: UUID = UUID.randomUUID(),
-    @ManyToOne(cascade = [(CascadeType.REMOVE)])
+    @ManyToOne
     @JoinColumn(name = "member_id")
     @JsonIgnore
     val member: Member,
