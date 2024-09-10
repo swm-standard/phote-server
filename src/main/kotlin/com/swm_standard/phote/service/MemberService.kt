@@ -10,9 +10,6 @@ class MemberService(
 ) {
     fun deleteMember(memberId: UUID): UUID {
         memberRepository.deleteById(memberId)
-        if (memberRepository.existsById(memberId)) {
-            throw IllegalStateException()
-        }
 
         return memberId
     }
