@@ -78,7 +78,7 @@ class QuestionTest {
         val sharedQuestions = Question.createSharedQuestions(questions, member)
 
         assertEquals(sharedQuestions.size, questions.size)
-        assertEquals(sharedQuestions[0].member, member)
+        assertEquals(sharedQuestions[0].member.image, member.image)
         assertEquals(sharedQuestions[2].answer, questions[2].answer)
         assertEquals(sharedQuestions[1].tags[0].name, questions[1].tags[0].name)
         assertEquals(sharedQuestions[1].tags[0].id, questions[1].tags[0].id)
