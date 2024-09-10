@@ -1,19 +1,10 @@
 package com.swm_standard.phote.entity
 
-import com.navercorp.fixturemonkey.FixtureMonkey
-import com.navercorp.fixturemonkey.kotlin.KotlinPlugin
-import com.navercorp.fixturemonkey.kotlin.giveMeOne
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
 class AnswerTest {
-    private val fixtureMonkey: FixtureMonkey =
-        FixtureMonkey
-            .builder()
-            .plugin(KotlinPlugin())
-            .build()
-
     @Test
     fun `문제가 객관식이면 정오답 체크한다`() {
         val category = Category.MULTIPLE
@@ -51,13 +42,13 @@ class AnswerTest {
         Workbook(
             title = "hinc",
             description = null,
-            member = fixtureMonkey.giveMeOne(),
+            member = createMember(),
             emoji = "📚",
         )
 
     fun createExam() =
         Exam(
-            member = fixtureMonkey.giveMeOne(),
+            member = createMember(),
             workbook = createWorkbook(),
             sequence = 4282,
             time = 40,
@@ -109,5 +100,13 @@ class AnswerTest {
             questionSet = listOf(),
             tags = mutableListOf(),
             memo = null,
+        )
+
+    private fun createMember() =
+        Member(
+            name = "Wilbur Noel",
+            email = "leslie.warner@example.com",
+            image = "ocurreret",
+            provider = Provider.APPLE,
         )
 }
