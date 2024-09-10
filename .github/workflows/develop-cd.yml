@@ -37,7 +37,7 @@ jobs:
               run: |
                   cd newrelic
                   touch newrelic.yml
-                echo "${{ secrets.NEW_RELIC_FILE }}" > newrelic.yml
+                  echo "${{ secrets.NEW_RELIC_FILE }}" | base64 --decode > newrelic.yml
 
               shell: bash
 
@@ -51,7 +51,7 @@ jobs:
             - name: Docker build
               run: |
                   docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
-                  docker build -t app .
+                  docker build --no-cache -t app .
                   docker tag app ${{ secrets.DOCKER_USERNAME }}/phote:latest
                   docker push ${{ secrets.DOCKER_USERNAME }}/phote:latest
 

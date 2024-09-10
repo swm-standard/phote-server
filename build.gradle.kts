@@ -112,17 +112,6 @@ buildscript {
     }
 }
 
-// sentry {
-// 	// Generates a JVM (Java, Kotlin, etc.) source bundle and uploads your source code to Sentry.
-// 	// This enables source context, allowing you to see your source
-// 	// code as part of your stack traces in Sentry.
-// 	includeSourceContext = true
-//
-// 	org = "swm-standard"
-// 	projectName = "phote"
-// 	authToken ="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"
-// }
-
 // Querydsl
 val generated = file("src/main/generated")
 tasks.withType<JavaCompile> {
