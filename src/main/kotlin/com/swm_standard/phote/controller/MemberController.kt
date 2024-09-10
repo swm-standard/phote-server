@@ -2,6 +2,7 @@ package com.swm_standard.phote.controller
 
 import com.swm_standard.phote.common.resolver.memberId.MemberId
 import com.swm_standard.phote.common.responsebody.BaseResponse
+import com.swm_standard.phote.dto.DeleteMemberResponse
 import com.swm_standard.phote.service.MemberService
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -16,9 +17,9 @@ class MemberController(
     @DeleteMapping("/member")
     fun deleteMember(
         @MemberId memberId: UUID,
-    ): BaseResponse<UUID> {
+    ): BaseResponse<DeleteMemberResponse> {
         val uuid = memberService.deleteMember(memberId)
 
-        return BaseResponse(msg = "멤버 탈퇴 성공", data = uuid)
+        return BaseResponse(msg = "멤버 탈퇴 성공", data = DeleteMemberResponse(uuid))
     }
 }

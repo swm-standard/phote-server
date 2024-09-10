@@ -12,7 +12,7 @@ import org.hibernate.annotations.SQLRestriction
 import java.util.UUID
 
 @Entity
-@SQLDelete(sql = "UPDATE question_set SET deleted_at = NOW() WHERE question_set_id = ?")
+@SQLDelete(sql = "UPDATE member SET deleted_at = NOW() WHERE member_uuid = ?")
 @SQLRestriction("deleted_at is NULL")
 data class Member(
     val name: String,
