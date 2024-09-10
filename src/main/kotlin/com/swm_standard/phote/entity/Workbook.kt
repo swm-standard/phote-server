@@ -21,7 +21,7 @@ import java.util.UUID
 data class Workbook(
     var title: String,
     var description: String?,
-    @ManyToOne
+    @ManyToOne(cascade = [(CascadeType.REMOVE)])
     @JoinColumn(name = "member_id")
     @JsonIgnore
     val member: Member,

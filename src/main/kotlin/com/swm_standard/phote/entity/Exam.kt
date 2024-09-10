@@ -13,7 +13,7 @@ import java.util.UUID
 
 @Entity
 data class Exam(
-    @ManyToOne
+    @ManyToOne(cascade = [(CascadeType.REMOVE)])
     @JoinColumn(name = "member_id")
     val member: Member,
     @ManyToOne
