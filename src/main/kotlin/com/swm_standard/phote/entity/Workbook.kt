@@ -1,6 +1,7 @@
 package com.swm_standard.phote.entity
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import com.swm_standard.phote.common.exception.BadRequestException
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -75,6 +76,10 @@ data class Workbook(
     }
 
     fun decreaseQuantity() {
+        if (this.quantity - 1 < 0) {
+            throw BadRequestException(fieldName = "quantity", message = "삭제 시 quantity가 음수가 됩니다.")
+        }
+
         this.quantity -= 1
         modifiedAt = LocalDateTime.now()
     }

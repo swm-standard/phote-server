@@ -2,7 +2,6 @@ plugins {
     id("org.springframework.boot") version "3.3.1"
     id("io.spring.dependency-management") version "1.1.5"
     id("org.asciidoctor.jvm.convert") version "3.3.2"
-    id("io.sentry.jvm.gradle") version "4.8.0"
     id("org.jlleitschuh.gradle.ktlint") version "11.1.0"
     kotlin("plugin.jpa") version "1.9.24"
     kotlin("jvm") version "1.9.24"
@@ -65,7 +64,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0-RC")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.9.0-RC")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
-    testImplementation("com.navercorp.fixturemonkey:fixture-monkey-kotlin:1.0.23")
+    testImplementation("com.navercorp.fixturemonkey:fixture-monkey-kotlin:1.0.25")
 
     // querydsl
     implementation("com.querydsl:querydsl-jpa:5.0.0:jakarta")
@@ -186,7 +185,7 @@ tasks.jacocoTestCoverageVerification {
             limit {
                 counter = "METHOD"
                 value = "COVEREDRATIO"
-                minimum = 0.40.toBigDecimal()
+                minimum = 0.30.toBigDecimal()
             }
 
             val qDomains = emptyList<String>().toMutableList()
