@@ -5,10 +5,12 @@ import com.swm_standard.phote.common.exception.ExpiredTokenException
 import com.swm_standard.phote.entity.RefreshToken
 import com.swm_standard.phote.repository.RefreshTokenRepository
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
 import kotlin.jvm.optionals.getOrElse
 
 @Service
+@Transactional(readOnly = true)
 class TokenService(
     private val refreshTokenRepository: RefreshTokenRepository,
     private val jwtTokenProvider: JwtTokenProvider,
@@ -22,6 +24,7 @@ class TokenService(
         return jwtTokenProvider.createToken(refresh.memberId)
     }
 
+    @Transactional
     fun generateRefreshToken(memberId: UUID): UUID {
         val refreshToken =
             refreshTokenRepository.findByMemberId(memberId) ?: RefreshToken(UUID.randomUUID(), memberId)
