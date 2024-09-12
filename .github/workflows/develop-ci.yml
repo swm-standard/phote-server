@@ -8,7 +8,7 @@ on:
 permissions: write-all
 
 jobs:
-    build:
+    setting:
         runs-on: ubuntu-latest
 
         steps:
@@ -21,23 +21,28 @@ jobs:
 
             - name: Set up properties
               run: |
-                cd src/main
-                mkdir resources
-                cd resources
-                touch application.properties
-                echo "${{ secrets.APPLICATION }}" > application.properties
-                cat application.properties
+                  cd src/main
+                  mkdir resources
+                  cd resources
+                  touch application.properties
+                  echo "${{ secrets.APPLICATION }}" > application.properties
+                  cat application.properties
 
               shell: bash
 
             - name: Grant execute permission for gradlew
               run: chmod +x gradlew
 
-            - name: Test with Gradle
-              run: ./gradlew clean build jacocoTestReport
 
-            - name: Publish Unit Test Results
-              uses: EnricoMi/publish-unit-test-result-action@v1
-              if: ${{ always() }}
+            - name: Test with Gradle
+              run: ./gradlew clean jacocoTestReport
+
+            - name: Add coverage to PR
+              id: jacoco
+              uses: madrapps/jacoco-report@v1.2
               with:
-                  files: build/test-results/**/*.xml
+                    paths: ${{ github.workspace }}/build/jacoco/index.xml
+                    token: ${{ secrets.GITHUB_TOKEN }}
+                    title: "테스트 커버리지 측정"
+                    min-coverage-overall: 40
+                    min-coverage-changed-files: 40
