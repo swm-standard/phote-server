@@ -1,50 +1,32 @@
 package com.swm_standard.phote.entity
 
-import org.assertj.core.api.Assertions
+import com.navercorp.fixturemonkey.FixtureMonkey
+import com.navercorp.fixturemonkey.api.introspector.FieldReflectionArbitraryIntrospector
+import com.navercorp.fixturemonkey.kotlin.KotlinPlugin
+import com.navercorp.fixturemonkey.kotlin.giveMeBuilder
+import com.navercorp.fixturemonkey.kotlin.giveMeOne
+import com.navercorp.fixturemonkey.kotlin.setExp
+import com.navercorp.fixturemonkey.kotlin.sizeExp
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 class ExamTest {
-    private fun createExam(): Exam {
-        val member = Member("phote", "phote@test.com", "imageUrl", Provider.KAKAO)
-        val workbook = Workbook.createWorkbook(title = "testTitle", description = "", member = member)
-
-        val exam =
-            Exam(
-                member = member,
-                workbook = workbook,
-                sequence = 1,
-                time = 30,
-            )
-
-        val answer =
-            Answer(
-                question =
-                Question(
-                    member = member,
-                    statement = "모든 각이 동일한 삼각형은?",
-                    image = "http://example.com/image.jpg",
-                    answer = "정삼각형",
-                    category = Category.ESSAY,
-                    memo = "삼각형 내각의 합은 180도이다.",
-                ),
-                exam = exam,
-                submittedAnswer = "정삼각형",
-                sequence = 1,
-            )
-
-        answer.isCorrect = true
-
-        exam.answers.add(answer)
-        exam.answers.add(answer)
-
-        return exam
-    }
+    private val fixtureMonkey =
+        FixtureMonkey
+            .builder()
+            .plugin(KotlinPlugin())
+            .objectIntrospector(FieldReflectionArbitraryIntrospector.INSTANCE)
+            .build()
 
     @Test
     fun `문제 풀이한 총 문제수를 구한다`() {
         // given
-        val exam = createExam()
+        val exam: Exam =
+            fixtureMonkey
+                .giveMeBuilder<Exam>()
+                .sizeExp(Exam::answers, 2)
+                .sample()
 
         // when
         val totalQuantity = exam.calculateTotalQuantity()
@@ -55,42 +37,30 @@ class ExamTest {
 
     @Test
     fun `시험 생성에 성공한다`() {
-        val workbook = createWorkbook()
-        val member = createMember()
+        val workbook: Workbook = fixtureMonkey.giveMeOne()
+        val member: Member = fixtureMonkey.giveMeOne()
         val sequence: Int = 2
         val time = 20
 
         val exam = Exam.createExam(member, workbook, sequence, time)
 
-        Assertions.assertThat(exam.workbook).isEqualTo(workbook)
-        Assertions.assertThat(exam.member.name).isEqualTo(member.name)
-        Assertions.assertThat(exam.sequence).isEqualTo(sequence)
+        assertThat(exam.workbook).isEqualTo(workbook)
+        assertThat(exam.member.name).isEqualTo(member.name)
+        assertThat(exam.sequence).isEqualTo(sequence)
     }
 
     @Test
     fun `totalCorrect가 증가한다`() {
-        val exam = createExam()
         val count = 3
-        val totalCorrect = exam.totalCorrect
+        val totalCorrect = 2
+        val exam =
+            fixtureMonkey
+                .giveMeBuilder<Exam>()
+                .setExp(Exam::totalCorrect, totalCorrect)
+                .sample()
 
         exam.increaseTotalCorrect(count)
 
-        Assertions.assertThat(exam.totalCorrect).isEqualTo(totalCorrect + count)
+        assertThat(exam.totalCorrect).isEqualTo(totalCorrect + count)
     }
-
-    fun createWorkbook(): Workbook =
-        Workbook(
-            title = "hinc",
-            description = null,
-            member = createMember(),
-            emoji = "📚",
-        )
-
-    fun createMember(): Member =
-        Member(
-            name = "Mayra Payne",
-            email = "penelope.mccarty@example.com",
-            image = "dicant",
-            provider = Provider.APPLE,
-        )
 }
