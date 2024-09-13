@@ -6,6 +6,7 @@ import com.swm_standard.phote.dto.RenewAccessTokenResponse
 import com.swm_standard.phote.dto.UserInfoResponse
 import com.swm_standard.phote.service.GoogleAuthService
 import com.swm_standard.phote.service.KaKaoAuthService
+import com.swm_standard.phote.service.AppleAuthService
 import com.swm_standard.phote.service.TokenService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -22,6 +23,7 @@ import java.util.UUID
 class AuthController(
     private val googleAuthService: GoogleAuthService,
     private val kaKaoAuthService: KaKaoAuthService,
+    private val appleAuthService: AppleAuthService,
     private val tokenService: TokenService,
 ) {
     @Operation(summary = "google-login", description = "구글 로그인/회원가입")
@@ -43,6 +45,18 @@ class AuthController(
     ): BaseResponse<UserInfoResponse> {
         val accessToken = kaKaoAuthService.getTokenFromKakao(request)
         val userInfo = kaKaoAuthService.getUserInfoFromKakao(accessToken)
+
+        val message = if (userInfo.isMember == false) "회원가입 성공" else "로그인 성공"
+        return BaseResponse(msg = message, data = userInfo)
+    }
+
+    @Operation(summary = "apple-login", description = "애플 로그인/회원가입")
+    @PostMapping("/apple-login")
+    fun appleLogin(
+        @RequestBody request: LoginRequest,
+    ): BaseResponse<UserInfoResponse> {
+        val idToken = appleAuthService.getTokenFromApple(request)
+        val userInfo = appleAuthService.getUserInfoFromApple(idToken)
 
         val message = if (userInfo.isMember == false) "회원가입 성공" else "로그인 성공"
         return BaseResponse(msg = message, data = userInfo)
