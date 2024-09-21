@@ -17,7 +17,10 @@ class JwtAuthenticationFilter(
         chain: FilterChain?,
     ) {
         val accessToken = resolveToken(request as HttpServletRequest)
-        if (accessToken != null && jwtTokenProvider.validateToken(accessToken)) {
+        if (accessToken != null &&
+            jwtTokenProvider.validateToken(accessToken) &&
+            request.getHeader("userAgent")?.contains("ELB-HealthChecker/2.0") == false
+        ) {
             val authentication = jwtTokenProvider.getAuthentication(accessToken)
             SecurityContextHolder.getContext().authentication = authentication
         }
