@@ -12,14 +12,14 @@
 
 
 ## 🛠️ ERD
-<img src="https://github.com/user-attachments/assets/4dc6fc68-5a78-4ff5-b16f-b0038dd5dc1e" height="900"/>
+<img src="https://github.com/user-attachments/assets/9ee0fcbc-d4db-4853-b898-efe2fd4caff1" height="900"/>
 
 ## 🌳 서비스 핵심 기능
-<img src="https://github.com/user-attachments/assets/b1dc33cd-b095-43d6-ab1c-92f34e1ab777"/>
-<img src="https://github.com/user-attachments/assets/52a08758-49c5-4cf6-b573-7d528f0fad39"/>
+<img src="https://github.com/user-attachments/assets/c20130e0-ceeb-47a3-b82a-4469fa075222" width="600"/>
+<img src="https://github.com/user-attachments/assets/376c1165-258b-45b2-852e-32e69ca787e6" width="600"/>
 
 ## 🌳 Server Architecture
-<img src="https://github.com/user-attachments/assets/4aa75f81-f71b-4c28-b045-9929fc5a98ad"/>
+<img src="https://github.com/user-attachments/assets/e61704e7-68eb-42da-a06f-dcb135f7b288" width="600"/>
 
 ## 🌳 Branch
 
