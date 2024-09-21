@@ -156,3 +156,4 @@ application.properties
 .gradle
 build
 resources
+/newrelic/newrelic.yml
