@@ -4,7 +4,7 @@
 
 ## 👩‍👧‍👧 Our Team
 
-|                        **☘️☘ [박수린](https://github.com/RinRinPARK)**                         |                         **🫧 [박세연](https://github.com/adorableco)**                          |
+|                         **☘️[박수린](https://github.com/RinRinPARK)**                          |                         **🫧 [박세연](https://github.com/adorableco)**                          |
   |:-------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------:|
 | <img src="https://avatars.githubusercontent.com/u/87180069?v=4" width="300" height="300" /> | <img src ="https://avatars.githubusercontent.com/u/90397541?v=4" width="300" height="300" /> |
 |                                      Server Developer                                       |                                       Server Developer                                       |
