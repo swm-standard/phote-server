@@ -15,11 +15,11 @@
 <img src="https://github.com/user-attachments/assets/9ee0fcbc-d4db-4853-b898-efe2fd4caff1" height="900"/>
 
 ## 🌳 서비스 핵심 기능
-<img src="https://github.com/user-attachments/assets/c20130e0-ceeb-47a3-b82a-4469fa075222" width="600"/>
-<img src="https://github.com/user-attachments/assets/376c1165-258b-45b2-852e-32e69ca787e6" width="600"/>
+<img src="https://github.com/user-attachments/assets/c20130e0-ceeb-47a3-b82a-4469fa075222" />
+<img src="https://github.com/user-attachments/assets/376c1165-258b-45b2-852e-32e69ca787e6" />
 
 ## 🌳 Server Architecture
-<img src="https://github.com/user-attachments/assets/e61704e7-68eb-42da-a06f-dcb135f7b288" width="600"/>
+<img src="https://github.com/user-attachments/assets/e61704e7-68eb-42da-a06f-dcb135f7b288" />
 
 ## 🌳 Branch
 
