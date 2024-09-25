@@ -32,14 +32,21 @@ data class ImageInfo(
 data class ChatGPTRequest(
     var model: String,
     var messages: MutableList<RequestMessage>,
+    val temperature: Float = 0.49F,
 ) {
     constructor(model: String, imageUrl: String) :
         this(
             model,
             mutableListOf(
                 RequestMessage(
+                    "system",
+                    mutableListOf(TextContent(TRANSFORM_QUESTION_PROMPT)),
+                ),
+                RequestMessage(
                     "user",
-                    mutableListOf(TextContent(TRANSFORM_QUESTION_PROMPT), ImageContent(ImageInfo(imageUrl))),
+                    mutableListOf(
+                        ImageContent(ImageInfo(imageUrl)),
+                    ),
                 ),
             ),
         )
@@ -49,8 +56,12 @@ data class ChatGPTRequest(
             model,
             mutableListOf(
                 RequestMessage(
+                    "system",
+                    mutableListOf(TextContent(CHECK_ANSWER_PROMPT)),
+                ),
+                RequestMessage(
                     "user",
-                    mutableListOf(TextContent("$CHECK_ANSWER_PROMPT\n$submittedAnswer \n$correctAnswer")),
+                    mutableListOf(TextContent("$submittedAnswer \n$correctAnswer")),
                 ),
             ),
         )
