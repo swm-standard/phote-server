@@ -1,6 +1,6 @@
 services:
     redis:
-        image: redis
+        image: redis:latest
         container_name: myredis
         restart: unless-stopped
         volumes:
@@ -14,13 +14,15 @@ services:
             - phote-network
 
     jarimage:
+        depends_on:
+            -   redis
         image: rinpark/phote:latest
         restart: unless-stopped
         container_name: myphote
         environment:
             - TZ=Asia/Seoul
         ports:
-            - 8080:8080
+            - "8080:8080"
         networks:
             - phote-network
 
