@@ -16,6 +16,4 @@ interface QuestionSetRepository :
         questionId: UUID,
         workbookId: UUID,
     ): Boolean
-
-    fun findByWorkbookIdOrderBySequence(workbookId: UUID): List<QuestionSet>
 }

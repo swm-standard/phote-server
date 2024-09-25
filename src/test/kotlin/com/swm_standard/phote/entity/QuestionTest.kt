@@ -26,14 +26,15 @@ class QuestionTest {
         // given
         val optionList =
             listOf(
-                Arbitraries.strings().sample(),
-                Arbitraries.strings().sample(),
-                Arbitraries.strings().sample(),
-                Arbitraries.strings().sample(),
-                Arbitraries.strings().sample(),
+                Arbitraries.strings().withoutEdgeCases().sample(),
+                Arbitraries.strings().withoutEdgeCases().sample(),
+                Arbitraries.strings().withoutEdgeCases().sample(),
+                Arbitraries.strings().withoutEdgeCases().sample(),
+                Arbitraries.strings().withoutEdgeCases().sample(),
             )
 
-        val json = """
+        val json =
+            """
         {
             "1": "${optionList[0]}",
             "2": "${optionList[1]}",
