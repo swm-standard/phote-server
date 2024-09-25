@@ -53,18 +53,22 @@ class ExamService(
         val responses =
             buildList {
                 exam.answers.forEach { answer ->
-                    add(
-                        ReadExamHistoryDetail(
-                            statement = answer.question.statement,
-                            options = answer.question.options?.let { answer.question.deserializeOptions() },
-                            image = answer.question.image,
-                            category = answer.question.category,
-                            answer = answer.question.answer,
-                            submittedAnswer = answer.submittedAnswer,
-                            isCorrect = answer.isCorrect,
-                            sequence = answer.sequence,
-                        ),
-                    )
+                    val question = answer.question
+                    if (question != null) {
+                        println("question")
+                        add(
+                            ReadExamHistoryDetail(
+                                statement = question.statement,
+                                options = question.options?.let { question.deserializeOptions() },
+                                image = question.image,
+                                category = question.category,
+                                answer = question.answer,
+                                submittedAnswer = answer.submittedAnswer,
+                                isCorrect = answer.isCorrect,
+                                sequence = answer.sequence,
+                            ),
+                        )
+                    }
                 }
             }
 
