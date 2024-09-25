@@ -26,7 +26,6 @@ class WorkbookTest {
         val member: Member = fixtureMonkey.giveMeOne()
         val testTitle = Arbitraries.strings().sample() + "math"
 
-        println(testTitle)
         val workbook: Workbook = Workbook.createWorkbook(title = testTitle, description = "", member = member)
 
         assertThat(workbook.title).isEqualTo(testTitle)
