@@ -3,15 +3,36 @@ package com.swm_standard.phote.controller
 import com.swm_standard.phote.common.exception.InvalidInputException
 import com.swm_standard.phote.common.resolver.memberId.MemberId
 import com.swm_standard.phote.common.responsebody.BaseResponse
-import com.swm_standard.phote.dto.*
+import com.swm_standard.phote.dto.AddQuestionsToWorkbookRequest
+import com.swm_standard.phote.dto.CreateWorkbookRequest
+import com.swm_standard.phote.dto.CreateWorkbookResponse
+import com.swm_standard.phote.dto.DeleteQuestionInWorkbookResponse
+import com.swm_standard.phote.dto.DeleteWorkbookResponse
+import com.swm_standard.phote.dto.ReadQuestionsInWorkbookResponse
+import com.swm_standard.phote.dto.ReadWorkbookDetailResponse
+import com.swm_standard.phote.dto.ReadWorkbookListResponse
+import com.swm_standard.phote.dto.ReceiveSharedWorkbookRequest
+import com.swm_standard.phote.dto.ReceiveSharedWorkbookResponse
+import com.swm_standard.phote.dto.UpdateQuestionSequenceRequest
+import com.swm_standard.phote.dto.UpdateQuestionSequenceResponse
+import com.swm_standard.phote.dto.UpdateWorkbookDetailRequest
+import com.swm_standard.phote.dto.UpdateWorkbookDetailResponse
 import com.swm_standard.phote.service.WorkbookService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
-import org.springframework.web.bind.annotation.*
-import java.util.*
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
+import java.util.UUID
 
 @RestController
 @RequestMapping("/api")

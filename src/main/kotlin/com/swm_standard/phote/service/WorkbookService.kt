@@ -74,8 +74,7 @@ class WorkbookService(
     }
 
     fun readWorkbookList(memberId: UUID): List<ReadWorkbookListResponse> {
-        val member = getMember(memberId)
-        val workbooks: List<Workbook> = workbookRepository.findAllByMember(member)
+        val workbooks: List<Workbook> = workbookRepository.findWorkbooksByMember(memberId)
 
         return workbooks.map { workbook ->
             ReadWorkbookListResponse(
@@ -169,19 +168,10 @@ class WorkbookService(
     fun readQuestionsInWorkbook(workbookId: UUID): List<ReadQuestionsInWorkbookResponse> {
         getWorkbook(workbookId)
 
-        val questionSets: List<QuestionSet> = questionSetRepository.findByWorkbookIdOrderBySequence(workbookId)
+        val questionSets: List<ReadQuestionsInWorkbookResponse> =
+            questionSetRepository.findAllQuestionsInWorkbook(workbookId)
 
-        return questionSets.map { set ->
-            ReadQuestionsInWorkbookResponse(
-                set.id,
-                set.question.id,
-                set.question.statement,
-                set.question.options?.let { set.question.deserializeOptions() },
-                set.question.image,
-                set.question.category,
-                set.question.tags,
-            )
-        }
+        return questionSets
     }
 
     @Transactional
