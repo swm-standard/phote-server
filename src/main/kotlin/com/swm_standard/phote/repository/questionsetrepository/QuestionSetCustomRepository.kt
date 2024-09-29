@@ -1,4 +1,4 @@
-package com.swm_standard.phote.repository
+package com.swm_standard.phote.repository.questionsetrepository
 
 import com.swm_standard.phote.dto.ReadQuestionsInWorkbookResponse
 import com.swm_standard.phote.entity.Workbook

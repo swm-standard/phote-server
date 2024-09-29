@@ -1,4 +1,4 @@
-package com.swm_standard.phote.repository
+package com.swm_standard.phote.repository.questionrepository
 
 import com.querydsl.jpa.impl.JPAQueryFactory
 import com.swm_standard.phote.dto.SearchQuestionsToAddResponse

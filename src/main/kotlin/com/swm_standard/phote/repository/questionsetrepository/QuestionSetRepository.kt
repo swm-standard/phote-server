@@ -1,4 +1,4 @@
-package com.swm_standard.phote.repository
+package com.swm_standard.phote.repository.questionsetrepository
 
 import com.swm_standard.phote.entity.QuestionSet
 import org.springframework.data.jpa.repository.JpaRepository

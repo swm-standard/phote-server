@@ -15,10 +15,10 @@ import com.swm_standard.phote.entity.Category
 import com.swm_standard.phote.entity.Exam
 import com.swm_standard.phote.entity.Question
 import com.swm_standard.phote.repository.AnswerRepository
-import com.swm_standard.phote.repository.ExamRepository
 import com.swm_standard.phote.repository.MemberRepository
-import com.swm_standard.phote.repository.QuestionRepository
-import com.swm_standard.phote.repository.WorkbookRepository
+import com.swm_standard.phote.repository.examrepository.ExamRepository
+import com.swm_standard.phote.repository.questionrepository.QuestionRepository
+import com.swm_standard.phote.repository.workbookrepository.WorkbookRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async

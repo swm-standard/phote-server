@@ -15,8 +15,8 @@ import com.swm_standard.phote.dto.TransformQuestionResponse
 import com.swm_standard.phote.entity.Question
 import com.swm_standard.phote.entity.Tag
 import com.swm_standard.phote.repository.MemberRepository
-import com.swm_standard.phote.repository.QuestionRepository
 import com.swm_standard.phote.repository.TagRepository
+import com.swm_standard.phote.repository.questionrepository.QuestionRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
