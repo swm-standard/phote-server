@@ -20,9 +20,9 @@ import com.swm_standard.phote.entity.Question
 import com.swm_standard.phote.entity.QuestionSet
 import com.swm_standard.phote.entity.Workbook
 import com.swm_standard.phote.repository.MemberRepository
-import com.swm_standard.phote.repository.QuestionRepository
-import com.swm_standard.phote.repository.QuestionSetRepository
-import com.swm_standard.phote.repository.WorkbookRepository
+import com.swm_standard.phote.repository.questionrepository.QuestionRepository
+import com.swm_standard.phote.repository.questionsetrepository.QuestionSetRepository
+import com.swm_standard.phote.repository.workbookrepository.WorkbookRepository
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime

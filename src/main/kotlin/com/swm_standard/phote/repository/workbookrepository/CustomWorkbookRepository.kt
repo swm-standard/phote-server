@@ -1,4 +1,4 @@
-package com.swm_standard.phote.repository
+package com.swm_standard.phote.repository.workbookrepository
 
 import com.swm_standard.phote.entity.Workbook
 import java.util.UUID

@@ -1,4 +1,4 @@
-package com.swm_standard.phote.repository
+package com.swm_standard.phote.repository.examrepository
 
 import com.querydsl.jpa.impl.JPAQueryFactory
 import com.swm_standard.phote.entity.QExam.exam

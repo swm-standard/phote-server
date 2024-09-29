@@ -1,6 +1,6 @@
 package com.swm_standard.phote.entity
 
-import com.swm_standard.phote.repository.QuestionRepository
+import com.swm_standard.phote.repository.questionrepository.QuestionRepository
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.Mock

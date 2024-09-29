@@ -1,13 +1,11 @@
-package com.swm_standard.phote.repository
+package com.swm_standard.phote.repository.questionsetrepository
 
 import com.querydsl.jpa.impl.JPAQueryFactory
 import com.swm_standard.phote.dto.ReadQuestionsInWorkbookResponse
+import com.swm_standard.phote.entity.QQuestion.question
 import com.swm_standard.phote.entity.QQuestionSet.questionSet
-import com.swm_standard.phote.entity.Question
 import com.swm_standard.phote.entity.QuestionSet
 import com.swm_standard.phote.entity.Workbook
-import jakarta.persistence.EntityManager
-import jakarta.persistence.PersistenceContext
 import org.springframework.stereotype.Repository
 import java.util.UUID
 import java.util.stream.Collectors
@@ -16,9 +14,6 @@ import java.util.stream.Collectors
 class QuestionSetCustomRepositoryImpl(
     private val jpaQueryFactory: JPAQueryFactory,
 ) : QuestionSetCustomRepository {
-    @PersistenceContext
-    private lateinit var em: EntityManager
-
     override fun findMaxSequenceByWorkbookId(workbook: Workbook): Int {
         val maxSequence: Int? =
             jpaQueryFactory
@@ -35,17 +30,13 @@ class QuestionSetCustomRepositoryImpl(
         val questionSetIds = toQuestionSetIds(workbookId)
 
         val questions =
-            em
-                .createQuery(
-                    "select q" +
-                        " from Question q" +
-                        " join q.questionSet qs" +
-                        " join fetch q.tags t" +
-                        " where qs.id in :questionSetIds" +
-                        " order by qs.sequence",
-                    Question::class.java,
-                ).setParameter("questionSetIds", questionSetIds)
-                .resultList
+            jpaQueryFactory
+                .selectFrom(question)
+                .join(question.questionSet, questionSet)
+                .fetchJoin()
+                .where(questionSet.id.`in`(questionSetIds))
+                .orderBy(questionSet.id.asc())
+                .fetch()
 
         var index = 0
 
@@ -67,14 +58,11 @@ class QuestionSetCustomRepositoryImpl(
 
     private fun toQuestionSetIds(workbookId: UUID): List<UUID> {
         val questionSets: MutableList<QuestionSet> =
-            em
-                .createQuery(
-                    "select qs from QuestionSet qs" +
-                        " where qs.workbook.id = :workbookId" +
-                        " order by qs.sequence",
-                    QuestionSet::class.java,
-                ).setParameter("workbookId", workbookId)
-                .resultList
+            jpaQueryFactory
+                .selectFrom(questionSet)
+                .where(questionSet.id.eq(workbookId))
+                .orderBy(questionSet.sequence.asc())
+                .fetch()
 
         return questionSets
             .stream()
