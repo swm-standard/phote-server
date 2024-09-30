@@ -60,7 +60,7 @@ class QuestionSetCustomRepositoryImpl(
         val questionSets: MutableList<QuestionSet> =
             jpaQueryFactory
                 .selectFrom(questionSet)
-                .where(questionSet.id.eq(workbookId))
+                .where(questionSet.workbook.id.eq(workbookId))
                 .orderBy(questionSet.sequence.asc())
                 .fetch()
 
