@@ -74,7 +74,7 @@ class S3Service(
 
 class FileValidate {
     companion object {
-        private val IMAGE_EXTENSIONS: List<String> = listOf("jpg", "png", "gif", "webp")
+        private val IMAGE_EXTENSIONS: List<String> = listOf("jpg", "png", "gif", "webp", "jpeg")
 
         fun checkImageFormat(fileName: String) {
             val extensionIndex = fileName.lastIndexOf('.')
