@@ -1,18 +1,11 @@
 package com.swm_standard.phote.entity
 
-import jakarta.persistence.CascadeType
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.JoinColumn
-import jakarta.persistence.ManyToOne
-import jakarta.persistence.OneToMany
+import jakarta.persistence.*
 import java.util.UUID
 
 @Entity
-data class Exam(
+@DiscriminatorColumn(name = "type", length = 10)
+class Exam(
     @ManyToOne
     @JoinColumn(name = "member_id")
     val member: Member,
