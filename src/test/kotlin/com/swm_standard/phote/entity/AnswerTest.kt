@@ -21,7 +21,6 @@ class AnswerTest {
     @Test
     fun `문제가 객관식이면 정오답 체크한다`() {
         val submittedAnswer = Arbitraries.strings().numeric().sample()
-        val category = Category.MULTIPLE
         val correctAnswer = Arbitraries.strings().numeric().sample()
         val answer =
             fixtureMonkey
