@@ -14,8 +14,8 @@ data class Answer(
     @JoinColumn(name = "question_id")
     val question: Question,
     @ManyToOne
-    @JoinColumn(name = "exam_id")
-    val exam: Exam,
+    @JoinColumn(name = "exam_result_id")
+    val examResult: ExamResult,
     @Column(name = "submitted_answer")
     val submittedAnswer: String?,
     val sequence: Int,
@@ -30,12 +30,12 @@ data class Answer(
     companion object {
         fun createAnswer(
             question: Question,
-            exam: Exam,
+            examResult: ExamResult,
             submittedAnswer: String?,
             sequence: Int,
         ) = Answer(
             question,
-            exam,
+            examResult,
             submittedAnswer,
             sequence,
         )
