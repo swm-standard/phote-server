@@ -13,8 +13,10 @@ import com.swm_standard.phote.dto.SubmittedAnswerRequest
 import com.swm_standard.phote.entity.Answer
 import com.swm_standard.phote.entity.Category
 import com.swm_standard.phote.entity.Exam
+import com.swm_standard.phote.entity.ExamResult
 import com.swm_standard.phote.entity.Question
 import com.swm_standard.phote.repository.AnswerRepository
+import com.swm_standard.phote.repository.ExamResultRepository
 import com.swm_standard.phote.repository.MemberRepository
 import com.swm_standard.phote.repository.examrepository.ExamRepository
 import com.swm_standard.phote.repository.questionrepository.QuestionRepository
@@ -40,6 +42,7 @@ class ExamService(
     private val memberRepository: MemberRepository,
     private val answerRepository: AnswerRepository,
     private val template: RestTemplate,
+    private val examResultRepository: ExamResultRepository,
 ) {
     @Value("\${openai.model.grading}")
     lateinit var model: String
@@ -48,14 +51,12 @@ class ExamService(
     lateinit var url: String
 
     fun readExamHistoryDetail(id: UUID): ReadExamHistoryDetailResponse {
-        val exam = examRepository.findById(id).orElseThrow { NotFoundException("examId", "존재하지 않는 examId") }
-
+        val examResult = examResultRepository.findByExamId(id) ?: throw NotFoundException(fieldName = "examResult")
         val responses =
             buildList {
-                exam.answers.forEach { answer ->
+                examResult.answers.forEach { answer ->
                     val question = answer.question
                     if (question != null) {
-                        println("question")
                         add(
                             ReadExamHistoryDetail(
                                 statement = question.statement,
@@ -72,23 +73,28 @@ class ExamService(
                 }
             }
 
+        // FIXME: 원래 createdAt 은 시험 생성일시임
         return ReadExamHistoryDetailResponse(
-            examId = exam.id!!,
-            totalCorrect = exam.totalCorrect,
-            time = exam.time,
+            examId = id,
+            totalCorrect = examResult.totalCorrect,
+            time = examResult.time,
             questions = responses,
-            createdAt = exam.createdAt,
+            createdAt = examResult.createdAt,
         )
     }
 
     fun readExamHistoryList(workbookId: UUID): List<ReadExamHistoryListResponse> {
         val exams = examRepository.findAllByWorkbookId(workbookId)
         return exams.map { exam ->
+            // FIXME: exam 마다 examResult 를 또 조회해야함 쿼리 개선 필요
+            val examResult =
+                examResultRepository.findByExamId(exam.id!!) ?: throw NotFoundException(fieldName = "examResult")
+
             ReadExamHistoryListResponse(
                 examId = exam.id!!,
-                totalQuantity = exam.calculateTotalQuantity(),
-                totalCorrect = exam.totalCorrect,
-                time = exam.time,
+                totalQuantity = examResult.calculateTotalQuantity(),
+                totalCorrect = examResult.totalCorrect,
+                time = examResult.time,
                 sequence = exam.sequence,
             )
         }
@@ -116,8 +122,20 @@ class ExamService(
                             ).getOrElse { throw NotFoundException(fieldName = "member") },
                         workbook,
                         examRepository.findMaxSequenceByWorkbookId(workbook) + 1,
-                        request.time,
                     ),
+            )
+
+        val examResult =
+            examResultRepository.save(
+                ExamResult.createExamResult(
+                    member =
+                        memberRepository
+                            .findById(
+                                memberId,
+                            ).orElseThrow { NotFoundException(fieldName = "member") },
+                    time = request.time,
+                    exam,
+                ),
             )
 
         var totalCorrect = 0
@@ -133,7 +151,7 @@ class ExamService(
                     Answer.createAnswer(
                         question = question,
                         submittedAnswer = answer.submittedAnswer,
-                        exam = exam,
+                        examResult = examResult,
                         sequence = index + 1,
                     )
 
@@ -163,11 +181,11 @@ class ExamService(
                 )
             }
 
-        exam.increaseTotalCorrect(totalCorrect)
+        examResult.increaseTotalCorrect(totalCorrect)
 
         return GradeExamResponse(
             examId = exam.id!!,
-            totalCorrect = exam.totalCorrect,
+            totalCorrect = examResult.totalCorrect,
             questionQuantity = response.size,
             answers = response,
         )

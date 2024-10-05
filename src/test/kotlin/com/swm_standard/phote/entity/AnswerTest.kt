@@ -41,6 +41,8 @@ class AnswerTest {
     @Test
     fun `제출한 답안을 생성한다`() {
         val exam: Exam = fixtureMonkey.giveMeOne()
+        val examResult: ExamResult = fixtureMonkey.giveMeBuilder<ExamResult>().setExp(ExamResult::exam, exam).sample()
+
         val submittedAnswer = Arbitraries.strings().numeric().sample()
         val question =
             fixtureMonkey
@@ -52,13 +54,13 @@ class AnswerTest {
         val createAnswer =
             Answer.createAnswer(
                 question = question,
-                exam = exam,
+                examResult = examResult,
                 submittedAnswer = submittedAnswer,
                 sequence = sequence,
             )
 
         assertThat(createAnswer.submittedAnswer).isEqualTo(submittedAnswer)
-        assertThat(createAnswer.exam).isEqualTo(exam)
+        assertThat(createAnswer.examResult).isEqualTo(examResult)
         assertThat(createAnswer.sequence).isEqualTo(sequence)
     }
 }

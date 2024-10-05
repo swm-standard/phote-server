@@ -22,10 +22,10 @@ class ExamTest {
     @Test
     fun `문제 풀이한 총 문제수를 구한다`() {
         // given
-        val exam: Exam =
+        val exam: ExamResult =
             fixtureMonkey
-                .giveMeBuilder<Exam>()
-                .sizeExp(Exam::answers, 2)
+                .giveMeBuilder<ExamResult>()
+                .sizeExp(ExamResult::answers, 2)
                 .sample()
 
         // when
@@ -42,7 +42,7 @@ class ExamTest {
         val sequence: Int = 2
         val time = 20
 
-        val exam = Exam.createExam(member, workbook, sequence, time)
+        val exam = Exam.createExam(member, workbook, sequence)
 
         assertThat(exam.workbook).isEqualTo(workbook)
         assertThat(exam.member.name).isEqualTo(member.name)
@@ -55,8 +55,8 @@ class ExamTest {
         val totalCorrect = 2
         val exam =
             fixtureMonkey
-                .giveMeBuilder<Exam>()
-                .setExp(Exam::totalCorrect, totalCorrect)
+                .giveMeBuilder<ExamResult>()
+                .setExp(ExamResult::totalCorrect, totalCorrect)
                 .sample()
 
         exam.increaseTotalCorrect(count)
