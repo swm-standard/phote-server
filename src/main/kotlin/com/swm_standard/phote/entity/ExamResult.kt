@@ -9,9 +9,13 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToMany
+import org.hibernate.annotations.OnDelete
+import org.hibernate.annotations.OnDeleteAction
+import org.hibernate.annotations.SQLDelete
 import java.util.UUID
 
 @Entity
+@SQLDelete(sql = "UPDATE exam_result SET deleted_at = NOW() WHERE exam_result_id = ?")
 data class ExamResult(
     @JoinColumn(name = "member_id")
     @ManyToOne
@@ -19,6 +23,7 @@ data class ExamResult(
     val time: Int,
     @JoinColumn(name = "exam_id")
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     val exam: Exam,
 ) : BaseTimeEntity() {
     @Id
