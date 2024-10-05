@@ -1,0 +1,30 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+Actor 강사
+Actor 학생
+Participant Phote
+Database DB
+
+autonumber
+autoactivate on
+
+== 공유용 문제 풀이 ==
+
+강사 -> Phote: 시험 생성(startTime, endTime, capacity, workbook)
+Phote --> 강사 : 생성된 시험
+
+학생 -> Phote: 시험 내 문제 목록 요청
+Phote --> 학생 : 문제 목록
+학생 -> Phote :  문제 풀이 제출
+Phote -> DB : (강사가 생성한) Exam 에  연관지어 문제 풀이(Answer) 저장
+Phote --> 학생 : 문제 풀이 채점 결과
+
+== 개인용 문제 풀이 ==
+학생 -> Phote--: 문제집 내 문제 목록 요청
+Phote  --> 학생 : 문제 목록
+학생 -> Phote  : 문제 풀이 제출
+Phote  -> Phote: Exam 생성
+Phote -> DB--:  문제 풀이(Answer) 와 Exam 저장
+Phote --> 학생: 문제 풀이 채점 결과
+@enduml
