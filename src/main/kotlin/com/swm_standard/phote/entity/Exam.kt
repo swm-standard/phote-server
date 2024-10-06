@@ -1,17 +1,24 @@
 package com.swm_standard.phote.entity
 
-import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
+import jakarta.persistence.DiscriminatorColumn
+import jakarta.persistence.DiscriminatorValue
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.Inheritance
+import jakarta.persistence.InheritanceType
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
-import jakarta.persistence.OneToMany
+import org.hibernate.annotations.SQLDelete
 import java.util.UUID
 
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn(name = "exam_type")
+@DiscriminatorValue(value = "MY_EXAM")
+@SQLDelete(sql = "UPDATE exam SET deleted_at = NOW() WHERE exam_id = ?")
 data class Exam(
     @ManyToOne
     @JoinColumn(name = "member_id")
@@ -20,30 +27,17 @@ data class Exam(
     @JoinColumn(name = "workbook_id")
     val workbook: Workbook,
     val sequence: Int,
-    val time: Int,
 ) : BaseTimeEntity() {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "exam_id", nullable = false, unique = true)
     var id: UUID? = null
 
-    var totalCorrect: Int = 0
-
-    @OneToMany(mappedBy = "exam", cascade = [(CascadeType.REMOVE)])
-    val answers: MutableList<Answer> = mutableListOf()
-
-    fun calculateTotalQuantity(): Int = answers.size
-
     companion object {
         fun createExam(
             member: Member,
             workbook: Workbook,
             sequence: Int,
-            time: Int,
-        ) = Exam(member, workbook, sequence, time)
-    }
-
-    fun increaseTotalCorrect(count: Int) {
-        totalCorrect += count
+        ) = Exam(member, workbook, sequence)
     }
 }

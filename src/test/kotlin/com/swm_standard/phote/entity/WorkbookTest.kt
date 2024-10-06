@@ -48,6 +48,19 @@ class WorkbookTest {
     }
 
     @Test
+    fun `문제집 내용에 해당하는 키워드가 없으면 📚이모지로 세팅한다`() {
+        val workbook: Workbook = fixtureMonkey.giveMeOne()
+        val modifiedTitle = "asdsaddsdf 축구 야구"
+        val modifiedDescription: String? = Arbitraries.strings().injectNull(0.3).sample()
+
+        workbook.updateWorkbook(modifiedTitle, modifiedDescription)
+
+        assertThat(workbook.title).isEqualTo(modifiedTitle)
+        assertThat(workbook.description).isEqualTo(modifiedDescription)
+        assertThat(workbook.emoji).isEqualTo("📚")
+    }
+
+    @Test
     fun `문제 1개 삭제 시에 quantity가 1만큼 줄어든다`() {
         val testNum: Int = Arbitraries.integers().greaterOrEqual(1).sample()
         val workbook: Workbook =

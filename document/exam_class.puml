@@ -1,0 +1,41 @@
+@startuml
+class Exam {
+    id: UUID
+    member: Member
+    workbook: Workbook
+    sequence: Int
+}
+
+class Answer {
+    id: Long
+    question: Question
+    examResult: ExamResult
+    submittedAnswer: String
+    sequence: Int
+    isCorrect: Boolean
+}
+
+class SharedExam {
+    startTime: LocalDateTime
+    endTime: LocalDateTime
+    capacity: Int
+}
+
+
+class ExamResult {
+    id: UUID
+    member: Member
+    time: Int
+    totalCorrect: Int
+    answers: MutableList<Answer>
+    calculateTotalQuantity()
+    increaseTotalCorrect(count: Int)
+}
+
+ExamResult --> Exam
+Answer --> ExamResult
+Exam <|-- SharedExam
+
+
+
+@enduml
