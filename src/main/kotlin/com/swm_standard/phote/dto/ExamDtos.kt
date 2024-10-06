@@ -38,6 +38,7 @@ data class ReadExamStudentResult(
     val userId: UUID,
     val name: String,
     val score: Int,
+    val time: Int,
 )
 
 data class ReadExamResultsResponse(

@@ -56,7 +56,6 @@ class ExamService(
     @Value("\${openai.api.url}")
     lateinit var url: String
 
-    @Transactional(readOnly = true)
     fun readExamHistoryDetail(id: UUID): ReadExamHistoryDetailResponse {
         val examResult = examResultRepository.findByExamId(id) ?: throw NotFoundException(fieldName = "examResult")
         val responses =
@@ -90,7 +89,6 @@ class ExamService(
         )
     }
 
-    @Transactional(readOnly = true)
     fun readExamHistoryList(workbookId: UUID): List<ReadExamHistoryListResponse> {
         val exams = examRepository.findAllByWorkbookId(workbookId)
         return exams.map { exam ->
@@ -108,7 +106,6 @@ class ExamService(
         }
     }
 
-    @Transactional(readOnly = true)
     fun readExamResults(examId: UUID): ReadExamResultsResponse {
         val exam = examRepository.findById(examId).orElseThrow { NotFoundException(fieldName = "examId") }
         val examResults = examResultRepository.findAllByExamId(examId)
@@ -117,7 +114,8 @@ class ExamService(
             ReadExamStudentResult(
                 examResult.member.id,
                 examResult.member.name,
-                examResult.totalCorrect
+                examResult.totalCorrect,
+                examResult.time,
             )
         }
 
