@@ -20,6 +20,7 @@ import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -76,13 +77,13 @@ class ExamController(
 
     @Operation(summary = "regradeExam", description = "(강사가) 시험 정오답 재채점")
     @SecurityRequirement(name = "bearer Auth")
-    @PostMapping("/exam/{examId}/{userId}")
+    @PatchMapping("/exam/{examId}/{memberId}")
     fun regradeExam(
         @PathVariable(required = true) examId: UUID,
-        @PathVariable(required = true) userId: UUID,
+        @PathVariable(required = true) memberId: UUID,
         @Valid @RequestBody request: RegradeExamRequest,
     ): BaseResponse<RegradeExamResponse> {
-        val response = examService.regradeExam(examId, userId, request)
+        val response = examService.regradeExam(examId, memberId, request)
 
         return BaseResponse(msg = "문제 재채점 성공", data = response)
     }
