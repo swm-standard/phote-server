@@ -19,9 +19,10 @@ class AnswerTest {
             .build()
 
     @Test
-    fun `문제가 객관식이면 정오답 체크한다`() {
+    fun `문제가 객관식일 때 정답은 true를 반환한다`() {
         val submittedAnswer = Arbitraries.strings().numeric().sample()
-        val correctAnswer = Arbitraries.strings().numeric().sample()
+        val correctAnswer = submittedAnswer
+
         val answer =
             fixtureMonkey
                 .giveMeBuilder<Answer>()
@@ -33,8 +34,25 @@ class AnswerTest {
 
         answer.checkMultipleAnswer()
 
-        assertThat(submittedAnswer == correctAnswer).isEqualTo(answer.isCorrect)
-        assertThat(answer.isCorrect).isFalse()
+        assertThat(answer.isCorrect).isEqualTo(true)
+    }
+
+    @Test
+    fun `문제가 객관식일 때 오답은 false를 반환한다`() {
+        val submittedAnswer = "5"
+        val wrongAnswer = "1"
+        val answer =
+            fixtureMonkey
+                .giveMeBuilder<Answer>()
+                .setExp(Answer::submittedAnswer, submittedAnswer)
+                .setExp(
+                    Answer::question,
+                    fixtureMonkey.giveMeBuilder<Question>().setExp(Question::answer, wrongAnswer).sample(),
+                ).sample()
+
+        answer.checkMultipleAnswer()
+
+        assertThat(answer.isCorrect).isEqualTo(false)
     }
 
     @Test

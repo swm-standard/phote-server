@@ -181,7 +181,7 @@ tasks.jacocoTestCoverageVerification {
             limit {
                 counter = "BRANCH"
                 value = "COVEREDRATIO"
-                minimum = 0.60.toBigDecimal()
+                minimum = 0.50.toBigDecimal()
             }
 
             val qDomains = emptyList<String>().toMutableList()

@@ -4,6 +4,7 @@ import com.swm_standard.phote.common.exception.NotFoundException
 import com.swm_standard.phote.dto.AnswerResponse
 import com.swm_standard.phote.dto.ChatGPTRequest
 import com.swm_standard.phote.dto.ChatGPTResponse
+import com.swm_standard.phote.dto.CreateSharedExamRequest
 import com.swm_standard.phote.dto.GradeExamRequest
 import com.swm_standard.phote.dto.GradeExamResponse
 import com.swm_standard.phote.dto.ReadExamHistoryDetail
@@ -14,7 +15,10 @@ import com.swm_standard.phote.entity.Answer
 import com.swm_standard.phote.entity.Category
 import com.swm_standard.phote.entity.Exam
 import com.swm_standard.phote.entity.ExamResult
+import com.swm_standard.phote.entity.Member
 import com.swm_standard.phote.entity.Question
+import com.swm_standard.phote.entity.SharedExam
+import com.swm_standard.phote.entity.Workbook
 import com.swm_standard.phote.repository.AnswerRepository
 import com.swm_standard.phote.repository.ExamResultRepository
 import com.swm_standard.phote.repository.MemberRepository
@@ -129,10 +133,10 @@ class ExamService(
             examResultRepository.save(
                 ExamResult.createExamResult(
                     member =
-                        memberRepository
-                            .findById(
-                                memberId,
-                            ).orElseThrow { NotFoundException(fieldName = "member") },
+                    memberRepository
+                        .findById(
+                            memberId,
+                        ).orElseThrow { NotFoundException(fieldName = "member") },
                     time = request.time,
                     exam,
                 ),
@@ -170,13 +174,12 @@ class ExamService(
                         totalCorrect += 1
                     }
                 }
-
                 val savedAnswer = answerRepository.save(savingAnswer)
 
                 AnswerResponse(
-                    questionId = savedAnswer.question.id,
+                    questionId = savedAnswer.question!!.id,
                     submittedAnswer = savedAnswer.submittedAnswer,
-                    correctAnswer = savedAnswer.question.answer,
+                    correctAnswer = savedAnswer.question!!.answer,
                     isCorrect = savedAnswer.isCorrect,
                 )
             }
@@ -191,9 +194,36 @@ class ExamService(
         )
     }
 
+    @Transactional
+    fun createSharedExam(
+        memberId: UUID,
+        request: CreateSharedExamRequest,
+    ): UUID {
+        SharedExam
+            .createSharedExam(
+                startTime = request.startTime,
+                endTime = request.endTime,
+                capacity = request.capacity,
+                member = findMember(memberId),
+                workbook = findWorkbook(request.workbookId),
+                title = request.title,
+            ).run {
+                val sharedExam = examRepository.save(this)
+                return sharedExam.id!!
+            }
+    }
+
+    private fun findWorkbook(workbookId: UUID): Workbook =
+        workbookRepository.findById(workbookId).orElseThrow { NotFoundException(fieldName = "workbook") }
+
+    private fun findMember(memberId: UUID): Member =
+        memberRepository.findById(memberId).orElseThrow {
+            NotFoundException(fieldName = "member")
+        }
+
     private suspend fun gradeByChatGpt(savingAnswer: Answer): Boolean {
         val chatGptRequest =
-            ChatGPTRequest(model, savingAnswer.submittedAnswer!!, savingAnswer.question.answer)
+            ChatGPTRequest(model, savingAnswer.submittedAnswer!!, savingAnswer.question!!.answer)
 
         val chatGPTResponse =
             withContext(Dispatchers.IO) {

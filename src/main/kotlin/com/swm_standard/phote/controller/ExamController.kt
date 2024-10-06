@@ -2,6 +2,8 @@ package com.swm_standard.phote.controller
 
 import com.swm_standard.phote.common.resolver.memberId.MemberId
 import com.swm_standard.phote.common.responsebody.BaseResponse
+import com.swm_standard.phote.dto.CreateSharedExamRequest
+import com.swm_standard.phote.dto.CreateSharedExamResponse
 import com.swm_standard.phote.dto.GradeExamRequest
 import com.swm_standard.phote.dto.GradeExamResponse
 import com.swm_standard.phote.dto.ReadExamHistoryDetailResponse
@@ -57,5 +59,17 @@ class ExamController(
         val response = examService.gradeExam(workbookId, request, memberId)
 
         return BaseResponse(msg = "문제 풀이 채점 성공", data = response)
+    }
+
+    @Operation(summary = "createSharedExam", description = "공유용 시험 생성")
+    @SecurityRequirement(name = "bearer Auth")
+    @PostMapping("/exam/create")
+    fun createSharedExam(
+        @MemberId memberId: UUID,
+        @Valid @RequestBody request: CreateSharedExamRequest,
+    ): BaseResponse<CreateSharedExamResponse> {
+        val sharedExamId: UUID = examService.createSharedExam(memberId, request)
+
+        return BaseResponse(data = CreateSharedExamResponse(sharedExamId), msg = "공유용 시험 생성 성공")
     }
 }
