@@ -39,6 +39,15 @@ data class GradeExamRequest(
     val answers: List<SubmittedAnswerRequest>,
 )
 
+data class RegradeExamRequest(
+    val questionId: UUID,
+    val isCorrect: Boolean,
+)
+
+data class RegradeExamResponse(
+    val examId: UUID,
+)
+
 data class SubmittedAnswerRequest(
     val questionId: UUID,
     val submittedAnswer: String?,

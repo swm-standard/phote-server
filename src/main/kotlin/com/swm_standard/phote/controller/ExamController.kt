@@ -6,6 +6,8 @@ import com.swm_standard.phote.dto.CreateSharedExamRequest
 import com.swm_standard.phote.dto.CreateSharedExamResponse
 import com.swm_standard.phote.dto.GradeExamRequest
 import com.swm_standard.phote.dto.GradeExamResponse
+import com.swm_standard.phote.dto.RegradeExamRequest
+import com.swm_standard.phote.dto.RegradeExamResponse
 import com.swm_standard.phote.dto.ReadExamHistoryDetailResponse
 import com.swm_standard.phote.dto.ReadExamHistoryListResponse
 import com.swm_standard.phote.service.ExamService
@@ -59,6 +61,19 @@ class ExamController(
         val response = examService.gradeExam(workbookId, request, memberId)
 
         return BaseResponse(msg = "문제 풀이 채점 성공", data = response)
+    }
+
+    @Operation(summary = "regradeExam", description = "(강사가) 시험 정오답 재채점")
+    @SecurityRequirement(name = "bearer Auth")
+    @PostMapping("/exam/{examId}/{userId}")
+    fun regradeExam(
+        @PathVariable(required = true) examId: UUID,
+        @PathVariable(required = true) userId: UUID,
+        @Valid @RequestBody request: RegradeExamRequest,
+    ): BaseResponse<RegradeExamResponse> {
+        val response = examService.regradeExam(examId, userId, request)
+
+        return BaseResponse(msg = "문제 재채점 성공", data = response)
     }
 
     @Operation(summary = "createSharedExam", description = "공유용 시험 생성")

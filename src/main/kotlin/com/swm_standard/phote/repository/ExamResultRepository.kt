@@ -6,4 +6,5 @@ import java.util.UUID
 
 interface ExamResultRepository : JpaRepository<ExamResult, UUID> {
     fun findByExamId(examId: UUID): ExamResult?
+    fun findByExamIdAndMemberId(examId: UUID, memberId: UUID): ExamResult
 }
