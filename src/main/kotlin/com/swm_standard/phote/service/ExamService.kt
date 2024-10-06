@@ -10,6 +10,8 @@ import com.swm_standard.phote.dto.GradeExamResponse
 import com.swm_standard.phote.dto.ReadExamHistoryDetail
 import com.swm_standard.phote.dto.ReadExamHistoryDetailResponse
 import com.swm_standard.phote.dto.ReadExamHistoryListResponse
+import com.swm_standard.phote.dto.ReadExamStudentResult
+import com.swm_standard.phote.dto.ReadExamResultsResponse
 import com.swm_standard.phote.dto.SubmittedAnswerRequest
 import com.swm_standard.phote.entity.Answer
 import com.swm_standard.phote.entity.Category
@@ -102,6 +104,22 @@ class ExamService(
                 sequence = exam.sequence,
             )
         }
+    }
+
+    fun readExamResults(examId: UUID): ReadExamResultsResponse {
+        val exam = examRepository.findById(examId).orElseThrow { NotFoundException(fieldName = "examId") }
+        val examResults = examResultRepository.findAllByExamId(examId)
+
+        val responses = examResults.map { examResult ->
+            ReadExamStudentResult(
+                examResult.member.id,
+                examResult.member.name,
+                examResult.totalCorrect,
+                examResult.time,
+            )
+        }
+
+        return ReadExamResultsResponse(examId, exam.workbook.quantity, responses)
     }
 
     @Transactional
