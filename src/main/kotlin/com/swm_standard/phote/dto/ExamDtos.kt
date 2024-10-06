@@ -1,6 +1,9 @@
 package com.swm_standard.phote.dto
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.swm_standard.phote.entity.Category
+import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.Positive
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -53,4 +56,24 @@ data class AnswerResponse(
     val submittedAnswer: String?,
     val correctAnswer: String,
     val isCorrect: Boolean,
+)
+
+data class CreateSharedExamRequest(
+    @field:NotBlank(message = "시험 이름을 입력해주세요.")
+    @JsonProperty("title")
+    private val _title: String?,
+    val startTime: LocalDateTime,
+    val endTime: LocalDateTime,
+    val workbookId: UUID,
+    @field:Positive(message = "수용인원은 양수이어야 합니다.")
+    @JsonProperty("capacity")
+    private val _capacity: Int,
+) {
+    val title: String get() = _title!!
+
+    val capacity: Int get() = _capacity
+}
+
+data class CreateSharedExamResponse(
+    val sharedExamId: UUID,
 )

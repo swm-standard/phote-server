@@ -12,7 +12,7 @@ import jakarta.persistence.ManyToOne
 data class Answer(
     @ManyToOne
     @JoinColumn(name = "question_id")
-    val question: Question,
+    val question: Question?,
     @ManyToOne
     @JoinColumn(name = "exam_result_id")
     val examResult: ExamResult,
@@ -42,6 +42,6 @@ data class Answer(
     }
 
     fun checkMultipleAnswer() {
-        isCorrect = submittedAnswer == question.answer
+        isCorrect = submittedAnswer == question?.answer
     }
 }
