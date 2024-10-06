@@ -10,6 +10,8 @@ import com.swm_standard.phote.dto.GradeExamResponse
 import com.swm_standard.phote.dto.ReadExamHistoryDetail
 import com.swm_standard.phote.dto.ReadExamHistoryDetailResponse
 import com.swm_standard.phote.dto.ReadExamHistoryListResponse
+import com.swm_standard.phote.dto.ReadExamStudentResult
+import com.swm_standard.phote.dto.ReadExamResultsResponse
 import com.swm_standard.phote.dto.SubmittedAnswerRequest
 import com.swm_standard.phote.entity.Answer
 import com.swm_standard.phote.entity.Category
@@ -54,6 +56,7 @@ class ExamService(
     @Value("\${openai.api.url}")
     lateinit var url: String
 
+    @Transactional(readOnly = true)
     fun readExamHistoryDetail(id: UUID): ReadExamHistoryDetailResponse {
         val examResult = examResultRepository.findByExamId(id) ?: throw NotFoundException(fieldName = "examResult")
         val responses =
@@ -87,6 +90,7 @@ class ExamService(
         )
     }
 
+    @Transactional(readOnly = true)
     fun readExamHistoryList(workbookId: UUID): List<ReadExamHistoryListResponse> {
         val exams = examRepository.findAllByWorkbookId(workbookId)
         return exams.map { exam ->
@@ -102,6 +106,22 @@ class ExamService(
                 sequence = exam.sequence,
             )
         }
+    }
+
+    @Transactional(readOnly = true)
+    fun readExamResults(examId: UUID): ReadExamResultsResponse {
+        val exam = examRepository.findById(examId).orElseThrow { NotFoundException(fieldName = "examId") }
+        val examResults = examResultRepository.findAllByExamId(examId)
+
+        val responses = examResults.map { examResult ->
+            ReadExamStudentResult(
+                examResult.member.id,
+                examResult.member.name,
+                examResult.totalCorrect
+            )
+        }
+
+        return ReadExamResultsResponse(examId, exam.workbook.quantity, responses)
     }
 
     @Transactional

@@ -34,6 +34,18 @@ data class ReadExamHistoryListResponse(
     val sequence: Int,
 )
 
+data class ReadExamStudentResult(
+    val userId: UUID,
+    val name: String,
+    val score: Int,
+)
+
+data class ReadExamResultsResponse(
+    val examId: UUID,
+    val totalQuestionCount: Int,
+    val students: List<ReadExamStudentResult>,
+)
+
 data class GradeExamRequest(
     val time: Int,
     val answers: List<SubmittedAnswerRequest>,
