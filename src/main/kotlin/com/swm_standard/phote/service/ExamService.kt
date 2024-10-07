@@ -7,6 +7,8 @@ import com.swm_standard.phote.dto.ChatGPTResponse
 import com.swm_standard.phote.dto.CreateSharedExamRequest
 import com.swm_standard.phote.dto.GradeExamRequest
 import com.swm_standard.phote.dto.GradeExamResponse
+import com.swm_standard.phote.dto.RegradeExamRequest
+import com.swm_standard.phote.dto.RegradeExamResponse
 import com.swm_standard.phote.dto.ReadExamHistoryDetail
 import com.swm_standard.phote.dto.ReadExamHistoryDetailResponse
 import com.swm_standard.phote.dto.ReadExamHistoryListResponse
@@ -210,6 +212,21 @@ class ExamService(
             questionQuantity = response.size,
             answers = response,
         )
+    }
+
+    @Transactional
+    fun regradeExam(
+        examId: UUID,
+        memberId: UUID,
+        request: RegradeExamRequest,
+    ): RegradeExamResponse {
+        val examResult = examResultRepository.findByExamIdAndMemberId(examId, memberId)
+        val answer = answerRepository.findByExamResultIdAndQuestionId(examResult.id!!, request.questionId)
+
+        examResult.increaseTotalCorrect(if (request.isCorrect) 1 else -1)
+        answer.isCorrect = request.isCorrect == true
+
+        return RegradeExamResponse(request.questionId)
     }
 
     @Transactional
