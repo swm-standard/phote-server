@@ -144,10 +144,16 @@ class ExamService(
                         ),
                 )
             } else {
-                examRepository
-                    .findById(
-                        checkNotNull(request.examId),
-                    ).orElseThrow { NotFoundException(fieldName = "exam") }
+                (
+                    examRepository
+                        .findById(
+                            checkNotNull(request.examId),
+                        ).orElseThrow { NotFoundException(fieldName = "exam") }
+                        as SharedExam
+                    ).apply {
+                    validateSubmissionTime()
+                    increaseExamineeCount()
+                }
             }
 
         val examResult =

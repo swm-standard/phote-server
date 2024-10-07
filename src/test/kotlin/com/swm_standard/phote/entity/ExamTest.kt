@@ -4,6 +4,7 @@ import com.navercorp.fixturemonkey.FixtureMonkey
 import com.navercorp.fixturemonkey.api.introspector.FieldReflectionArbitraryIntrospector
 import com.navercorp.fixturemonkey.kotlin.KotlinPlugin
 import com.navercorp.fixturemonkey.kotlin.giveMeOne
+import com.navercorp.fixturemonkey.kotlin.setExp
 import com.swm_standard.phote.common.exception.BadRequestException
 import net.jqwik.api.Arbitraries
 import org.assertj.core.api.Assertions.assertThat
@@ -94,5 +95,53 @@ class ExamTest {
                 title,
             )
         }
+    }
+
+    @Test
+    fun `공유용 시험 풀이 제출 시간이 시작 시간 전이면 실패한다`() {
+        val sharedExam =
+            fixtureMonkey
+                .giveMeBuilder(SharedExam::class.java)
+                .setExp(SharedExam::startTime, LocalDateTime.now().plusDays(1))
+                .build()
+                .sample()
+
+        assertThrows<BadRequestException> {
+            sharedExam.validateSubmissionTime()
+        }
+    }
+
+    @Test
+    fun `공유용 시험의 시험 제출 인원 수를 증가시킨다`() {
+        val examineeCount = Arbitraries.integers().sample()
+        val sharedExam =
+            fixtureMonkey
+                .giveMeBuilder(SharedExam::class.java)
+                .setExp(SharedExam::startTime, LocalDateTime.now().plusDays(1))
+                .setExp(SharedExam::examineeCount, examineeCount)
+                .build()
+                .sample()
+
+        sharedExam.increaseExamineeCount()
+
+        assertThat(sharedExam.examineeCount).isEqualTo(examineeCount + 1)
+    }
+
+    @Test
+    fun `공유용 시험의 수용 인원을 초과하면 인원 수 증가에 실패한다`() {
+        val examineeCount = Arbitraries.integers().sample()
+        val sharedExam =
+            fixtureMonkey
+                .giveMeBuilder(SharedExam::class.java)
+                .setExp(SharedExam::startTime, LocalDateTime.now().plusDays(1))
+                .setExp(SharedExam::examineeCount, examineeCount)
+                .setExp(SharedExam::capacity, examineeCount)
+                .build()
+                .sample()
+
+        assertThrows<BadRequestException> {
+            sharedExam.increaseExamineeCount()
+        }
+        assertThat(sharedExam.examineeCount).isEqualTo(examineeCount)
     }
 }
