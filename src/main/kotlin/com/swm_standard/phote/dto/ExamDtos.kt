@@ -35,7 +35,7 @@ data class ReadExamHistoryListResponse(
 )
 
 data class ReadExamStudentResult(
-    val userId: UUID,
+    val memberId: UUID,
     val name: String,
     val score: Int,
     val time: Int,
