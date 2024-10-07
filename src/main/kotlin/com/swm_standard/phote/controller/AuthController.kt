@@ -2,11 +2,11 @@ package com.swm_standard.phote.controller
 
 import com.swm_standard.phote.common.responsebody.BaseResponse
 import com.swm_standard.phote.dto.LoginRequest
+import com.swm_standard.phote.dto.MemberInfoResponse
 import com.swm_standard.phote.dto.RenewAccessTokenResponse
-import com.swm_standard.phote.dto.UserInfoResponse
+import com.swm_standard.phote.service.AppleAuthService
 import com.swm_standard.phote.service.GoogleAuthService
 import com.swm_standard.phote.service.KaKaoAuthService
-import com.swm_standard.phote.service.AppleAuthService
 import com.swm_standard.phote.service.TokenService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -30,36 +30,36 @@ class AuthController(
     @PostMapping("/google-login")
     fun googleLogin(
         @RequestBody request: LoginRequest,
-    ): BaseResponse<UserInfoResponse> {
+    ): BaseResponse<MemberInfoResponse> {
         val accessToken = googleAuthService.getTokenFromGoogle(request)
-        val userInfo = googleAuthService.getUserInfoFromGoogle(accessToken)
+        val memberInfo = googleAuthService.getMemberInfoFromGoogle(accessToken)
 
-        val message = if (userInfo.isMember == false) "회원가입 성공" else "로그인 성공"
-        return BaseResponse(msg = message, data = userInfo)
+        val message = if (memberInfo.isMember == false) "회원가입 성공" else "로그인 성공"
+        return BaseResponse(msg = message, data = memberInfo)
     }
 
     @Operation(summary = "kakao-login", description = "카카오 로그인/회원가입")
     @PostMapping("/kakao-login")
     fun kakaoLogin(
         @RequestBody request: LoginRequest,
-    ): BaseResponse<UserInfoResponse> {
+    ): BaseResponse<MemberInfoResponse> {
         val accessToken = kaKaoAuthService.getTokenFromKakao(request)
-        val userInfo = kaKaoAuthService.getUserInfoFromKakao(accessToken)
+        val memberInfo = kaKaoAuthService.getMemberInfoFromKakao(accessToken)
 
-        val message = if (userInfo.isMember == false) "회원가입 성공" else "로그인 성공"
-        return BaseResponse(msg = message, data = userInfo)
+        val message = if (memberInfo.isMember == false) "회원가입 성공" else "로그인 성공"
+        return BaseResponse(msg = message, data = memberInfo)
     }
 
     @Operation(summary = "apple-login", description = "애플 로그인/회원가입")
     @PostMapping("/apple-login")
     fun appleLogin(
         @RequestBody request: LoginRequest,
-    ): BaseResponse<UserInfoResponse> {
+    ): BaseResponse<MemberInfoResponse> {
         val idToken = appleAuthService.getTokenFromApple(request)
-        val userInfo = appleAuthService.getUserInfoFromApple(idToken)
+        val memberInfo = appleAuthService.getMemberInfoFromApple(idToken)
 
-        val message = if (userInfo.isMember == false) "회원가입 성공" else "로그인 성공"
-        return BaseResponse(msg = message, data = userInfo)
+        val message = if (memberInfo.isMember == false) "회원가입 성공" else "로그인 성공"
+        return BaseResponse(msg = message, data = memberInfo)
     }
 
     @Operation(summary = "renewAccessToken", description = "refreshToken으로 accessToken 갱신")

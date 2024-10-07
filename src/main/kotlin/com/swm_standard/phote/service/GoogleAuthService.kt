@@ -5,7 +5,7 @@ import com.swm_standard.phote.common.module.NicknameGenerator
 import com.swm_standard.phote.common.module.ProfileImageGenerator
 import com.swm_standard.phote.dto.GoogleAccessResponse
 import com.swm_standard.phote.dto.LoginRequest
-import com.swm_standard.phote.dto.UserInfoResponse
+import com.swm_standard.phote.dto.MemberInfoResponse
 import com.swm_standard.phote.entity.Member
 import com.swm_standard.phote.entity.Provider
 import com.swm_standard.phote.repository.MemberRepository
@@ -52,7 +52,7 @@ class GoogleAuthService(
         return response.accessToken
     }
 
-    fun getUserInfoFromGoogle(token: String): UserInfoResponse {
+    fun getMemberInfoFromGoogle(token: String): MemberInfoResponse {
         val restTemplate = RestTemplate()
         val headers = HttpHeaders()
         val params: MutableMap<String, Any> = HashMap()
@@ -60,13 +60,13 @@ class GoogleAuthService(
 
         val googleTokenRequest: HttpEntity<MutableMap<String, Any>> = HttpEntity(params, headers)
 
-        val dto: UserInfoResponse =
+        val dto: MemberInfoResponse =
             restTemplate
                 .exchange(
                     "https://www.googleapis.com/userinfo/v2/me",
                     HttpMethod.GET,
                     googleTokenRequest,
-                    UserInfoResponse::class.java,
+                    MemberInfoResponse::class.java,
                 ).body!!
 
         var member = memberRepository.findByEmail(dto.email)
@@ -81,7 +81,7 @@ class GoogleAuthService(
 
         dto.accessToken = jwtTokenProvider.createToken(member.id)
         dto.refreshToken = tokenService.generateRefreshToken(member.id)
-        dto.userId = member.id
+        dto.memberId = member.id
         dto.name = member.name
 
         return dto

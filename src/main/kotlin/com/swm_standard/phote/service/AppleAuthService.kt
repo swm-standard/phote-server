@@ -7,7 +7,7 @@ import com.swm_standard.phote.common.authority.JwtTokenProvider
 import com.swm_standard.phote.common.module.NicknameGenerator
 import com.swm_standard.phote.common.module.ProfileImageGenerator
 import com.swm_standard.phote.dto.LoginRequest
-import com.swm_standard.phote.dto.UserInfoResponse
+import com.swm_standard.phote.dto.MemberInfoResponse
 import com.swm_standard.phote.entity.Member
 import com.swm_standard.phote.entity.Provider
 import com.swm_standard.phote.repository.MemberRepository
@@ -29,8 +29,8 @@ import java.security.PrivateKey
 import java.security.Security
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.util.Date
 import java.util.Base64
+import java.util.Date
 
 @Service
 class AppleAuthService(
@@ -80,8 +80,7 @@ class AppleAuthService(
         return jsonNode["id_token"].asText()
     }
 
-    fun getUserInfoFromApple(token: String): UserInfoResponse {
-
+    fun getMemberInfoFromApple(token: String): MemberInfoResponse {
         val signedJWT: SignedJWT = SignedJWT.parse(token)
         val getPayload: JWTClaimsSet = signedJWT.getJWTClaimsSet()
 
@@ -110,12 +109,12 @@ class AppleAuthService(
         }
 
         val dto =
-            UserInfoResponse(
+            MemberInfoResponse(
                 name = member.name,
                 email = member.email,
                 picture = member.image,
                 isMember = isMember,
-                userId = member.id,
+                memberId = member.id,
                 accessToken = jwtTokenProvider.createToken(member.id),
             )
 
@@ -127,7 +126,8 @@ class AppleAuthService(
     private fun generateClientSecret(): String {
         val expiration: LocalDateTime = LocalDateTime.now().plusMinutes(5)
 
-        return Jwts.builder()
+        return Jwts
+            .builder()
             .setHeaderParam(JwsHeader.KEY_ID, keyId)
             .setIssuer(teamId)
             .setAudience(authUrl)

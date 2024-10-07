@@ -1,5 +1,6 @@
 package com.swm_standard.phote.service
 
+import com.swm_standard.phote.common.exception.BadRequestException
 import com.swm_standard.phote.common.exception.NotFoundException
 import com.swm_standard.phote.dto.AnswerResponse
 import com.swm_standard.phote.dto.ChatGPTRequest
@@ -12,15 +13,14 @@ import com.swm_standard.phote.dto.RegradeExamResponse
 import com.swm_standard.phote.dto.ReadExamHistoryDetail
 import com.swm_standard.phote.dto.ReadExamHistoryDetailResponse
 import com.swm_standard.phote.dto.ReadExamHistoryListResponse
-import com.swm_standard.phote.dto.ReadExamStudentResult
 import com.swm_standard.phote.dto.ReadExamResultsResponse
+import com.swm_standard.phote.dto.ReadExamStudentResult
 import com.swm_standard.phote.dto.SubmittedAnswerRequest
 import com.swm_standard.phote.entity.Answer
 import com.swm_standard.phote.entity.Category
 import com.swm_standard.phote.entity.Exam
 import com.swm_standard.phote.entity.ExamResult
 import com.swm_standard.phote.entity.Member
-import com.swm_standard.phote.entity.Question
 import com.swm_standard.phote.entity.SharedExam
 import com.swm_standard.phote.entity.Workbook
 import com.swm_standard.phote.repository.AnswerRepository
@@ -112,69 +112,76 @@ class ExamService(
         val exam = examRepository.findById(examId).orElseThrow { NotFoundException(fieldName = "examId") }
         val examResults = examResultRepository.findAllByExamId(examId)
 
-        val responses = examResults.map { examResult ->
-            ReadExamStudentResult(
-                examResult.member.id,
-                examResult.member.name,
-                examResult.totalCorrect,
-                examResult.time,
-            )
-        }
+        val responses =
+            examResults.map { examResult ->
+                ReadExamStudentResult(
+                    examResult.member.id,
+                    examResult.member.name,
+                    examResult.totalCorrect,
+                    examResult.time,
+                )
+            }
 
         return ReadExamResultsResponse(examId, exam.workbook.quantity, responses)
     }
 
     @Transactional
     fun gradeExam(
-        workbookId: UUID,
         request: GradeExamRequest,
         memberId: UUID,
     ): GradeExamResponse {
-        val workbook =
-            workbookRepository
-                .findById(
-                    workbookId,
-                ).getOrElse { throw NotFoundException(fieldName = "workbook") }
+        val member = findMember(memberId)
 
         val exam =
-            examRepository.save(
-                Exam
-                    .createExam(
-                        memberRepository
-                            .findById(
-                                memberId,
-                            ).getOrElse { throw NotFoundException(fieldName = "member") },
-                        workbook,
-                        examRepository.findMaxSequenceByWorkbookId(workbook) + 1,
-                    ),
-            )
+            if (request.workbookId != null) {
+                val workbook = findWorkbook(request.workbookId)
+                isWorkbookOwner(workbook, memberId)
+
+                examRepository.save(
+                    Exam
+                        .createExam(
+                            member,
+                            workbook,
+                            examRepository.findMaxSequenceByWorkbookId(workbook) + 1,
+                        ),
+                )
+            } else {
+                (
+                    examRepository
+                        .findById(
+                            checkNotNull(request.examId),
+                        ).orElseThrow { NotFoundException(fieldName = "exam") }
+                        as SharedExam
+                    ).apply {
+                    validateSubmissionTime()
+                    increaseExamineeCount()
+                }
+            }
 
         val examResult =
             examResultRepository.save(
                 ExamResult.createExamResult(
-                    member =
-                    memberRepository
-                        .findById(
-                            memberId,
-                        ).orElseThrow { NotFoundException(fieldName = "member") },
+                    member = member,
                     time = request.time,
-                    exam,
+                    exam = exam,
                 ),
             )
 
         var totalCorrect = 0
 
+        val questions =
+            questionRepository
+                .findAllByIdIn(request.answers.map { answer -> answer.questionId })
+                .associateBy { it.id }
+
         val response =
             request.answers.mapIndexed { index: Int, answer: SubmittedAnswerRequest ->
-                val question: Question =
-                    questionRepository.findById(answer.questionId).getOrElse {
-                        throw NotFoundException(fieldName = "questionId (${answer.questionId})")
-                    }
+                val question = questions.getValue(answer.questionId)
 
                 val savingAnswer: Answer =
                     Answer.createAnswer(
                         question = question,
-                        submittedAnswer = answer.submittedAnswer,
+                        submittedAnswer = request.answers[index].submittedAnswer,
                         examResult = examResult,
                         sequence = index + 1,
                     )
@@ -214,6 +221,15 @@ class ExamService(
         )
     }
 
+    private fun isWorkbookOwner(
+        workbook: Workbook,
+        memberId: UUID,
+    ) {
+        if (workbook.member.id != memberId) {
+            throw BadRequestException(fieldName = "member", "사용자가 소유한 시험이 아닙니다.")
+        }
+    }
+
     @Transactional
     fun regradeExam(
         examId: UUID,
@@ -249,7 +265,10 @@ class ExamService(
     }
 
     private fun findWorkbook(workbookId: UUID): Workbook =
-        workbookRepository.findById(workbookId).orElseThrow { NotFoundException(fieldName = "workbook") }
+        workbookRepository
+            .findById(
+                workbookId,
+            ).getOrElse { throw NotFoundException(fieldName = "workbook") }
 
     private fun findMember(memberId: UUID): Member =
         memberRepository.findById(memberId).orElseThrow {

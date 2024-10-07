@@ -2,6 +2,7 @@ package com.swm_standard.phote.entity
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
@@ -16,7 +17,7 @@ import java.util.UUID
 @Inheritance(strategy = InheritanceType.JOINED)
 @SQLDelete(sql = "UPDATE exam SET deleted_at = NOW() WHERE exam_id = ?")
 data class Exam(
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     val member: Member,
     @ManyToOne

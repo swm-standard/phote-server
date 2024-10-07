@@ -16,13 +16,13 @@ data class GoogleAccessResponse(
     val idToken: String,
 )
 
-data class UserInfoResponse(
+data class MemberInfoResponse(
     var accessToken: String? = null,
     var name: String?,
     val email: String,
     var picture: String,
     var isMember: Boolean? = true,
-    var userId: UUID?,
+    var memberId: UUID?,
 ) {
     var refreshToken: UUID? = null
 }
