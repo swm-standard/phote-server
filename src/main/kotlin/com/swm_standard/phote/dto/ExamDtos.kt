@@ -49,6 +49,8 @@ data class ReadExamResultsResponse(
 
 data class GradeExamRequest(
     val time: Int,
+    val workbookId: UUID?,
+    val examId: UUID?,
     val answers: List<SubmittedAnswerRequest>,
 )
 

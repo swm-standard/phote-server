@@ -61,13 +61,12 @@ class ExamController(
 
     @Operation(summary = "gradeExam", description = "문제풀이 제출 및 채점")
     @SecurityRequirement(name = "bearer Auth")
-    @PostMapping("/exam/{workbookId}")
+    @PostMapping("/exam")
     fun gradeExam(
-        @PathVariable(required = true) workbookId: UUID,
         @Valid @RequestBody request: GradeExamRequest,
         @Parameter(hidden = true) @MemberId memberId: UUID,
     ): BaseResponse<GradeExamResponse> {
-        val response = examService.gradeExam(workbookId, request, memberId)
+        val response = examService.gradeExam(request, memberId)
 
         return BaseResponse(msg = "문제 풀이 채점 성공", data = response)
     }
@@ -76,7 +75,7 @@ class ExamController(
     @SecurityRequirement(name = "bearer Auth")
     @PostMapping("/exam/create")
     fun createSharedExam(
-        @MemberId memberId: UUID,
+        @Parameter(hidden = true) @MemberId memberId: UUID,
         @Valid @RequestBody request: CreateSharedExamRequest,
     ): BaseResponse<CreateSharedExamResponse> {
         val sharedExamId: UUID = examService.createSharedExam(memberId, request)
