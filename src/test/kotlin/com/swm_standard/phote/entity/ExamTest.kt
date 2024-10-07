@@ -117,8 +117,8 @@ class ExamTest {
         val sharedExam =
             fixtureMonkey
                 .giveMeBuilder(SharedExam::class.java)
-                .setExp(SharedExam::startTime, LocalDateTime.now().plusDays(1))
                 .setExp(SharedExam::examineeCount, examineeCount)
+                .setExp(SharedExam::capacity, Arbitraries.integers().greaterOrEqual(examineeCount + 1))
                 .build()
                 .sample()
 
