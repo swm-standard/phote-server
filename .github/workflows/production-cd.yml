@@ -66,6 +66,6 @@ jobs:
                   port: ${{ secrets.DEV_PORT }}
                   envs: COMPOSE
                   script: |
-                      sudo docker-compose -f $COMPOSE down --rmi all
+                      sudo docker compose -f $COMPOSE down --rmi all
                       sudo docker pull ${{ secrets.DOCKER_USERNAME }}/prod-phote:latest
-                      sudo docker-compose -f $COMPOSE up -d
+                      sudo docker compose -f $COMPOSE up -d
