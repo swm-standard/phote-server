@@ -1,0 +1,71 @@
+name: production-cd
+
+on:
+    push:
+        branches: [ 'release' ]
+
+permissions:
+    contents: read
+
+jobs:
+    build:
+
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v3
+            - name: Set up JDK 17
+              uses: actions/setup-java@v3
+              with:
+                  java-version: '17'
+                  distribution: 'temurin'
+
+
+            - name: Set up properties
+              run: |
+                  cd src/main
+                  mkdir resources
+                  cd resources
+                  touch application.properties
+                  echo "${{ secrets.PROD_APPLICATION }}" > application.properties
+                  cat application.properties
+
+              shell: bash
+
+
+            - name: Set up newrelic.yml
+              run: |
+                  cd newrelic
+                  touch newrelic.yml
+                  echo "${{ secrets.PROD_NEW_RELIC_FILE }}" | base64 --decode > newrelic.yml
+
+              shell: bash
+
+
+            - name: Grant execute permission for gradlew
+              run: chmod +x gradlew
+
+            - name: Build with Gradle
+              run: ./gradlew build -x test -x ktlintMainSourceSetCheck
+
+            - name: Docker build
+              run: |
+                  docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+                  docker build --no-cache -t app .
+                  docker tag app ${{ secrets.DOCKER_USERNAME }}/prod-phote:latest
+                  docker push ${{ secrets.DOCKER_USERNAME }}/prod-phote:latest
+
+            - name: Deploy
+              uses: appleboy/ssh-action@v0.1.4
+              env:
+                  COMPOSE: "/home/ubuntu/compose/docker-compose-dev.yml"
+              with:
+                  host: ${{ secrets.PROD_HOST }}
+                  username: ${{ secrets.USERNAME }}
+                  key: ${{ secrets.PROD_PRIVATE_KEY }}
+                  port: ${{ secrets.DEV_PORT }}
+                  envs: COMPOSE
+                  script: |
+                      sudo docker-compose -f $COMPOSE down --rmi all
+                      sudo docker pull ${{ secrets.DOCKER_USERNAME }}/prod-phote:latest
+                      sudo docker-compose -f $COMPOSE up -d
