@@ -35,3 +35,8 @@ data class LoginRequest(
     val code: String,
     val redirectUri: String,
 )
+
+data class NativeLoginRequest(
+    val email: String,
+    val password: String,
+)
