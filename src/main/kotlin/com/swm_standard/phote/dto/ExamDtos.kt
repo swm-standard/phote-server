@@ -60,7 +60,7 @@ data class ReadExamResultDetail(
 
 data class ReadExamResultDetailResponse(
     val examId: UUID,
-    val memberId: UUID,
+    val memberName: String,
     val totalCorrect: Int,
     val time: Int,
     val createdAt: LocalDateTime,

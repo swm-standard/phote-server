@@ -149,9 +149,11 @@ class ExamService(
                 }
             }
 
+        val member = memberRepository.findById(memberId).orElseThrow { NotFoundException(fieldName = "memberId") }
+
         return ReadExamResultDetailResponse(
             examId = examId,
-            memberId = memberId,
+            memberName = member.name,
             totalCorrect = examResult.totalCorrect,
             time = examResult.time,
             questions = responses,
