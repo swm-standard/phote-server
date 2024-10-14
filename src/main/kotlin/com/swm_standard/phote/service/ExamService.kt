@@ -14,6 +14,8 @@ import com.swm_standard.phote.dto.ReadExamHistoryDetail
 import com.swm_standard.phote.dto.ReadExamHistoryDetailResponse
 import com.swm_standard.phote.dto.ReadExamHistoryListResponse
 import com.swm_standard.phote.dto.ReadExamResultsResponse
+import com.swm_standard.phote.dto.ReadExamResultDetail
+import com.swm_standard.phote.dto.ReadExamResultDetailResponse
 import com.swm_standard.phote.dto.ReadExamStudentResult
 import com.swm_standard.phote.dto.SubmittedAnswerRequest
 import com.swm_standard.phote.entity.Answer
@@ -81,7 +83,6 @@ class ExamService(
                 }
             }
 
-        // FIXME: 원래 createdAt 은 시험 생성일시임
         return ReadExamHistoryDetailResponse(
             examId = id,
             totalCorrect = examResult.totalCorrect,
@@ -123,6 +124,41 @@ class ExamService(
             }
 
         return ReadExamResultsResponse(examId, exam.workbook.quantity, responses)
+    }
+
+    fun readExamResultDetail(examId: UUID, memberId: UUID): ReadExamResultDetailResponse {
+        val examResult = examResultRepository.findByExamIdAndMemberId(examId, memberId)
+        val responses =
+            buildList {
+                examResult.answers.forEach { answer ->
+                    val question = answer.question
+                    if (question != null) {
+                        add(
+                            ReadExamResultDetail(
+                                statement = question.statement,
+                                options = question.options?.let { question.deserializeOptions() },
+                                image = question.image,
+                                category = question.category,
+                                answer = question.answer,
+                                submittedAnswer = answer.submittedAnswer,
+                                isCorrect = answer.isCorrect,
+                                sequence = answer.sequence,
+                            ),
+                        )
+                    }
+                }
+            }
+
+        val member = memberRepository.findById(memberId).orElseThrow { NotFoundException(fieldName = "memberId") }
+
+        return ReadExamResultDetailResponse(
+            examId = examId,
+            memberName = member.name,
+            totalCorrect = examResult.totalCorrect,
+            time = examResult.time,
+            questions = responses,
+            createdAt = examResult.createdAt,
+        )
     }
 
     @Transactional

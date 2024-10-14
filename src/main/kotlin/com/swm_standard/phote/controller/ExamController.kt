@@ -11,6 +11,7 @@ import com.swm_standard.phote.dto.RegradeExamResponse
 import com.swm_standard.phote.dto.ReadExamHistoryDetailResponse
 import com.swm_standard.phote.dto.ReadExamHistoryListResponse
 import com.swm_standard.phote.dto.ReadExamResultsResponse
+import com.swm_standard.phote.dto.ReadExamResultDetailResponse
 import com.swm_standard.phote.service.ExamService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -61,6 +62,19 @@ class ExamController(
         ) examId: UUID,
     ): BaseResponse<ReadExamResultsResponse> =
         BaseResponse(msg = "학생 시험 결과 조회 성공", data = examService.readExamResults(examId))
+
+    @Operation(summary = "readExamResultDetail", description = "(강사가) 학생의 시험 결과 상세조회")
+    @SecurityRequirement(name = "bearer Auth")
+    @GetMapping("/exam/result/{examId}/{memberId}")
+    fun readExamResultDetail(
+        @PathVariable(
+            required = true,
+        ) examId: UUID,
+        @PathVariable(
+            required = true,
+        ) memberId: UUID,
+    ): BaseResponse<ReadExamResultDetailResponse> =
+        BaseResponse(msg = "학생 시험 결과 상세조회 성공", data = examService.readExamResultDetail(examId, memberId))
 
     @Operation(summary = "gradeExam", description = "문제풀이 제출 및 채점")
     @SecurityRequirement(name = "bearer Auth")
