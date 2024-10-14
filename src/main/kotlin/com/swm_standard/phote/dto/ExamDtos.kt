@@ -47,6 +47,26 @@ data class ReadExamResultsResponse(
     val students: List<ReadExamStudentResult>,
 )
 
+data class ReadExamResultDetail(
+    val statement: String,
+    val options: List<String>?,
+    val image: String?,
+    val category: Category,
+    val answer: String,
+    val submittedAnswer: String?,
+    val isCorrect: Boolean,
+    val sequence: Int,
+)
+
+data class ReadExamResultDetailResponse(
+    val examId: UUID,
+    val memberId: UUID,
+    val totalCorrect: Int,
+    val time: Int,
+    val createdAt: LocalDateTime,
+    val questions: List<ReadExamResultDetail>,
+)
+
 data class GradeExamRequest(
     val time: Int,
     val workbookId: UUID?,
