@@ -8,27 +8,31 @@ import com.swm_standard.phote.dto.ChatGPTResponse
 import com.swm_standard.phote.dto.CreateSharedExamRequest
 import com.swm_standard.phote.dto.GradeExamRequest
 import com.swm_standard.phote.dto.GradeExamResponse
-import com.swm_standard.phote.dto.RegradeExamRequest
-import com.swm_standard.phote.dto.RegradeExamResponse
+import com.swm_standard.phote.dto.ReadAllSharedExamsResponse
 import com.swm_standard.phote.dto.ReadExamHistoryDetail
 import com.swm_standard.phote.dto.ReadExamHistoryDetailResponse
 import com.swm_standard.phote.dto.ReadExamHistoryListResponse
-import com.swm_standard.phote.dto.ReadExamResultsResponse
 import com.swm_standard.phote.dto.ReadExamResultDetail
 import com.swm_standard.phote.dto.ReadExamResultDetailResponse
+import com.swm_standard.phote.dto.ReadExamResultsResponse
 import com.swm_standard.phote.dto.ReadExamStudentResult
+import com.swm_standard.phote.dto.RegradeExamRequest
+import com.swm_standard.phote.dto.RegradeExamResponse
 import com.swm_standard.phote.dto.SubmittedAnswerRequest
 import com.swm_standard.phote.entity.Answer
 import com.swm_standard.phote.entity.Category
 import com.swm_standard.phote.entity.Exam
 import com.swm_standard.phote.entity.ExamResult
+import com.swm_standard.phote.entity.ExamStatus
 import com.swm_standard.phote.entity.Member
+import com.swm_standard.phote.entity.ParticipationType
 import com.swm_standard.phote.entity.SharedExam
 import com.swm_standard.phote.entity.Workbook
 import com.swm_standard.phote.repository.AnswerRepository
-import com.swm_standard.phote.repository.ExamResultRepository
 import com.swm_standard.phote.repository.MemberRepository
+import com.swm_standard.phote.repository.SharedExamRepository
 import com.swm_standard.phote.repository.examrepository.ExamRepository
+import com.swm_standard.phote.repository.examresultrepository.ExamResultRepository
 import com.swm_standard.phote.repository.questionrepository.QuestionRepository
 import com.swm_standard.phote.repository.workbookrepository.WorkbookRepository
 import kotlinx.coroutines.CoroutineScope
@@ -40,8 +44,18 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.client.RestTemplate
+import java.time.LocalDateTime
 import java.util.UUID
 import kotlin.jvm.optionals.getOrElse
+
+private fun SharedExam.checkStatus(): ExamStatus =
+    if (this.startTime.isAfter(LocalDateTime.now())) {
+        ExamStatus.NOT_STARTED
+    } else if (this.endTime.isBefore(LocalDateTime.now())) {
+        ExamStatus.COMPLETED
+    } else {
+        ExamStatus.IN_PROGRESS
+    }
 
 @Service
 @Transactional(readOnly = true)
@@ -53,6 +67,7 @@ class ExamService(
     private val answerRepository: AnswerRepository,
     private val template: RestTemplate,
     private val examResultRepository: ExamResultRepository,
+    private val sharedExamRepository: SharedExamRepository,
 ) {
     @Value("\${openai.model.grading}")
     lateinit var model: String
@@ -126,7 +141,10 @@ class ExamService(
         return ReadExamResultsResponse(examId, exam.workbook.quantity, responses)
     }
 
-    fun readExamResultDetail(examId: UUID, memberId: UUID): ReadExamResultDetailResponse {
+    fun readExamResultDetail(
+        examId: UUID,
+        memberId: UUID,
+    ): ReadExamResultDetailResponse {
         val examResult = examResultRepository.findByExamIdAndMemberId(examId, memberId)
         val responses =
             buildList {
@@ -298,6 +316,43 @@ class ExamService(
                 val sharedExam = examRepository.save(this)
                 return sharedExam.id!!
             }
+    }
+
+    fun readAllSharedExams(memberId: UUID): List<ReadAllSharedExamsResponse> {
+        val examsAsCreator =
+            (
+                sharedExamRepository
+                    .findAllByMemberId(memberId)
+                ).map { exam ->
+                ReadAllSharedExamsResponse(
+                    examId = exam.id!!,
+                    memberId = memberId,
+                    title = exam.title,
+                    startTime = exam.startTime,
+                    endTime = exam.endTime,
+                    capacity = exam.capacity,
+                    status = exam.checkStatus(),
+                    role = ParticipationType.CREATOR,
+                )
+            }
+
+        // FIXME: examResult 중에서 SharedExam에 대한 examResult만 가져와야 함
+        val examsAsExaminee =
+            examResultRepository
+                .findAllByMemberId(memberId)
+                .map { examResult ->
+                    ReadAllSharedExamsResponse(
+                        examId = examResult.exam.id!!,
+                        memberId = memberId,
+                        title = (examResult.exam as SharedExam).title,
+                        startTime = (examResult.exam as SharedExam).startTime,
+                        endTime = (examResult.exam as SharedExam).endTime,
+                        status = (examResult.exam as SharedExam).checkStatus(),
+                        role = ParticipationType.EXAMINEE,
+                    )
+                }
+
+        return examsAsCreator + examsAsExaminee
     }
 
     private fun findWorkbook(workbookId: UUID): Workbook =

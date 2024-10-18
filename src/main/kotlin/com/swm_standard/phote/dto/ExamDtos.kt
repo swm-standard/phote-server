@@ -2,6 +2,8 @@ package com.swm_standard.phote.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.swm_standard.phote.entity.Category
+import com.swm_standard.phote.entity.ExamStatus
+import com.swm_standard.phote.entity.ParticipationType
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Positive
 import java.time.LocalDateTime
@@ -120,4 +122,19 @@ data class CreateSharedExamRequest(
 
 data class CreateSharedExamResponse(
     val sharedExamId: UUID,
+)
+
+// FIXME: 생성한 시험이냐, 응시한 시험이냐에 따라 필요한 필드가 달라지는데 dto를 두개로 만들고 List<T> 로 반환해야 하는지.. 이렇게 null로 두면 되는지...
+data class ReadAllSharedExamsResponse(
+    val examId: UUID,
+    val memberId: UUID,
+    val title: String,
+    val startTime: LocalDateTime,
+    val endTime: LocalDateTime,
+    val status: ExamStatus,
+    val role: ParticipationType,
+    val capacity: Int? = null,
+    val examineeCount: Int? = null,
+    val totalCorrect: Int? = null,
+    val questionQuantity: Int? = null,
 )
