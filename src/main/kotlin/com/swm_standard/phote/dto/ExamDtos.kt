@@ -137,3 +137,13 @@ data class ReadAllSharedExamsResponse(
     val totalCorrect: Int? = null,
     val questionQuantity: Int? = null,
 )
+
+data class ReadSharedExamInfoResponse(
+    val examId: UUID,
+    val title: String,
+    val startTime: LocalDateTime,
+    val endTime: LocalDateTime,
+    val capacity: Int,
+    val workbookId: UUID,
+    val isWriter: Boolean,
+)

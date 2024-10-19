@@ -7,6 +7,7 @@ import com.swm_standard.phote.dto.CreateSharedExamResponse
 import com.swm_standard.phote.dto.GradeExamRequest
 import com.swm_standard.phote.dto.GradeExamResponse
 import com.swm_standard.phote.dto.ReadAllSharedExamsResponse
+import com.swm_standard.phote.dto.ReadSharedExamInfoResponse
 import com.swm_standard.phote.dto.ReadExamHistoryDetailResponse
 import com.swm_standard.phote.dto.ReadExamHistoryListResponse
 import com.swm_standard.phote.dto.ReadExamResultDetailResponse
@@ -121,4 +122,13 @@ class ExamController(
         @Parameter(hidden = true) @MemberId memberId: UUID,
     ): BaseResponse<List<ReadAllSharedExamsResponse>> =
         BaseResponse(data = examService.readAllSharedExams(memberId), msg = "공유용 시험 목록 조회 성공")
+
+    @Operation(summary = "readSharedExamInfo", description = "공유된/공유받은 시험 정보 조회")
+    @SecurityRequirement(name = "bearer Auth")
+    @GetMapping("/shared-exam/{examId}")
+    fun readSharedExamInfo(
+        @PathVariable(required = true) examId: UUID,
+        @Parameter(hidden = true) @MemberId memberId: UUID,
+    ): BaseResponse<ReadSharedExamInfoResponse> =
+        BaseResponse(data = examService.readSharedExamInfo(examId, memberId), msg = "공유용 시험 정보 조회 성공")
 }
