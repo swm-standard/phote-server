@@ -362,15 +362,14 @@ class ExamService(
 
     fun readSharedExamInfo(examId: UUID, memberId: UUID): ReadSharedExamInfoResponse {
         val sharedExam = sharedExamRepository.findById(examId).orElseThrow { NotFoundException(fieldName = "examId") }
-        val exam = examRepository.findById(examId).orElseThrow { NotFoundException(fieldName = "examId") }
         return ReadSharedExamInfoResponse(
             examId = examId,
             title = sharedExam.title,
             startTime = sharedExam.startTime,
             endTime = sharedExam.endTime,
             capacity = sharedExam.capacity,
-            workbookId = exam.workbook.id,
-            isWriter = exam.member.id == memberId,
+            workbookId = sharedExam.workbook.id,
+            isWriter = sharedExam.member.id == memberId,
         )
     }
 
