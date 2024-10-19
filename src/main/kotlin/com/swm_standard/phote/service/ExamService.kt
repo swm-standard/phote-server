@@ -369,7 +369,7 @@ class ExamService(
             endTime = sharedExam.endTime,
             capacity = sharedExam.capacity,
             workbookId = sharedExam.workbook.id,
-            isWriter = sharedExam.member.id == memberId,
+            role = if (sharedExam.member.id == memberId) ParticipationType.CREATOR else ParticipationType.EXAMINEE,
         )
     }
 

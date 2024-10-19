@@ -145,5 +145,5 @@ data class ReadSharedExamInfoResponse(
     val endTime: LocalDateTime,
     val capacity: Int,
     val workbookId: UUID,
-    val isWriter: Boolean,
+    val role: ParticipationType,
 )
