@@ -20,7 +20,7 @@ data class Exam(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     val member: Member,
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "workbook_id")
     val workbook: Workbook,
     val sequence: Int,
