@@ -9,6 +9,7 @@ import com.swm_standard.phote.dto.CreateSharedExamRequest
 import com.swm_standard.phote.dto.GradeExamRequest
 import com.swm_standard.phote.dto.GradeExamResponse
 import com.swm_standard.phote.dto.ReadAllSharedExamsResponse
+import com.swm_standard.phote.dto.ReadSharedExamInfoResponse
 import com.swm_standard.phote.dto.ReadExamHistoryDetail
 import com.swm_standard.phote.dto.ReadExamHistoryDetailResponse
 import com.swm_standard.phote.dto.ReadExamHistoryListResponse
@@ -357,6 +358,19 @@ class ExamService(
                 }
 
         return examsAsCreator + examsAsExaminee
+    }
+
+    fun readSharedExamInfo(examId: UUID, memberId: UUID): ReadSharedExamInfoResponse {
+        val sharedExam = sharedExamRepository.findById(examId).orElseThrow { NotFoundException(fieldName = "examId") }
+        return ReadSharedExamInfoResponse(
+            examId = examId,
+            title = sharedExam.title,
+            startTime = sharedExam.startTime,
+            endTime = sharedExam.endTime,
+            capacity = sharedExam.capacity,
+            workbookId = sharedExam.workbook.id,
+            role = if (sharedExam.member.id == memberId) ParticipationType.CREATOR else ParticipationType.EXAMINEE,
+        )
     }
 
     private fun findWorkbook(workbookId: UUID): Workbook =
