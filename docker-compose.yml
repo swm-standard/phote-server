@@ -1,28 +1,23 @@
 services:
-    redis:
-        image: redis:latest
-        container_name: myredis
+    blue:
+        image: rinpark/phote:latest
         restart: unless-stopped
-        volumes:
-            - /var/lib/docker/volumes/redis-volume/_data:/data
-        ports:
-            - "6379:6379"
+        container_name: blue
         environment:
             - TZ=Asia/Seoul
-        hostname: redis
+        ports:
+            - "8082:8080"
         networks:
             - phote-network
 
-    jarimage:
-        depends_on:
-            -   redis
+    green:
         image: rinpark/phote:latest
         restart: unless-stopped
-        container_name: myphote
+        container_name: green
         environment:
             - TZ=Asia/Seoul
         ports:
-            - "8080:8080"
+            - "8081:8080"
         networks:
             - phote-network
 

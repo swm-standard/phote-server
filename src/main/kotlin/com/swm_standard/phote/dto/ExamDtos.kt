@@ -2,6 +2,8 @@ package com.swm_standard.phote.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.swm_standard.phote.entity.Category
+import com.swm_standard.phote.entity.ExamStatus
+import com.swm_standard.phote.entity.ParticipationType
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Positive
 import java.time.LocalDateTime
@@ -45,6 +47,26 @@ data class ReadExamResultsResponse(
     val examId: UUID,
     val totalQuestionCount: Int,
     val students: List<ReadExamStudentResult>,
+)
+
+data class ReadExamResultDetail(
+    val statement: String,
+    val options: List<String>?,
+    val image: String?,
+    val category: Category,
+    val answer: String,
+    val submittedAnswer: String?,
+    val isCorrect: Boolean,
+    val sequence: Int,
+)
+
+data class ReadExamResultDetailResponse(
+    val examId: UUID,
+    val memberName: String,
+    val totalCorrect: Int,
+    val time: Int,
+    val createdAt: LocalDateTime,
+    val questions: List<ReadExamResultDetail>,
 )
 
 data class GradeExamRequest(
@@ -100,4 +122,28 @@ data class CreateSharedExamRequest(
 
 data class CreateSharedExamResponse(
     val sharedExamId: UUID,
+)
+
+data class ReadAllSharedExamsResponse(
+    val examId: UUID,
+    val creator: String,
+    val title: String,
+    val startTime: LocalDateTime,
+    val endTime: LocalDateTime,
+    val status: ExamStatus,
+    val role: ParticipationType,
+    val capacity: Int? = null,
+    val examineeCount: Int? = null,
+    val totalCorrect: Int? = null,
+    val questionQuantity: Int? = null,
+)
+
+data class ReadSharedExamInfoResponse(
+    val examId: UUID,
+    val title: String,
+    val startTime: LocalDateTime,
+    val endTime: LocalDateTime,
+    val capacity: Int,
+    val workbookId: UUID,
+    val role: ParticipationType,
 )

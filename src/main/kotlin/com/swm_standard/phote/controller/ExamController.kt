@@ -6,11 +6,14 @@ import com.swm_standard.phote.dto.CreateSharedExamRequest
 import com.swm_standard.phote.dto.CreateSharedExamResponse
 import com.swm_standard.phote.dto.GradeExamRequest
 import com.swm_standard.phote.dto.GradeExamResponse
-import com.swm_standard.phote.dto.RegradeExamRequest
-import com.swm_standard.phote.dto.RegradeExamResponse
+import com.swm_standard.phote.dto.ReadAllSharedExamsResponse
+import com.swm_standard.phote.dto.ReadSharedExamInfoResponse
 import com.swm_standard.phote.dto.ReadExamHistoryDetailResponse
 import com.swm_standard.phote.dto.ReadExamHistoryListResponse
+import com.swm_standard.phote.dto.ReadExamResultDetailResponse
 import com.swm_standard.phote.dto.ReadExamResultsResponse
+import com.swm_standard.phote.dto.RegradeExamRequest
+import com.swm_standard.phote.dto.RegradeExamResponse
 import com.swm_standard.phote.service.ExamService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -18,9 +21,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -62,6 +65,19 @@ class ExamController(
     ): BaseResponse<ReadExamResultsResponse> =
         BaseResponse(msg = "학생 시험 결과 조회 성공", data = examService.readExamResults(examId))
 
+    @Operation(summary = "readExamResultDetail", description = "(강사가) 학생의 시험 결과 상세조회")
+    @SecurityRequirement(name = "bearer Auth")
+    @GetMapping("/exam/result/{examId}/{memberId}")
+    fun readExamResultDetail(
+        @PathVariable(
+            required = true,
+        ) examId: UUID,
+        @PathVariable(
+            required = true,
+        ) memberId: UUID,
+    ): BaseResponse<ReadExamResultDetailResponse> =
+        BaseResponse(msg = "학생 시험 결과 상세조회 성공", data = examService.readExamResultDetail(examId, memberId))
+
     @Operation(summary = "gradeExam", description = "문제풀이 제출 및 채점")
     @SecurityRequirement(name = "bearer Auth")
     @PostMapping("/exam")
@@ -98,4 +114,21 @@ class ExamController(
 
         return BaseResponse(data = CreateSharedExamResponse(sharedExamId), msg = "공유용 시험 생성 성공")
     }
+
+    @Operation(summary = "readAllSharedExams", description = "공유용 시험 목록 조회")
+    @SecurityRequirement(name = "bearer Auth")
+    @GetMapping("/exams")
+    fun readAllSharedExams(
+        @Parameter(hidden = true) @MemberId memberId: UUID,
+    ): BaseResponse<List<ReadAllSharedExamsResponse>> =
+        BaseResponse(data = examService.readAllSharedExams(memberId), msg = "공유용 시험 목록 조회 성공")
+
+    @Operation(summary = "readSharedExamInfo", description = "공유된/공유받은 시험 정보 조회")
+    @SecurityRequirement(name = "bearer Auth")
+    @GetMapping("/shared-exam/{examId}")
+    fun readSharedExamInfo(
+        @PathVariable(required = true) examId: UUID,
+        @Parameter(hidden = true) @MemberId memberId: UUID,
+    ): BaseResponse<ReadSharedExamInfoResponse> =
+        BaseResponse(data = examService.readSharedExamInfo(examId, memberId), msg = "공유용 시험 정보 조회 성공")
 }
