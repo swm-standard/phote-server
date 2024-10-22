@@ -2,7 +2,7 @@ services:
     blue:
         image: rinpark/phote:latest
         restart: unless-stopped
-        container_name: myphote
+        container_name: blue
         environment:
             - TZ=Asia/Seoul
         ports:
@@ -13,7 +13,7 @@ services:
     green:
         image: rinpark/phote:latest
         restart: unless-stopped
-        container_name: myphote
+        container_name: green
         environment:
             - TZ=Asia/Seoul
         ports:
