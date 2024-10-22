@@ -6,7 +6,7 @@ services:
         environment:
             - TZ=Asia/Seoul
         ports:
-            - "8080:8080"
+            - "8082:8080"
         networks:
             - phote-network
 
