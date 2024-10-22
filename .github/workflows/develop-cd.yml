@@ -75,4 +75,5 @@ jobs:
                   script: |
                       sudo docker pull ${{ secrets.DOCKER_USERNAME }}/phote:latest
                       sudo chmod 777 ./deploy.sh
+                      ./deploy.sh
                       sudo docker image prune -f
