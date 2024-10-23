@@ -115,6 +115,7 @@ class ExamService(
             !sharedExamRepository.findById(exam.id!!).isPresent
         }.map { exam ->
             val examResult = examResultRepository.findByExamIdAndMemberId(exam.id!!, memberId)
+                ?: throw NotFoundException(fieldName = "examResult")
 
             ReadExamHistoryListResponse(
                 examId = exam.id!!,
