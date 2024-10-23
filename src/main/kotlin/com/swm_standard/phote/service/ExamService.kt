@@ -110,9 +110,11 @@ class ExamService(
 
     fun readExamHistoryList(workbookId: UUID, memberId: UUID): List<ReadExamHistoryListResponse> {
         val exams = examRepository.findAllByWorkbookId(workbookId)
-        return exams.map { exam ->
-            val examResult =
-                examResultRepository.findByExamIdAndMemberId(exam.id!!, memberId)
+
+        return exams.filter { exam ->
+            !sharedExamRepository.findById(exam.id!!).isPresent
+        }.map { exam ->
+            val examResult = examResultRepository.findByExamIdAndMemberId(exam.id!!, memberId)
 
             ReadExamHistoryListResponse(
                 examId = exam.id!!,
