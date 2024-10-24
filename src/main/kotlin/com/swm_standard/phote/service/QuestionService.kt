@@ -17,9 +17,7 @@ import com.swm_standard.phote.entity.Tag
 import com.swm_standard.phote.repository.MemberRepository
 import com.swm_standard.phote.repository.TagRepository
 import com.swm_standard.phote.repository.questionrepository.QuestionRepository
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
+import kotlinx.coroutines.*
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
@@ -127,26 +125,30 @@ class QuestionService(
         imageUrl: String,
         imageCoordinates: List<List<Int>>?,
     ): TransformQuestionResponse {
-        val transformedImageUrl =
-            CoroutineScope(Dispatchers.IO)
-                .async {
-                    // 문제 그림 추출
-                    imageCoordinates?.let { transformImage(imageUrl, it) }
-                }.await()
+        lateinit var transformedImageUrlDeferred: Deferred<String?>
+        lateinit var chatGPTResponseSplitDeferred: Deferred<List<String>>
 
-        val chatGPTResponseSplit =
-            CoroutineScope(Dispatchers.IO)
-                .async {
-                    // openAI로 메시지 전송
-                    val request = ChatGPTRequest(model, imageUrl)
-                    val chatGPTResponse = template.postForObject(url, request, ChatGPTResponse::class.java)
+        withContext(Dispatchers.IO) {
+            transformedImageUrlDeferred = async {
+                // 문제 그림 추출
+                imageCoordinates?.let { transformImage(imageUrl, it) }
+            }
 
-                    // openAI로부터 메시지 수신
-                    splitChatGPTResponse(chatGPTResponse)
-                }.await()
+            chatGPTResponseSplitDeferred = async {
+                // openAI로 메시지 전송
+                val request = ChatGPTRequest(model, imageUrl)
+                val chatGPTResponse = template.postForObject(url, request, ChatGPTResponse::class.java)
 
+                // openAI로부터 메시지 수신
+                splitChatGPTResponse(chatGPTResponse)
+            }
+        }
         // 문제 문항과 객관식을 분리해서 dto에 저장
-        return TransformQuestionResponse(chatGPTResponseSplit[0], chatGPTResponseSplit.drop(1), transformedImageUrl)
+        return TransformQuestionResponse(
+            chatGPTResponseSplitDeferred.await()[0],
+            chatGPTResponseSplitDeferred.await().drop(1),
+            transformedImageUrlDeferred.await()
+        )
     }
 
     suspend fun transformImage(
