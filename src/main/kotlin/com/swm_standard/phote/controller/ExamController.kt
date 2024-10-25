@@ -52,8 +52,9 @@ class ExamController(
         @PathVariable(
             required = true,
         ) workbookId: UUID,
+        @MemberId memberId: UUID,
     ): BaseResponse<List<ReadExamHistoryListResponse>> =
-        BaseResponse(msg = "문제풀이 기록 리스트 조회 성공", data = examService.readExamHistoryList(workbookId))
+        BaseResponse(msg = "문제풀이 기록 리스트 조회 성공", data = examService.readExamHistoryList(workbookId, memberId))
 
     @Operation(summary = "readExamResults", description = "(강사가) 학생들의 시험 결과 목록을 조회")
     @SecurityRequirement(name = "bearer Auth")

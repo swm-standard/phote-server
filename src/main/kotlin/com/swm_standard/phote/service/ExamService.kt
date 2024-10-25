@@ -108,12 +108,14 @@ class ExamService(
         )
     }
 
-    fun readExamHistoryList(workbookId: UUID): List<ReadExamHistoryListResponse> {
+    fun readExamHistoryList(workbookId: UUID, memberId: UUID): List<ReadExamHistoryListResponse> {
         val exams = examRepository.findAllByWorkbookId(workbookId)
-        return exams.map { exam ->
-            // FIXME: exam 마다 examResult 를 또 조회해야함 쿼리 개선 필요
-            val examResult =
-                examResultRepository.findByExamId(exam.id!!) ?: throw NotFoundException(fieldName = "examResult")
+
+        return exams.filter { exam ->
+            !sharedExamRepository.findById(exam.id!!).isPresent
+        }.map { exam ->
+            val examResult = examResultRepository.findByExamIdAndMemberId(exam.id!!, memberId)
+                ?: throw NotFoundException(fieldName = "examResult")
 
             ReadExamHistoryListResponse(
                 examId = exam.id!!,
