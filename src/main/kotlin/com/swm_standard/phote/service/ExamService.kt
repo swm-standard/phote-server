@@ -9,7 +9,6 @@ import com.swm_standard.phote.dto.CreateSharedExamRequest
 import com.swm_standard.phote.dto.GradeExamRequest
 import com.swm_standard.phote.dto.GradeExamResponse
 import com.swm_standard.phote.dto.ReadAllSharedExamsResponse
-import com.swm_standard.phote.dto.ReadSharedExamInfoResponse
 import com.swm_standard.phote.dto.ReadExamHistoryDetail
 import com.swm_standard.phote.dto.ReadExamHistoryDetailResponse
 import com.swm_standard.phote.dto.ReadExamHistoryListResponse
@@ -17,6 +16,7 @@ import com.swm_standard.phote.dto.ReadExamResultDetail
 import com.swm_standard.phote.dto.ReadExamResultDetailResponse
 import com.swm_standard.phote.dto.ReadExamResultsResponse
 import com.swm_standard.phote.dto.ReadExamStudentResult
+import com.swm_standard.phote.dto.ReadSharedExamInfoResponse
 import com.swm_standard.phote.dto.RegradeExamRequest
 import com.swm_standard.phote.dto.RegradeExamResponse
 import com.swm_standard.phote.dto.SubmittedAnswerRequest
@@ -30,10 +30,10 @@ import com.swm_standard.phote.entity.ParticipationType
 import com.swm_standard.phote.entity.SharedExam
 import com.swm_standard.phote.entity.Workbook
 import com.swm_standard.phote.repository.AnswerRepository
-import com.swm_standard.phote.repository.ExamResultRepository
 import com.swm_standard.phote.repository.MemberRepository
 import com.swm_standard.phote.repository.SharedExamRepository
 import com.swm_standard.phote.repository.examrepository.ExamRepository
+import com.swm_standard.phote.repository.examresultrepository.ExamResultRepository
 import com.swm_standard.phote.repository.questionrepository.QuestionRepository
 import com.swm_standard.phote.repository.workbookrepository.WorkbookRepository
 import kotlinx.coroutines.CoroutineScope
@@ -108,21 +108,29 @@ class ExamService(
         )
     }
 
-    fun readExamHistoryList(workbookId: UUID, memberId: UUID): List<ReadExamHistoryListResponse> {
-        val exams = examRepository.findAllByWorkbookId(workbookId)
+    fun readExamHistoryList(
+        workbookId: UUID,
+        memberId: UUID,
+    ): List<ReadExamHistoryListResponse> {
+        val exams =
+            examRepository
+                .findAllByWorkbookId(workbookId)
+                .filter { exam -> !sharedExamRepository.findById(exam.id!!).isPresent }
 
-        return exams.filter { exam ->
-            !sharedExamRepository.findById(exam.id!!).isPresent
-        }.map { exam ->
-            val examResult = examResultRepository.findByExamIdAndMemberId(exam.id!!, memberId)
-                ?: throw NotFoundException(fieldName = "examResult")
+        val examResults =
+            examResultRepository
+                .findAllByExamIdListAndMemberId(exams.map { it.id!! }, memberId)
+                .also {
+                    if (it.size != exams.size) throw NotFoundException(fieldName = "examResult")
+                }
 
+        return examResults.map {
             ReadExamHistoryListResponse(
-                examId = exam.id!!,
-                totalQuantity = examResult.calculateTotalQuantity(),
-                totalCorrect = examResult.totalCorrect,
-                time = examResult.time,
-                sequence = exam.sequence,
+                examId = it.exam.id!!,
+                totalCorrect = it.totalCorrect,
+                totalQuantity = it.totalQuantity,
+                time = it.time,
+                sequence = it.exam.sequence,
             )
         }
     }
@@ -148,7 +156,9 @@ class ExamService(
         examId: UUID,
         memberId: UUID,
     ): ReadExamResultDetailResponse {
-        val examResult = examResultRepository.findByExamIdAndMemberId(examId, memberId)
+        val examResult =
+            examResultRepository.findByExamIdAndMemberId(examId, memberId)
+                ?: throw NotFoundException(fieldName = "examResult")
         val responses =
             buildList {
                 examResult.answers.forEach { answer ->
@@ -221,6 +231,7 @@ class ExamService(
                     member = member,
                     time = request.time,
                     exam = exam,
+                    totalQuantity = request.answers.size,
                 ),
             )
 
@@ -293,7 +304,9 @@ class ExamService(
         memberId: UUID,
         request: RegradeExamRequest,
     ): RegradeExamResponse {
-        val examResult = examResultRepository.findByExamIdAndMemberId(examId, memberId)
+        val examResult =
+            examResultRepository.findByExamIdAndMemberId(examId, memberId)
+                ?: throw NotFoundException(fieldName = "examResult")
         val answer = answerRepository.findByExamResultIdAndQuestionId(examResult.id!!, request.questionId)
 
         examResult.increaseTotalCorrect(if (request.isCorrect) 1 else -1)
@@ -355,14 +368,17 @@ class ExamService(
                         status = sharedExam.checkStatus(),
                         role = ParticipationType.EXAMINEE,
                         totalCorrect = examResult.totalCorrect,
-                        questionQuantity = examResult.calculateTotalQuantity(),
+                        questionQuantity = examResult.totalQuantity,
                     )
                 }
 
         return examsAsCreator + examsAsExaminee
     }
 
-    fun readSharedExamInfo(examId: UUID, memberId: UUID): ReadSharedExamInfoResponse {
+    fun readSharedExamInfo(
+        examId: UUID,
+        memberId: UUID,
+    ): ReadSharedExamInfoResponse {
         val sharedExam = sharedExamRepository.findById(examId).orElseThrow { NotFoundException(fieldName = "examId") }
         return ReadSharedExamInfoResponse(
             examId = examId,

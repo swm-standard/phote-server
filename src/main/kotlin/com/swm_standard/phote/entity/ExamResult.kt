@@ -3,6 +3,7 @@ package com.swm_standard.phote.entity
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
@@ -16,12 +17,13 @@ import java.util.UUID
 @SQLDelete(sql = "UPDATE exam_result SET deleted_at = NOW() WHERE exam_result_id = ?")
 data class ExamResult(
     @JoinColumn(name = "member_id")
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     val member: Member,
     val time: Int,
     @JoinColumn(name = "exam_id")
     @ManyToOne
     val exam: Exam,
+    val totalQuantity: Int,
 ) : BaseTimeEntity() {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -33,8 +35,6 @@ data class ExamResult(
     @OneToMany(mappedBy = "examResult", cascade = [(CascadeType.REMOVE)])
     val answers: MutableList<Answer> = mutableListOf()
 
-    fun calculateTotalQuantity(): Int = answers.size
-
     fun increaseTotalCorrect(count: Int) {
         totalCorrect += count
     }
@@ -44,6 +44,7 @@ data class ExamResult(
             member: Member,
             time: Int,
             exam: Exam,
-        ) = ExamResult(member, time, exam)
+            totalQuantity: Int,
+        ) = ExamResult(member, time, exam, totalQuantity)
     }
 }
