@@ -27,7 +27,6 @@ class QuestionCustomRepositoryImpl(
                 .where(question.member.id.eq(memberId))
                 .leftJoin(question.tags, tag)
                 .fetchJoin()
-                .distinct()
 
         // 태그 조건: tags로 들어온 태그들을 모두 포함하는 문제 검색
         if (!tags.isNullOrEmpty()) {

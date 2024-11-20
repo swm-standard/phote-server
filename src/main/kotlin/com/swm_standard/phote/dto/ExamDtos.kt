@@ -126,6 +126,7 @@ data class CreateSharedExamResponse(
 
 data class ReadAllSharedExamsResponse(
     val examId: UUID,
+    val workbookId: UUID,
     val creator: String,
     val title: String,
     val startTime: LocalDateTime,

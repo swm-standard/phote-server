@@ -342,6 +342,7 @@ class ExamService(
                 ).map { exam ->
                 ReadAllSharedExamsResponse(
                     examId = exam.id!!,
+                    workbookId = exam.workbook.id,
                     creator = exam.member.name,
                     title = exam.title,
                     startTime = exam.startTime,
@@ -361,6 +362,7 @@ class ExamService(
                     val sharedExam = examResult.exam as SharedExam
                     ReadAllSharedExamsResponse(
                         examId = examResult.exam.id!!,
+                        workbookId = sharedExam.workbook.id,
                         creator = sharedExam.member.name,
                         title = sharedExam.title,
                         startTime = sharedExam.startTime,
