@@ -6,7 +6,7 @@ import com.swm_standard.phote.common.exception.BadRequestException
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 import org.springframework.web.multipart.MultipartFile
-import java.util.*
+import java.util.UUID
 
 @Component
 class S3Service(
