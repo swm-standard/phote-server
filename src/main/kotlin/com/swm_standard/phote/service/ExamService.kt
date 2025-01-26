@@ -42,12 +42,12 @@ import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.client.RestTemplate
+import java.lang.System.currentTimeMillis
 import java.time.LocalDateTime
 import java.util.UUID
 import kotlin.jvm.optionals.getOrElse
@@ -201,8 +201,9 @@ class ExamService(
     suspend fun gradeExam(
         request: GradeExamRequest,
         memberId: UUID,
-    ): GradeExamResponse = withContext(Dispatchers.IO + CoroutineName("gradeExam")) {
-        logger.info { "[${coroutineContext[CoroutineName.Key]}] : gradeExam 시작" }
+    ): GradeExamResponse = withContext(Dispatchers.IO + CoroutineName("gradeExamV1")) {
+        val startTime = currentTimeMillis()
+        logger.info { "[${coroutineContext[CoroutineName]}] : gradeExam 시작" }
         val member = findMember(memberId)
         val exam = getOrCreateExam(request, memberId, member)
         val examResult = createExamResult(member, request, exam)
@@ -216,14 +217,13 @@ class ExamService(
                 gradeAnswer(questions.getValue(answer.questionId), answer, examResult, index)
             }
         }.awaitAll()
-            .let {
-                answerRepository.saveAll(it)
-            }
 
-        examResult.increaseTotalCorrect(answerResults.count { it.isCorrect })
+        val totalCorrect = answerResults.count { it.isCorrect }
+        examResult.increaseTotalCorrect(totalCorrect)
         examResultRepository.save(examResult)
 
         logger.info { "[${coroutineContext[CoroutineName]}] : gradeExam 종료" }
+        logger.info { "gradeExam 실행 시간: ${currentTimeMillis() - startTime}ms" }
         GradeExamResponse(
             examId = exam.id!!,
             totalCorrect = examResult.totalCorrect,
@@ -350,29 +350,30 @@ class ExamService(
         answer: SubmittedAnswerRequest,
         examResult: ExamResult,
         index: Int
-    ): Answer {
+    ): Answer = withContext(Dispatchers.IO) {
         val savingAnswer = Answer.createAnswer(
             question = question,
             submittedAnswer = answer.submittedAnswer,
             examResult = examResult,
             sequence = index + 1
         )
+
         savingAnswer.isCorrect = when {
             savingAnswer.submittedAnswer == null -> false
             question.category == Category.MULTIPLE -> savingAnswer.checkMultipleAnswer()
             question.category == Category.ESSAY -> gradeByChatGpt(savingAnswer)
             else -> throw BadRequestException(message = "ChatGPT 채점 오류")
         }
-        logger.info { "[CoroutineName(########)][answer: ${index + 1}] : gradeAnswer 종료" }
 
-        return savingAnswer
+        logger.info { "[${coroutineContext[CoroutineName.Key]}][answer: ${index + 1}] : gradeAnswer 종료" }
+        answerRepository.save(savingAnswer)
     }
 
     private suspend fun gradeByChatGpt(savingAnswer: Answer): Boolean {
         val chatGptRequest =
             ChatGPTRequest(model, savingAnswer.submittedAnswer!!, savingAnswer.question!!.answer)
 
-        val chatGPTResponse = coroutineScope {
+        val chatGPTResponse = withContext(Dispatchers.IO) {
             logger.info { "[${coroutineContext[CoroutineName.Key]}][answer: ${savingAnswer.sequence}] : chatgpt 시작" }
             template.postForObject(url, chatGptRequest, ChatGPTResponse::class.java)
         }
