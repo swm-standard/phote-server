@@ -7,6 +7,7 @@ plugins {
     kotlin("jvm") version "1.9.24"
     kotlin("plugin.spring") version "1.9.24"
     id("jacoco")
+    id("org.jetbrains.dokka") version "1.9.20"
 
     // for querydsl
     kotlin("kapt") version "1.9.24"
@@ -67,6 +68,7 @@ dependencies {
     testImplementation("com.navercorp.fixturemonkey:fixture-monkey-kotlin:1.0.25")
     implementation("org.bouncycastle:bcpkix-jdk18on:1.75")
     implementation("com.nimbusds:nimbus-jose-jwt:9.12")
+    implementation("io.github.oshai:kotlin-logging-jvm:5.1.4")
 
     // querydsl
     implementation("com.querydsl:querydsl-jpa:5.0.0:jakarta")

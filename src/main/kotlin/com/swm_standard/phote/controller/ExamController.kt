@@ -7,11 +7,11 @@ import com.swm_standard.phote.dto.CreateSharedExamResponse
 import com.swm_standard.phote.dto.GradeExamRequest
 import com.swm_standard.phote.dto.GradeExamResponse
 import com.swm_standard.phote.dto.ReadAllSharedExamsResponse
-import com.swm_standard.phote.dto.ReadSharedExamInfoResponse
 import com.swm_standard.phote.dto.ReadExamHistoryDetailResponse
 import com.swm_standard.phote.dto.ReadExamHistoryListResponse
 import com.swm_standard.phote.dto.ReadExamResultDetailResponse
 import com.swm_standard.phote.dto.ReadExamResultsResponse
+import com.swm_standard.phote.dto.ReadSharedExamInfoResponse
 import com.swm_standard.phote.dto.RegradeExamRequest
 import com.swm_standard.phote.dto.RegradeExamResponse
 import com.swm_standard.phote.service.ExamService
@@ -29,12 +29,20 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 
+/**
+ * Exam 관련 컨트롤러 클래스
+ */
 @RestController
 @RequestMapping("/api")
 @Tag(name = "Exam", description = "Exam API Document")
 class ExamController(
     private val examService: ExamService,
 ) {
+    /**
+     * 시험 기록 상세 조회 기능
+     * @param id 시험 id
+     * @return 시험 기록 상세 정보
+     */
     @Operation(summary = "readExamHistoryDetail", description = "문제풀이 기록 상세조회")
     @SecurityRequirement(name = "bearer Auth")
     @GetMapping("/exam/{id}")
@@ -82,7 +90,7 @@ class ExamController(
     @Operation(summary = "gradeExam", description = "문제풀이 제출 및 채점")
     @SecurityRequirement(name = "bearer Auth")
     @PostMapping("/exam")
-    fun gradeExam(
+    suspend fun gradeExam(
         @Valid @RequestBody request: GradeExamRequest,
         @Parameter(hidden = true) @MemberId memberId: UUID,
     ): BaseResponse<GradeExamResponse> {

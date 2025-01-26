@@ -41,7 +41,8 @@ data class Answer(
         )
     }
 
-    fun checkMultipleAnswer() {
+    fun checkMultipleAnswer(): Boolean {
         isCorrect = submittedAnswer == question?.answer
+        return isCorrect
     }
 }
