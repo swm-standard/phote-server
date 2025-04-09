@@ -27,6 +27,7 @@ import com.swm_standard.phote.entity.ExamResult
 import com.swm_standard.phote.entity.ExamStatus
 import com.swm_standard.phote.entity.Member
 import com.swm_standard.phote.entity.ParticipationType
+import com.swm_standard.phote.entity.Question
 import com.swm_standard.phote.entity.SharedExam
 import com.swm_standard.phote.entity.Workbook
 import com.swm_standard.phote.repository.AnswerRepository
@@ -36,15 +37,17 @@ import com.swm_standard.phote.repository.examrepository.ExamRepository
 import com.swm_standard.phote.repository.examresultrepository.ExamResultRepository
 import com.swm_standard.phote.repository.questionrepository.QuestionRepository
 import com.swm_standard.phote.repository.workbookrepository.WorkbookRepository
-import kotlinx.coroutines.CoroutineScope
+import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.client.RestTemplate
+import java.lang.System.currentTimeMillis
 import java.time.LocalDateTime
 import java.util.UUID
 import kotlin.jvm.optionals.getOrElse
@@ -57,6 +60,8 @@ private fun SharedExam.checkStatus(): ExamStatus =
     } else {
         ExamStatus.IN_PROGRESS
     }
+
+private val logger = KotlinLogging.logger {}
 
 @Service
 @Transactional(readOnly = true)
@@ -193,84 +198,40 @@ class ExamService(
     }
 
     @Transactional
-    fun gradeExam(
+    suspend fun gradeExam(
         request: GradeExamRequest,
         memberId: UUID,
-    ): GradeExamResponse {
+    ): GradeExamResponse = withContext(Dispatchers.IO + CoroutineName("gradeExamV2")) {
+        val startTime = currentTimeMillis()
+        logger.info { "[${coroutineContext[CoroutineName.Key]}] : gradeExam 시작" }
+
         val member = findMember(memberId)
+        val exam = getOrCreateExam(request, memberId, member)
+        val examResult = createExamResult(member, request, exam)
 
-        val exam =
-            if (request.workbookId != null) {
-                val workbook = findWorkbook(request.workbookId)
-                isWorkbookOwner(workbook, memberId)
+        val questions = questionRepository.findAllByIdIn(request.answers.map { it.questionId })
+            .associateBy { it.id }
 
-                examRepository.save(
-                    Exam
-                        .createExam(
-                            member,
-                            workbook,
-                            examRepository.findMaxSequenceByWorkbookId(workbook) + 1,
-                        ),
-                )
-            } else {
-                (
-                    examRepository
-                        .findById(
-                            checkNotNull(request.examId),
-                        ).orElseThrow { NotFoundException(fieldName = "exam") }
-                        as SharedExam
-                    ).apply {
-                    validateSubmissionTime()
-                    increaseExamineeCount()
-                }
+        val answerResults = request.answers.mapIndexed { index, answer ->
+            async {
+                logger.info { "[${coroutineContext[CoroutineName.Key]}][answer: ${index + 1}] : gradeAnswer 시작" }
+                gradeAnswer(questions.getValue(answer.questionId), answer, examResult, index)
+            }
+        }.awaitAll()
+            .let {
+                answerRepository.saveAll(it)
             }
 
-        val examResult =
-            examResultRepository.save(
-                ExamResult.createExamResult(
-                    member = member,
-                    time = request.time,
-                    exam = exam,
-                    totalQuantity = request.answers.size,
-                ),
-            )
+        examResult.increaseTotalCorrect(answerResults.count { it.isCorrect })
+        examResultRepository.save(examResult)
 
-        var totalCorrect = 0
-
-        val questions =
-            questionRepository
-                .findAllByIdIn(request.answers.map { answer -> answer.questionId })
-                .associateBy { it.id }
-
-        val response =
-            request.answers.mapIndexed { index: Int, answer: SubmittedAnswerRequest ->
-                val question = questions.getValue(answer.questionId)
-
-                val savingAnswer: Answer =
-                    Answer.createAnswer(
-                        question = question,
-                        submittedAnswer = request.answers[index].submittedAnswer,
-                        examResult = examResult,
-                        sequence = index + 1,
-                    )
-
-                CoroutineScope(Dispatchers.IO).launch {
-                    if (savingAnswer.submittedAnswer == null) {
-                        savingAnswer.isCorrect = false
-                    } else {
-                        when (question.category) {
-                            Category.MULTIPLE -> savingAnswer.checkMultipleAnswer()
-                            Category.ESSAY ->
-                                savingAnswer.isCorrect =
-                                    async { gradeByChatGpt(savingAnswer) }.await()
-                        }
-                    }
-                    if (savingAnswer.isCorrect) {
-                        totalCorrect += 1
-                    }
-                }
-                val savedAnswer = answerRepository.save(savingAnswer)
-
+        logger.info { "[${coroutineContext[CoroutineName]}] : gradeExam 종료" }
+        logger.info { "gradeExam 실행 시간: ${currentTimeMillis() - startTime}ms" }
+        GradeExamResponse(
+            examId = exam.id!!,
+            totalCorrect = examResult.totalCorrect,
+            questionQuantity = answerResults.size,
+            answers = answerResults.map { savedAnswer ->
                 AnswerResponse(
                     questionId = savedAnswer.question!!.id,
                     submittedAnswer = savedAnswer.submittedAnswer,
@@ -278,24 +239,7 @@ class ExamService(
                     isCorrect = savedAnswer.isCorrect,
                 )
             }
-
-        examResult.increaseTotalCorrect(totalCorrect)
-
-        return GradeExamResponse(
-            examId = exam.id!!,
-            totalCorrect = examResult.totalCorrect,
-            questionQuantity = response.size,
-            answers = response,
         )
-    }
-
-    private fun isWorkbookOwner(
-        workbook: Workbook,
-        memberId: UUID,
-    ) {
-        if (workbook.member.id != memberId) {
-            throw BadRequestException(fieldName = "member", "사용자가 소유한 시험이 아닙니다.")
-        }
     }
 
     @Transactional
@@ -404,18 +348,92 @@ class ExamService(
             NotFoundException(fieldName = "member")
         }
 
+    private suspend fun gradeAnswer(
+        question: Question,
+        answer: SubmittedAnswerRequest,
+        examResult: ExamResult,
+        index: Int
+    ): Answer = withContext(Dispatchers.IO) {
+        val savingAnswer = Answer.createAnswer(
+            question = question,
+            submittedAnswer = answer.submittedAnswer,
+            examResult = examResult,
+            sequence = index + 1
+        )
+        savingAnswer.isCorrect = when {
+            savingAnswer.submittedAnswer == null -> false
+            question.category == Category.MULTIPLE -> savingAnswer.checkMultipleAnswer()
+            question.category == Category.ESSAY -> gradeByChatGpt(savingAnswer)
+            else -> throw BadRequestException(message = "ChatGPT 채점 오류")
+        }
+        logger.info { "[CoroutineName(###########)][answer: ${index + 1}] : gradeAnswer 종료" }
+
+        savingAnswer
+    }
+
     private suspend fun gradeByChatGpt(savingAnswer: Answer): Boolean {
         val chatGptRequest =
             ChatGPTRequest(model, savingAnswer.submittedAnswer!!, savingAnswer.question!!.answer)
 
-        val chatGPTResponse =
-            withContext(Dispatchers.IO) {
-                template.postForObject(url, chatGptRequest, ChatGPTResponse::class.java)
-            }
+        val chatGPTResponse = withContext(Dispatchers.IO) {
+            logger.info { "[${coroutineContext[CoroutineName.Key]}][answer: ${savingAnswer.sequence}] : chatgpt 시작" }
+            template.postForObject(url, chatGptRequest, ChatGPTResponse::class.java)
+        }
 
         return when (chatGPTResponse!!.choices[0].message.content) {
             "true" -> true
             else -> false
+        }
+    }
+
+    private fun createExamResult(
+        member: Member,
+        request: GradeExamRequest,
+        exam: Exam
+    ) = examResultRepository.save(
+        ExamResult.createExamResult(
+            member = member,
+            time = request.time,
+            exam = exam,
+            totalQuantity = request.answers.size,
+        ),
+    )
+
+    private fun getOrCreateExam(
+        request: GradeExamRequest,
+        memberId: UUID,
+        member: Member
+    ) = if (request.workbookId != null) {
+        val workbook = findWorkbook(request.workbookId)
+        isWorkbookOwner(workbook, memberId)
+
+        examRepository.save(
+            Exam
+                .createExam(
+                    member,
+                    workbook,
+                    examRepository.findMaxSequenceByWorkbookId(workbook) + 1,
+                ),
+        )
+    } else {
+        (
+            examRepository
+                .findById(
+                    checkNotNull(request.examId),
+                ).orElseThrow { NotFoundException(fieldName = "exam") }
+                as SharedExam
+            ).apply {
+            validateSubmissionTime()
+            increaseExamineeCount()
+        }
+    }
+
+    private fun isWorkbookOwner(
+        workbook: Workbook,
+        memberId: UUID,
+    ) {
+        if (workbook.member.id != memberId) {
+            throw BadRequestException(fieldName = "member", "사용자가 소유한 시험이 아닙니다.")
         }
     }
 }
