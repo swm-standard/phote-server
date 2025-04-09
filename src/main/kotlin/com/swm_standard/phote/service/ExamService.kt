@@ -201,9 +201,10 @@ class ExamService(
     suspend fun gradeExam(
         request: GradeExamRequest,
         memberId: UUID,
-    ): GradeExamResponse = withContext(Dispatchers.IO + CoroutineName("gradeExamV1")) {
+    ): GradeExamResponse = withContext(Dispatchers.IO + CoroutineName("gradeExamV2")) {
         val startTime = currentTimeMillis()
-        logger.info { "[${coroutineContext[CoroutineName]}] : gradeExam 시작" }
+        logger.info { "[${coroutineContext[CoroutineName.Key]}] : gradeExam 시작" }
+
         val member = findMember(memberId)
         val exam = getOrCreateExam(request, memberId, member)
         val examResult = createExamResult(member, request, exam)
@@ -217,9 +218,11 @@ class ExamService(
                 gradeAnswer(questions.getValue(answer.questionId), answer, examResult, index)
             }
         }.awaitAll()
+            .let {
+                answerRepository.saveAll(it)
+            }
 
-        val totalCorrect = answerResults.count { it.isCorrect }
-        examResult.increaseTotalCorrect(totalCorrect)
+        examResult.increaseTotalCorrect(answerResults.count { it.isCorrect })
         examResultRepository.save(examResult)
 
         logger.info { "[${coroutineContext[CoroutineName]}] : gradeExam 종료" }
@@ -357,16 +360,15 @@ class ExamService(
             examResult = examResult,
             sequence = index + 1
         )
-
         savingAnswer.isCorrect = when {
             savingAnswer.submittedAnswer == null -> false
             question.category == Category.MULTIPLE -> savingAnswer.checkMultipleAnswer()
             question.category == Category.ESSAY -> gradeByChatGpt(savingAnswer)
             else -> throw BadRequestException(message = "ChatGPT 채점 오류")
         }
+        logger.info { "[CoroutineName(###########)][answer: ${index + 1}] : gradeAnswer 종료" }
 
-        logger.info { "[${coroutineContext[CoroutineName.Key]}][answer: ${index + 1}] : gradeAnswer 종료" }
-        answerRepository.save(savingAnswer)
+        savingAnswer
     }
 
     private suspend fun gradeByChatGpt(savingAnswer: Answer): Boolean {

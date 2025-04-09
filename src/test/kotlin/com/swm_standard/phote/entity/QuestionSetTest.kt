@@ -20,7 +20,6 @@ class QuestionSetTest {
     fun `questionSet의 순서를 변경하는데 성공한다`() {
         val questionSet: QuestionSet = fixtureMonkey.giveMeOne()
         val newSequence = Arbitraries.integers().sample()
-
         questionSet.updateSequence(newSequence)
 
         assertEquals(newSequence, questionSet.sequence)
